@@ -67,6 +67,7 @@ all_tbls <- l2t_backup(l2t, backup_dir)
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 all_tbls$Study
+all_tbls$ChildStudy
 ```
 
 ## Writing

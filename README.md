@@ -52,10 +52,10 @@ src_tbls(l2t)
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
 head(studies)
-#>   StudyID      Study     Study_TimeStamp
-#> 1       1 TimePoint1 2015-04-22 19:04:22
-#> 2       2 TimePoint2 2015-04-22 19:04:44
-#> 3       3 TimePoint3 2015-04-22 19:05:47
+#>   StudyID      Study Code     Study_TimeStamp
+#> 1       1 TimePoint1    L 2015-06-26 14:44:06
+#> 2       2 TimePoint2    L 2015-06-26 14:44:06
+#> 3       3 TimePoint3    L 2015-06-26 14:44:06
 ```
 
 We can download and backup each table in the database with `l2t_backup`.
@@ -76,12 +76,28 @@ all_tbls <- l2t_backup(l2t, backup_dir)
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 all_tbls$Study
-#> Source: local data frame [3 x 3]
+#> Source: local data frame [3 x 4]
 #> 
-#>   StudyID      Study     Study_TimeStamp
-#> 1       1 TimePoint1 2015-04-22 19:04:22
-#> 2       2 TimePoint2 2015-04-22 19:04:44
-#> 3       3 TimePoint3 2015-04-22 19:05:47
+#>   StudyID      Study Code     Study_TimeStamp
+#> 1       1 TimePoint1    L 2015-06-26 14:44:06
+#> 2       2 TimePoint2    L 2015-06-26 14:44:06
+#> 3       3 TimePoint3    L 2015-06-26 14:44:06
+all_tbls$ChildStudy
+#> Source: local data frame [90 x 6]
+#> 
+#>    ChildStudyID ChildID StudyID ShortResearchID FullResearchID
+#> 1             1      23       1            600L      600L37MS2
+#> 2             2      24       1            601L      601L28MS1
+#> 3             3      25       1            602L      602L34MS2
+#> 4             4      26       1            603L      603L35FS2
+#> 5             5      27       1            604L      604L30FS1
+#> 6             6      28       1            605L      605L31MS1
+#> 7             7      29       1            606L      606L28MS1
+#> 8             8      30       1            607L      607L36MS2
+#> 9             9      31       1            608L      608L39FS2
+#> 10           10      32       1            609L      609L28MS1
+#> ..          ...     ...     ...             ...            ...
+#> Variables not shown: ChildStudy_TimeStamp (chr)
 ```
 
 Writing
@@ -100,8 +116,8 @@ dbListTables(l2t_write)
 
 # Before writing
 dbReadTable(l2t_write, "TestWrites")
-#>   TestWrite_TimeStamp TestWritesID Message
-#> 1 2015-06-26 12:32:03            4  Hello!
+#> [1] TestWritesID         Message              TestWrites_TimeStamp
+#> <0 rows> (or 0-length row.names)
 
 # Add rows to table
 append_rows_to_table(
@@ -112,7 +128,6 @@ append_rows_to_table(
 
 # After writing
 dbReadTable(l2t_write, "TestWrites")
-#>   TestWrite_TimeStamp TestWritesID Message
-#> 1 2015-06-26 12:32:03            4  Hello!
-#> 2 2015-06-26 13:05:17            5  Hello!
+#>   TestWritesID Message TestWrites_TimeStamp
+#> 1            8  Hello!  2015-06-26 14:48:22
 ```
