@@ -4,13 +4,13 @@
 #' @details
 #' http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html
 #' @export
-l2t_connect <- function(cnf_file) {
+l2t_connect <- function(cnf_file, db_name = "l2t") {
   assert_that(file.exists(cnf_file))
 
   src_mysql(
     user = NULL,
     password = NULL,
-    dbname = "l2t",
+    dbname = db_name,
     default.file = cnf_file)
 }
 

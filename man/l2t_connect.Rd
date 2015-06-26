@@ -4,7 +4,7 @@
 \alias{l2t_connect}
 \title{Connect to the L2T database using a MySQL config file}
 \usage{
-l2t_connect(cnf_file)
+l2t_connect(cnf_file, db_name = "l2t")
 }
 \arguments{
 \item{cnf_file}{a MySQL config file}
