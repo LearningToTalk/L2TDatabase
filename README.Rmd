@@ -16,8 +16,8 @@ knitr::opts_chunk$set(
 
 # L2TDatabase
 
-This R package contains helper functions for working with MySQL database for the
-[Learning To Talk](http://learningtotalk.org) project. 
+This R package contains helper functions for working with the MySQL database for
+the [Learning To Talk](http://learningtotalk.org) project.
 
 Connections to the database are managed by [.cnf files][cnf-ref]. This
 package provides `make_cnf_file` which creates a cnf file from login and
@@ -40,9 +40,9 @@ file.remove("my_connection.cnf")
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 ```
 
-Once we've create a .cnf file, we can now connect to the database using 
+Once we've create a .cnf file, we can connect to the database using 
 `l2t_connect`. We can view the names of all the tables in the database with 
-`dplyr::src_tbls`. See the dplyr [vignette on databases][dplyr-db] for how to
+`dplyr::src_tbls`. See the dplyr [vignette on databases][dplyr-db] for how to 
 work with remotely stored data using dplyr; it's really great stuff.
 
 ```{r}
