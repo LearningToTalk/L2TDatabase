@@ -27,8 +27,8 @@ l2t_connect <- function(cnf_file) {
 #'   console.
 #' @export
 #' @importFrom stringr str_replace_all
-make_cnf_template <- function(dest = "db.cnf", user = "", password = "",
-                              host = "", port = 3306, db = "") {
+make_cnf_file <- function(dest = "db.cnf", user = "", password = "",
+                          host = "", port = 3306, db = "") {
   # Template for a cnf file
   lines <- "[client]
   user=%s
