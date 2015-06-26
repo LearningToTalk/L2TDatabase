@@ -14,6 +14,11 @@ knitr::opts_chunk$set(
 )
 ```
 
+```{r, echo = FALSE, results = 'hide'}
+cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
+```
+
+
 # L2TDatabase
 
 This R package contains helper functions for working with the MySQL database for
@@ -32,12 +37,6 @@ make_cnf_file()
 # all values filled
 make_cnf_file(dest = "my_connection.cnf", user = "tj", password = "", 
               db = "my_db", host = "localhost", port = 3306)
-```
-
-```{r, echo = FALSE, results = 'hide'}
-file.remove("db.cnf")
-file.remove("my_connection.cnf")
-cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 ```
 
 Once we've create a .cnf file, we can connect to the database using 
@@ -69,6 +68,41 @@ all_tbls <- l2t_backup(l2t, backup_dir)
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 all_tbls$Study
 ```
+
+## Writing
+
+dplyr provides read-only access to a database, so we can't accidentally do 
+stupid things to our data. In order to write to the database in R, we have use
+the interface provided by the package RMySQL. We connect to the database using 
+`l2t_connect_writer`. For the purposes of this demo, we will work on the 
+separate `l2t_test` database.
+
+```{r}
+library("RMySQL")
+l2t_write <- l2t_writer_connect(cnf_file, db_name = "l2t_test")
+
+# Table listing
+dbListTables(l2t_write)
+
+# Before writing
+dbReadTable(l2t_write, "TestWrites")
+
+# Add rows to table
+append_rows_to_table(
+  db_con = l2t_write, 
+  tbl_name = "TestWrites", 
+  rows = data_frame(Message = "Hello!"))
+
+# After writing
+dbReadTable(l2t_write, "TestWrites")
+```
+
+```{r clean up, echo = FALSE, results = 'hide'}
+dbSendQuery(l2t_write, "DELETE FROM `l2t_test`.`TestWrites`")
+file.remove("db.cnf")
+file.remove("my_connection.cnf")
+```
+
 
 
 [cnf-ref]: http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html
