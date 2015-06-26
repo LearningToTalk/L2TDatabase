@@ -8,6 +8,8 @@ l2t_connect(cnf_file, db_name = "l2t")
 }
 \arguments{
 \item{cnf_file}{a MySQL config file}
+
+\item{db_name}{the name of the database to connect to. Defaults to "l2t".}
 }
 \value{
 a dplyr database connection
