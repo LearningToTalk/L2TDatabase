@@ -5,6 +5,9 @@
 append_rows_to_table <- function(db_con, tbl_name, rows) {
   assert_that(inherits(db_con, "MySQLConnection"), !inherits(db_con, "src"))
 
+  # Make sure data exists.
+  assert_that(not_empty(rows))
+
   # Make sure table exists. Otherwise the dbWriteTable will create a new table.
   assert_that(has_table(db_con, tbl_name))
 
