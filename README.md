@@ -45,10 +45,9 @@ l2t <- l2t_connect(cnf_file)
 
 # list all the tbls in the database
 src_tbls(l2t)
-#>  [1] "Child"             "ChildStudy"        "LENA_Admin"       
-#>  [4] "MinPair_Admin"     "MinPair_Mean"      "MinPair_Responses"
-#>  [7] "Notes"             "Scores_TimePoint1" "Study"            
-#> [10] "StudyTask"
+#> [1] "Child"             "ChildStudy"        "LENA_Admin"       
+#> [4] "MinPair_Admin"     "MinPair_Responses" "Notes"            
+#> [7] "Scores_TimePoint1" "Study"             "StudyTask"
 
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
@@ -69,7 +68,6 @@ all_tbls <- l2t_backup(l2t, backup_dir)
 #> Writing inst/backup/2015_06_29/ChildStudy.csv
 #> Writing inst/backup/2015_06_29/LENA_Admin.csv
 #> Writing inst/backup/2015_06_29/MinPair_Admin.csv
-#> Writing inst/backup/2015_06_29/MinPair_Mean.csv
 #> Writing inst/backup/2015_06_29/MinPair_Responses.csv
 #> Writing inst/backup/2015_06_29/Notes.csv
 #> Writing inst/backup/2015_06_29/Scores_TimePoint1.csv
@@ -77,13 +75,21 @@ all_tbls <- l2t_backup(l2t, backup_dir)
 #> Writing inst/backup/2015_06_29/StudyTask.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
-all_tbls$Study
-#> Source: local data frame [3 x 4]
+rows <- lapply(all_tbls, nrow)
+data_frame(tbl = names(rows), rows = unlist(rows))
+#> Source: local data frame [9 x 2]
 #> 
-#>   StudyID      Study Code     Study_TimeStamp
-#> 1       1 TimePoint1    L 2015-06-26 14:44:06
-#> 2       2 TimePoint2    L 2015-06-26 14:44:06
-#> 3       3 TimePoint3    L 2015-06-26 14:44:06
+#>                 tbl rows
+#> 1             Child  224
+#> 2        ChildStudy  224
+#> 3        LENA_Admin    0
+#> 4     MinPair_Admin  190
+#> 5 MinPair_Responses 7508
+#> 6             Notes    6
+#> 7 Scores_TimePoint1    0
+#> 8             Study    3
+#> 9         StudyTask   12
+
 all_tbls$ChildStudy
 #> Source: local data frame [224 x 6]
 #> 
@@ -131,5 +137,5 @@ append_rows_to_table(
 # After writing
 dbReadTable(l2t_write, "TestWrites")
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1            2  Hello!  2015-06-29 08:23:03
+#> 1            4  Hello!  2015-06-29 14:25:52
 ```
