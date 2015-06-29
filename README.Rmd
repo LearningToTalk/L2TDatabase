@@ -80,7 +80,7 @@ separate `l2t_test` database.
 
 ```{r}
 library("RMySQL")
-l2t_write <- l2t_writer_connect(cnf_file, db_name = "l2t_test")
+l2t_write <- l2t_writer_connect(cnf_file, db_name = "l2ttest")
 
 # Table listing
 dbListTables(l2t_write)
@@ -99,7 +99,7 @@ dbReadTable(l2t_write, "TestWrites")
 ```
 
 ```{r clean up, echo = FALSE, results = 'hide'}
-dbSendQuery(l2t_write, "DELETE FROM `l2t_test`.`TestWrites`")
+dbSendQuery(l2t_write, "DELETE FROM `l2ttest`.`TestWrites`")
 file.remove("db.cnf")
 file.remove("my_connection.cnf")
 ```
