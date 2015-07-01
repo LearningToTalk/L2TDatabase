@@ -56,6 +56,10 @@ src_tbls(l2t)
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
 head(studies)
+
+# or use %from% as an infix form of the above
+studies <- "Study" %from% l2t
+head(studies)
 ```
 
 We can download and backup each table in the database with `l2t_backup`.
