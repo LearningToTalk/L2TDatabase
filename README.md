@@ -45,10 +45,11 @@ l2t <- l2t_connect(cnf_file)
 
 # list all the tbls in the database
 src_tbls(l2t)
-#>  [1] "Child"             "ChildStudy"        "LENA_Admin"       
-#>  [4] "LENA_Hours"        "MinPair_Admin"     "MinPair_Responses"
-#>  [7] "Notes"             "Scores_TimePoint1" "Study"            
-#> [10] "StudyTask"
+#>  [1] "Child"             "ChildStudy"        "EVT"              
+#>  [4] "LENA_Admin"        "LENA_Hours"        "Literacy"         
+#>  [7] "MinPair_Admin"     "MinPair_Responses" "Notes"            
+#> [10] "SES"               "Scores_TimePoint1" "Study"            
+#> [13] "StudyTask"
 
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
@@ -73,36 +74,42 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(l2t, backup_dir)
-#> Writing inst/backup/2015_07_01/Child.csv
-#> Writing inst/backup/2015_07_01/ChildStudy.csv
-#> Writing inst/backup/2015_07_01/LENA_Admin.csv
-#> Writing inst/backup/2015_07_01/LENA_Hours.csv
-#> Writing inst/backup/2015_07_01/MinPair_Admin.csv
-#> Writing inst/backup/2015_07_01/MinPair_Responses.csv
-#> Writing inst/backup/2015_07_01/Notes.csv
-#> Writing inst/backup/2015_07_01/Scores_TimePoint1.csv
-#> Writing inst/backup/2015_07_01/Study.csv
-#> Writing inst/backup/2015_07_01/StudyTask.csv
+#> Writing inst/backup/2015_07_07/Child.csv
+#> Writing inst/backup/2015_07_07/ChildStudy.csv
+#> Writing inst/backup/2015_07_07/EVT.csv
+#> Writing inst/backup/2015_07_07/LENA_Admin.csv
+#> Writing inst/backup/2015_07_07/LENA_Hours.csv
+#> Writing inst/backup/2015_07_07/Literacy.csv
+#> Writing inst/backup/2015_07_07/MinPair_Admin.csv
+#> Writing inst/backup/2015_07_07/MinPair_Responses.csv
+#> Writing inst/backup/2015_07_07/Notes.csv
+#> Writing inst/backup/2015_07_07/SES.csv
+#> Writing inst/backup/2015_07_07/Scores_TimePoint1.csv
+#> Writing inst/backup/2015_07_07/Study.csv
+#> Writing inst/backup/2015_07_07/StudyTask.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
 data_frame(tbl = names(rows), rows = unlist(rows))
-#> Source: local data frame [10 x 2]
+#> Source: local data frame [13 x 2]
 #> 
 #>                  tbl rows
 #> 1              Child  224
 #> 2         ChildStudy  224
-#> 3         LENA_Admin  182
-#> 4         LENA_Hours 2968
-#> 5      MinPair_Admin  190
-#> 6  MinPair_Responses 7508
-#> 7              Notes    6
-#> 8  Scores_TimePoint1    0
-#> 9              Study    3
-#> 10         StudyTask   12
+#> 3                EVT    0
+#> 4         LENA_Admin  182
+#> 5         LENA_Hours 2968
+#> 6           Literacy    0
+#> 7      MinPair_Admin  190
+#> 8  MinPair_Responses 7508
+#> 9              Notes    6
+#> 10               SES    0
+#> 11 Scores_TimePoint1    0
+#> 12             Study    3
+#> 13         StudyTask   12
 
 all_tbls$ChildStudy
-#> Source: local data frame [224 x 6]
+#> Source: local data frame [224 x 8]
 #> 
 #>    ChildStudyID ChildID StudyID ShortResearchID FullResearchID
 #> 1             1      23       1            600L      600L37MS2
@@ -116,7 +123,8 @@ all_tbls$ChildStudy
 #> 9             9      31       1            608L      608L39FS2
 #> 10           10      32       1            609L      609L28MS1
 #> ..          ...     ...     ...             ...            ...
-#> Variables not shown: ChildStudy_TimeStamp (chr)
+#> Variables not shown: ChildStudy_TimeStamp (chr), Exclude (int),
+#>   ExcludeNotes (chr)
 ```
 
 Writing
@@ -148,5 +156,33 @@ append_rows_to_table(
 # After writing
 dbReadTable(l2t_write, "TestWrites")
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1            1  Hello!  2015-07-01 11:51:22
+#> 1            3  Hello!  2015-07-07 11:59:41
+```
+
+Helpers
+-------
+
+This package also provides some helper functions for working with our data. `undo_excel_date` converts Excel's dates into R dates. `chrono_age` computes the number of months (rounded down) between two dates, as you would when computing chronological age.
+
+``` r
+# Create a date and another 18 months later
+dates <- list()
+dates$t1 <- undo_excel_date(41659)
+dates$t2 <- undo_excel_date(41659 + 365 + 181)
+str(dates)
+#> List of 2
+#>  $ t1: POSIXct[1:1], format: "2014-01-20"
+#>  $ t2: POSIXct[1:1], format: "2015-07-20"
+
+# Chrono age in months, assuming t1 is a birthdate
+chrono_age(dates$t2, dates$t1)
+#> [1] 18
+
+# More chrono_age examples
+chrono_age("2014-01-20", "2012-01-20")
+#> [1] 24
+chrono_age("2014-01-20", "2011-12-20")
+#> [1] 25
+chrono_age("2014-01-20", "2011-11-20")
+#> [1] 26
 ```

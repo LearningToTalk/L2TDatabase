@@ -110,6 +110,28 @@ file.remove("db.cnf")
 file.remove("my_connection.cnf")
 ```
 
+## Helpers
+
+This package also provides some helper functions for working with our data. 
+`undo_excel_date` converts Excel's dates into R dates. `chrono_age` computes the
+number of months (rounded down) between two dates, as you would when computing
+chronological age.
+
+```{r}
+# Create a date and another 18 months later
+dates <- list()
+dates$t1 <- undo_excel_date(41659)
+dates$t2 <- undo_excel_date(41659 + 365 + 181)
+str(dates)
+
+# Chrono age in months, assuming t1 is a birthdate
+chrono_age(dates$t2, dates$t1)
+
+# More chrono_age examples
+chrono_age("2014-01-20", "2012-01-20")
+chrono_age("2014-01-20", "2011-12-20")
+chrono_age("2014-01-20", "2011-11-20")
+```
 
 
 [cnf-ref]: http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html
