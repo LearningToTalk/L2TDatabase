@@ -46,15 +46,15 @@ l2t <- l2t_connect(cnf_file)
 # list all the tbls in the database
 src_tbls(l2t)
 #>  [1] "Child"             "ChildStudy"        "EVT"              
-#>  [4] "LENA_Admin"        "LENA_Hours"        "Literacy"         
-#>  [7] "MinPair_Admin"     "MinPair_Responses" "Notes"            
-#> [10] "SES"               "Scores_TimePoint1" "Study"            
-#> [13] "StudyTask"
+#>  [4] "FruitStroop"       "LENA_Admin"        "LENA_Hours"       
+#>  [7] "Literacy"          "MinPair_Admin"     "MinPair_Responses"
+#> [10] "PPVT"              "SES"               "Scores_TimePoint1"
+#> [13] "Study"             "StudyTask"         "VerbalFluency"
 
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
 head(studies)
-#>   StudyID      Study Code     Study_TimeStamp
+#>   StudyID      Study Code     Study_Timestamp
 #> 1       1 TimePoint1    L 2015-06-26 14:44:06
 #> 2       2 TimePoint2    L 2015-06-26 14:44:06
 #> 3       3 TimePoint3    L 2015-06-26 14:44:06
@@ -62,7 +62,7 @@ head(studies)
 # or use %from% as an infix form of the above
 studies <- "Study" %from% l2t
 head(studies)
-#>   StudyID      Study Code     Study_TimeStamp
+#>   StudyID      Study Code     Study_Timestamp
 #> 1       1 TimePoint1    L 2015-06-26 14:44:06
 #> 2       2 TimePoint2    L 2015-06-26 14:44:06
 #> 3       3 TimePoint3    L 2015-06-26 14:44:06
@@ -74,39 +74,43 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(l2t, backup_dir)
-#> Writing inst/backup/2015_07_07/Child.csv
-#> Writing inst/backup/2015_07_07/ChildStudy.csv
-#> Writing inst/backup/2015_07_07/EVT.csv
-#> Writing inst/backup/2015_07_07/LENA_Admin.csv
-#> Writing inst/backup/2015_07_07/LENA_Hours.csv
-#> Writing inst/backup/2015_07_07/Literacy.csv
-#> Writing inst/backup/2015_07_07/MinPair_Admin.csv
-#> Writing inst/backup/2015_07_07/MinPair_Responses.csv
-#> Writing inst/backup/2015_07_07/Notes.csv
-#> Writing inst/backup/2015_07_07/SES.csv
-#> Writing inst/backup/2015_07_07/Scores_TimePoint1.csv
-#> Writing inst/backup/2015_07_07/Study.csv
-#> Writing inst/backup/2015_07_07/StudyTask.csv
+#> Writing inst/backup/2015_07_09/Child.csv
+#> Writing inst/backup/2015_07_09/ChildStudy.csv
+#> Writing inst/backup/2015_07_09/EVT.csv
+#> Writing inst/backup/2015_07_09/FruitStroop.csv
+#> Writing inst/backup/2015_07_09/LENA_Admin.csv
+#> Writing inst/backup/2015_07_09/LENA_Hours.csv
+#> Writing inst/backup/2015_07_09/Literacy.csv
+#> Writing inst/backup/2015_07_09/MinPair_Admin.csv
+#> Writing inst/backup/2015_07_09/MinPair_Responses.csv
+#> Writing inst/backup/2015_07_09/PPVT.csv
+#> Writing inst/backup/2015_07_09/SES.csv
+#> Writing inst/backup/2015_07_09/Scores_TimePoint1.csv
+#> Writing inst/backup/2015_07_09/Study.csv
+#> Writing inst/backup/2015_07_09/StudyTask.csv
+#> Writing inst/backup/2015_07_09/VerbalFluency.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
 data_frame(tbl = names(rows), rows = unlist(rows))
-#> Source: local data frame [13 x 2]
+#> Source: local data frame [15 x 2]
 #> 
 #>                  tbl rows
 #> 1              Child  224
 #> 2         ChildStudy  224
-#> 3                EVT    0
-#> 4         LENA_Admin  182
-#> 5         LENA_Hours 2968
-#> 6           Literacy    0
-#> 7      MinPair_Admin  190
-#> 8  MinPair_Responses 7508
-#> 9              Notes    6
-#> 10               SES    0
-#> 11 Scores_TimePoint1    0
-#> 12             Study    3
-#> 13         StudyTask   12
+#> 3                EVT  224
+#> 4        FruitStroop    0
+#> 5         LENA_Admin  182
+#> 6         LENA_Hours 2968
+#> 7           Literacy    0
+#> 8      MinPair_Admin  190
+#> 9  MinPair_Responses 7508
+#> 10              PPVT  224
+#> 11               SES    0
+#> 12 Scores_TimePoint1    0
+#> 13             Study    3
+#> 14         StudyTask   12
+#> 15     VerbalFluency    0
 
 all_tbls$ChildStudy
 #> Source: local data frame [224 x 8]
@@ -123,8 +127,36 @@ all_tbls$ChildStudy
 #> 9             9      31       1            608L      608L39FS2
 #> 10           10      32       1            609L      609L28MS1
 #> ..          ...     ...     ...             ...            ...
-#> Variables not shown: ChildStudy_TimeStamp (chr), Exclude (int),
+#> Variables not shown: ChildStudy_Timestamp (chr), Exclude (int),
 #>   ExcludeNotes (chr)
+```
+
+As I've worked on the back-end of the database, I've been using the Comment fields to describe the data that goes into each field. We can download these comments along with other pieces of information about a table by using `describe_tbl`. With this function, we can quickly create a "codebook" to accompany our data.
+
+``` r
+describe_tbl(l2t, "EVT")
+#>    Table          Field Index      DataType      DefaultValue NullAllowed
+#> 1    EVT   ChildStudyID   UNI       int(11)              <NA>          NO
+#> 2    EVT          EVTID   PRI       int(11)              <NA>          NO
+#> 3    EVT  EVT_Timestamp            datetime CURRENT_TIMESTAMP          NO
+#> 4    EVT       EVT_Form       enum('A','B')              <NA>         YES
+#> 5    EVT EVT_Completion                date              <NA>         YES
+#> 6    EVT        EVT_Raw             int(11)              <NA>         YES
+#> 7    EVT   EVT_Standard             int(11)              <NA>         YES
+#> 8    EVT        EVT_GSV             int(11)              <NA>         YES
+#> 9    EVT        EVT_Age              int(3)              <NA>         YES
+#> 10   EVT       EVT_Note        varchar(255)              <NA>         YES
+#>                                                Description
+#> 1                                                         
+#> 2                                                         
+#> 3                    When the record (row) was last edited
+#> 4                                     Form of the EVT test
+#> 5                                   Date EVT was completed
+#> 6                              Raw score (number of words)
+#> 7                                           Standard score
+#> 8                                       Growth scale value
+#> 9  Age in months (rounded down) when the EVT was completed
+#> 10                            Notes on test administration
 ```
 
 Writing
@@ -156,7 +188,7 @@ append_rows_to_table(
 # After writing
 dbReadTable(l2t_write, "TestWrites")
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1            3  Hello!  2015-07-07 11:59:41
+#> 1            5  Hello!  2015-07-09 11:32:12
 ```
 
 Helpers

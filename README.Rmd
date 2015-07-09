@@ -76,6 +76,16 @@ data_frame(tbl = names(rows), rows = unlist(rows))
 all_tbls$ChildStudy
 ```
 
+As I've worked on the back-end of the database, I've been using the Comment
+fields to describe the data that goes into each field. We can download these
+comments along with other pieces of information about a table by using
+`describe_tbl`. With this function, we can quickly create a "codebook" to
+accompany our data.
+
+```{r}
+describe_tbl(l2t, "EVT")
+```
+
 ## Writing
 
 dplyr provides read-only access to a database, so we can't accidentally do 

@@ -25,3 +25,28 @@ backup_tbl <- function(tbl_name, src, output_dir) {
   write_csv(df, output_file)
   df
 }
+
+
+
+#' Download a codebook for a database table
+#' @export
+#' @importFrom DBI dbGetQuery
+describe_tbl <- function(src, tbl_name) {
+  # Borrow connection if it's a dplyr connection. Not sure if this is dangerous
+  if (inherits(src, "src_mysql")) src <- src$con
+  assert_that(inherits(src, "MySQLConnection"))
+
+  # Make sure table exists
+  assert_that(has_table(src, tbl_name))
+
+  # Get the table description
+  this_query <- sprintf("SHOW FULL COLUMNS FROM %s", tbl_name)
+  info <- dbGetQuery(src, statement = this_query)
+
+  info <- info %>%
+    mutate(Table = tbl_name) %>%
+    select(Table, Field, Index = Key, DataType = Type, DefaultValue = Default,
+           NullAllowed = Null, Description = Comment)
+
+  info
+}
