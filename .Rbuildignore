@@ -3,3 +3,6 @@
 ^.*\.cnf$
 ^README\.Rmd$
 ^README-.*\.png$
+^inst/backup.*$
+^inst/migrations.*$
+^inst/paths.R$
