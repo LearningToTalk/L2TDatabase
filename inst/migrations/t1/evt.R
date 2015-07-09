@@ -66,7 +66,7 @@ to_add <- match_columns(to_add, current_rows) %>%
   arrange(ChildStudyID)
 to_add
 
-# Update with the remote table
+# Update the remote table
 l2t_write <- l2t_writer_connect("inst/l2t_db.cnf", "l2t")
 
 # An error here is a good thing if there are no new rows to add
