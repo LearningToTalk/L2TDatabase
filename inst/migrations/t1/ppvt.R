@@ -1,4 +1,4 @@
-# Add timepoint1 evt scores to the database
+# Add timepoint1 ppvt scores to the database
 
 library("L2TDatabase")
 library("dplyr")
@@ -19,19 +19,20 @@ is_na_string <- function(xs) is.element(xs, c(NA, "NA"))
 # Get T1 scores for both sites. Function sourced via paths$GetSiteInfo
 t1 <- GetSiteInfo()
 names(t1)
-t1_evt <- t1 %>%
+t1_ppvt <- t1 %>%
   select(ShortResearchID = Participant_ID,
-         EVT_Form,
-         EVT_Completion = starts_with("EVT_COMPLETION"),
-         EVT_Raw = starts_with("EVT_raw"),
-         EVT_Standard = starts_with("EVT_standard"),
-         EVT_GSV) %>%
+         PPVT_Form,
+         PPVT_Completion = starts_with("PPVT_COMPLETION"),
+         PPVT_Raw = starts_with("PPVT_raw"),
+         PPVT_Standard = starts_with("PPVT_standard"),
+         PPVT_GSV) %>%
   # Make sure scores are integers
-  mutate_each(funs(as.integer(.)), EVT_Raw:EVT_GSV) %>%
+  mutate_each(funs(as.integer(.)), PPVT_Raw:PPVT_GSV) %>%
   mutate(Study = "TimePoint1")
 
 # Convert dates
-t1_evt$EVT_Completion <- t1_evt$EVT_Completion %>%
+unique(t1_ppvt$PPVT_Completion)
+t1_ppvt$PPVT_Completion <- t1_ppvt$PPVT_Completion %>%
   convert_na_strings %>%
   undo_excel_date %>%
   format
@@ -42,21 +43,21 @@ cds <- l2t_dl$ChildStudy %>%
   left_join(l2t_dl$Child)
 cds
 
-# Attach the database identifiers to the EVT scores
-with_evt <- left_join(t1_evt, cds)
+# Attach the database identifiers to the PPVT scores
+with_ppvt <- left_join(t1_ppvt, cds)
 
 # Calculate chronological ages, default to NA if error encountered
 chr_age <- failwith(NA, chrono_age)
-with_evt <- with_evt %>%
-  mutate(EVT_Age = unlist(Map(chr_age, EVT_Completion, Birthdate)))
+with_ppvt <- with_ppvt %>%
+  mutate(PPVT_Age = unlist(Map(chr_age, PPVT_Completion, Birthdate)))
 
-# Remove duplicate rows (any row with matching ChildStudyID and EVT_Completion
+# Remove duplicate rows (any row with matching ChildStudyID and PPVT_Completion
 # values)
-current_rows <- l2t_dl$EVT
-current_empties <- filter(current_rows, is.na(EVT_Completion))
+current_rows <- l2t_dl$PPVT
+current_empties <- filter(current_rows, is.na(PPVT_Completion))
 
-to_add <- with_evt %>%
-  anti_join(current_rows, by = c("ChildStudyID", "EVT_Completion")) %>%
+to_add <- with_ppvt %>%
+  anti_join(current_rows, by = c("ChildStudyID", "PPVT_Completion")) %>%
   # In case the doesn't work on NA completion dates, keep rows with matching ids
   # but blank completion dates from being added.
   anti_join(current_empties, by = c("ChildStudyID"))
@@ -70,4 +71,4 @@ to_add
 l2t_write <- l2t_writer_connect("inst/l2t_db.cnf", "l2t")
 
 # An error here is a good thing if there are no new rows to add
-append_rows_to_table(l2t_write, "EVT", to_add)
+append_rows_to_table(l2t_write, "PPVT", to_add)
