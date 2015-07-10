@@ -30,11 +30,14 @@ names(t1) <- names(t1) %>%
 names(t1)[names(t1) %in% colnames("BRIEF" %from% l2t)]
 names(t1)[!names(t1) %in% colnames("BRIEF" %from% l2t)]
 
-# Only kept high inconsitency scores, so move inconsistency scores to notes column
+# UMN kept all inconsistency scores. UW only kept high inconsistency scores, so
+# move inconsistency scores to notes column, lest we think a bunch of data is
+# missing.
 incon <- t1$InconsistencyScore
 t1$BRIEF_Note <- ifelse(is.na(incon), NA, paste0("Inconsistency score: ", incon))
 
-# Check for strings in each column
+# Check values in each column. Want to know what strings are in the nominal
+# score columns.
 lapply(t1, unique)
 lapply(t1, function(xs) str_subset(xs, "[A-z]"))
 
