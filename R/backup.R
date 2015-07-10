@@ -2,7 +2,7 @@
 #' @export
 l2t_backup <- function(l2t_con, backup_dir) {
   # Create a folder for today's date
-  stamp <- format(Sys.time(), "%Y_%m_%d")
+  stamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
   this_backup_dir <- file.path(backup_dir, stamp)
   dir.create(this_backup_dir, showWarnings = FALSE, recursive = TRUE)
 
