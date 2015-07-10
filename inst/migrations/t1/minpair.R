@@ -11,15 +11,16 @@ all_responses <- import(paths$minpairs) %>%
   as_data_frame
 
 # Limit to timepoint1
-t1 <- all_responses %>% filter(Study == "TimePoint1")
+t1 <- all_responses %>% filter(Study == "TimePoint1") %>%
+  rename(ShortResearchID = Participant_ID,
+         MinPair_Dialect = Dialect,
+         MinPair_EprimeFile = Eprime.Basename,
+         MinPair_Completion = Date)
 
 # Make a table of administrations by getting one row per eprimefile
 t1_admins <- t1 %>%
-  select(Study,
-         ShortResearchID = Participant_ID,
-         Dialect,
-         EprimeFile = Eprime.Basename,
-         AdminDate = Date) %>%
+  select(Study, ShortResearchID, MinPair_Dialect,
+         MinPair_EprimeFile, MinPair_Completion) %>%
   distinct
 
 # Download/backup db beforehand
@@ -32,8 +33,9 @@ l2t_dl <- l2t_backup(l2t, "inst/backup")
 cds <- left_join(l2t_dl$ChildStudy, l2t_dl$Study)
 with_ids <- t1_admins %>%
   inner_join(cds) %>%
-  select(ChildStudyID, Dialect, EprimeFile, FullResearchID, AdminDate) %>%
-  mutate(IDFromFile = str_replace(EprimeFile, "MINP_", ""))
+  select(ChildStudyID, MinPair_Dialect, MinPair_EprimeFile,
+         FullResearchID, MinPair_Completion) %>%
+  mutate(IDFromFile = str_replace(MinPair_EprimeFile, "MINP_", ""))
 
 # Weird cases where id in the filename doesn't match the FullResearchID
 filter(with_ids, IDFromFile != FullResearchID)
@@ -42,16 +44,13 @@ filter(with_ids, IDFromFile != FullResearchID)
 curr_admins <- l2t_dl$MinPair_Admin
 with_ids <- match_columns(with_ids, curr_admins)
 rows_to_add <- anti_join(with_ids, curr_admins) %>%
-  arrange(ChildStudyID, AdminDate)
+  arrange(ChildStudyID, MinPair_Completion)
 rows_to_add
 
 # Add the rows
 l2t_write <- l2t_writer_connect("inst/l2t_db.cnf")
 append_rows_to_table(l2t_write, "MinPair_Admin", rows_to_add)
 tbl(l2t, "MinPair_Admin")
-
-# Now include the responses
-t1 <- t1 %>% rename(EprimeFile = Eprime.Basename, AdminDate = Date)
 
 # Attach local responses to remote administration records using the eprime
 # filename, administration date and dialect
