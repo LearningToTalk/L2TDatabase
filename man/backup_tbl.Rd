@@ -6,6 +6,18 @@
 \usage{
 backup_tbl(tbl_name, src, output_dir)
 }
+\arguments{
+\item{tbl_name}{the name of a database table}
+
+\item{src}{a dplyr-managed connection to a database}
+
+\item{output_dir}{directory where the csv is to be saved}
+}
+\value{
+A copy of the table is downloaded from the database and returned. A
+  blank data-frame is returned if the table could not be downloaded. The
+  contents of the table are written to \code{[output_dir]/[tbl_name].csv}.
+}
 \description{
 Download a tbl from a db connection and write to a csv
 }

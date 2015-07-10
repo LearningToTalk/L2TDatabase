@@ -2,11 +2,23 @@
 % Please edit documentation in R/backup.R
 \name{l2t_backup}
 \alias{l2t_backup}
-\title{Backup each tbl in the L2T database}
+\title{Download each tbl in a database and write to csv}
 \usage{
-l2t_backup(l2t_con, backup_dir)
+l2t_backup(src, backup_dir)
+}
+\arguments{
+\item{src}{a dplyr-managed connection to a database}
+
+\item{backup_dir}{location where to save the backed up table}
+}
+\value{
+Each table in the database is downloaded and saved via
+  \code{backup_tbl}. The downloaded tables are returned in a list of
+  dataframes. The csvs are saved together in a timestamped folder inside of
+  the \code{backup_dir} folder, so the path to a particular's table's csv
+  file would be \code{[backup_dir]/[timestamp]/[table_name].csv}.
 }
 \description{
-Backup each tbl in the L2T database
+Download each tbl in a database and write to csv
 }
 

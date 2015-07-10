@@ -2,11 +2,19 @@
 % Please edit documentation in R/backup.R
 \name{describe_db}
 \alias{describe_db}
-\title{Download a codebook for a database connection}
+\title{Download a codebook for a database}
 \usage{
 describe_db(src)
 }
+\arguments{
+\item{src}{a dplyr-managed connection to a database}
+}
+\value{
+A dataframe describing each table in a database. Columns in the
+  dataframe: Database, Table, (number of) Rows, Description (comment field
+  for the table)
+}
 \description{
-Download a codebook for a database connection
+Download a codebook for a database
 }
 

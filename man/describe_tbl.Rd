@@ -6,6 +6,17 @@
 \usage{
 describe_tbl(src, tbl_name)
 }
+\arguments{
+\item{src}{a dplyr-managed connection to a database}
+
+\item{tbl_name}{the name of a database table}
+}
+\value{
+A dataframe describing each column of a database table. Columns in
+  the dataframe: Table, Field, Index (type of database index), (storage)
+  DataType, DefaultValue, NullAllowed (whether blanks are allowed),
+  Description (the comment field from the table structure).
+}
 \description{
 Download a codebook for a database table
 }
