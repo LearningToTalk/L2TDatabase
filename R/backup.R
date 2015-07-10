@@ -50,3 +50,25 @@ describe_tbl <- function(src, tbl_name) {
 
   info
 }
+
+
+#' Download a codebook for a database connection
+#' @export
+#' @importFrom DBI dbGetQuery
+describe_db <- function(src) {
+  # Borrow connection if it's a dplyr connection. Not sure if this is dangerous
+  if (inherits(src, "src_mysql")) {
+    db_name <- src$info$dbname
+    src <- src$con
+  }
+  assert_that(inherits(src, "MySQLConnection"))
+
+  # Get the description
+  info <- dbGetQuery(src, statement = "SHOW TABLE STATUS")
+
+  info <- info %>%
+    mutate(Database = db_name) %>%
+    select(Database, Table = Name, Rows, Description = Comment)
+
+  info
+}
