@@ -76,6 +76,8 @@ data_frame(tbl = names(rows), rows = unlist(rows))
 all_tbls$ChildStudy
 ```
 
+## Metadata
+
 As I've worked on the back-end of the database, I've been using the Comment
 fields to describe the data that goes into each field. We can download these
 comments along with other pieces of information about a table by using
@@ -84,6 +86,13 @@ accompany our data.
 
 ```{r}
 describe_tbl(l2t, "EVT")
+```
+
+We can also download the table-level comments from a database with
+`describe_db`, although these descriptions have a much tighter length limit.
+
+```{r}
+describe_db(l2t)
 ```
 
 ## Writing

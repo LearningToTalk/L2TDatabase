@@ -75,22 +75,22 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(l2t, backup_dir)
-#> Writing inst/backup/2015-07-10_08-07/BRIEF.csv
-#> Writing inst/backup/2015-07-10_08-07/Child.csv
-#> Writing inst/backup/2015-07-10_08-07/ChildStudy.csv
-#> Writing inst/backup/2015-07-10_08-07/EVT.csv
-#> Writing inst/backup/2015-07-10_08-07/FruitStroop.csv
-#> Writing inst/backup/2015-07-10_08-07/LENA_Admin.csv
-#> Writing inst/backup/2015-07-10_08-07/LENA_Hours.csv
-#> Writing inst/backup/2015-07-10_08-07/Literacy.csv
-#> Writing inst/backup/2015-07-10_08-07/MinPair_Admin.csv
-#> Writing inst/backup/2015-07-10_08-07/MinPair_Responses.csv
-#> Writing inst/backup/2015-07-10_08-07/PPVT.csv
-#> Writing inst/backup/2015-07-10_08-07/SES.csv
-#> Writing inst/backup/2015-07-10_08-07/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-07-10_08-07/Study.csv
-#> Writing inst/backup/2015-07-10_08-07/StudyTask.csv
-#> Writing inst/backup/2015-07-10_08-07/VerbalFluency.csv
+#> Writing inst/backup/2015-07-10_10-36/BRIEF.csv
+#> Writing inst/backup/2015-07-10_10-36/Child.csv
+#> Writing inst/backup/2015-07-10_10-36/ChildStudy.csv
+#> Writing inst/backup/2015-07-10_10-36/EVT.csv
+#> Writing inst/backup/2015-07-10_10-36/FruitStroop.csv
+#> Writing inst/backup/2015-07-10_10-36/LENA_Admin.csv
+#> Writing inst/backup/2015-07-10_10-36/LENA_Hours.csv
+#> Writing inst/backup/2015-07-10_10-36/Literacy.csv
+#> Writing inst/backup/2015-07-10_10-36/MinPair_Admin.csv
+#> Writing inst/backup/2015-07-10_10-36/MinPair_Responses.csv
+#> Writing inst/backup/2015-07-10_10-36/PPVT.csv
+#> Writing inst/backup/2015-07-10_10-36/SES.csv
+#> Writing inst/backup/2015-07-10_10-36/Scores_TimePoint1.csv
+#> Writing inst/backup/2015-07-10_10-36/Study.csv
+#> Writing inst/backup/2015-07-10_10-36/StudyTask.csv
+#> Writing inst/backup/2015-07-10_10-36/VerbalFluency.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
@@ -134,6 +134,9 @@ all_tbls$ChildStudy
 #>   ExcludeNotes (chr)
 ```
 
+Metadata
+--------
+
 As I've worked on the back-end of the database, I've been using the Comment fields to describe the data that goes into each field. We can download these comments along with other pieces of information about a table by using `describe_tbl`. With this function, we can quickly create a "codebook" to accompany our data.
 
 ``` r
@@ -160,6 +163,46 @@ describe_tbl(l2t, "EVT")
 #> 8                                       Growth scale value
 #> 9      Age in months (rounded down) when EVT was completed
 #> 10                            Notes on test administration
+```
+
+We can also download the table-level comments from a database with `describe_db`, although these descriptions have a much tighter length limit.
+
+``` r
+describe_db(l2t)
+#>    Database             Table Rows
+#> 1       l2t             BRIEF  224
+#> 2       l2t             Child  224
+#> 3       l2t        ChildStudy  224
+#> 4       l2t               EVT  224
+#> 5       l2t       FruitStroop    0
+#> 6       l2t        LENA_Admin  182
+#> 7       l2t        LENA_Hours 2968
+#> 8       l2t          Literacy    0
+#> 9       l2t     MinPair_Admin  190
+#> 10      l2t MinPair_Responses 7674
+#> 11      l2t              PPVT  224
+#> 12      l2t               SES    0
+#> 13      l2t Scores_TimePoint1    0
+#> 14      l2t             Study    3
+#> 15      l2t         StudyTask   12
+#> 16      l2t     VerbalFluency    0
+#>                                                   Description
+#> 1  Scores from Behvr Rating Inventory of Exec Func--Preschool
+#> 2         Unique IDs and demographics of children in database
+#> 3                                                            
+#> 4                      Scores on Expressive Vocabulary Test 2
+#> 5                                                            
+#> 6                                    Notes on LENA recordings
+#> 7                  Stats from LENA recordings by hour-of-day.
+#> 8                                                            
+#> 9                                                            
+#> 10                                                           
+#> 11                Scores on Peabody Picture Vocabulary Test 4
+#> 12                                                           
+#> 13                                                           
+#> 14                                                           
+#> 15                                                           
+#> 16
 ```
 
 Writing
@@ -191,7 +234,7 @@ append_rows_to_table(
 # After writing
 dbReadTable(l2t_write, "TestWrites")
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1            6  Hello!  2015-07-10 08:07:55
+#> 1            7  Hello!  2015-07-10 10:36:39
 ```
 
 Helpers
