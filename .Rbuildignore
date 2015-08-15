@@ -6,3 +6,4 @@
 ^inst/backup.*$
 ^inst/migrations.*$
 ^inst/paths.R$
+^inst/temp$

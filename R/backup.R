@@ -33,11 +33,26 @@ l2t_backup <- function(src, backup_dir) {
   stamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
   this_backup_dir <- file.path(backup_dir, stamp)
   dir.create(this_backup_dir, showWarnings = FALSE, recursive = TRUE)
+  metadata_dir <- file.path(this_backup_dir, "metadata")
+  dir.create(metadata_dir, showWarnings = FALSE, recursive = TRUE)
 
   # Backup each tbl in the database connection
   tbls <- src_tbls(src)
   dfs <- lapply(tbls, backup_tbl, src = src, output_dir = this_backup_dir)
   names(dfs) <- tbls
+
+  # Save the field descriptions
+  descriptions <- bind_rows(Map(function(x) describe_tbl(src, x), tbls))
+  description_csv <- file.path(metadata_dir, "field_descriptions.csv")
+  message("Writing ", description_csv)
+  write_csv(descriptions, path = description_csv)
+
+  # Save the tbl descriptions
+  db_description <- describe_db(src)
+  db_description_csv <- file.path(metadata_dir, "table_descriptions.csv")
+  message("Writing ", db_description_csv)
+  write_csv(db_description, path = db_description_csv)
+
   dfs
 }
 

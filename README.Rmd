@@ -95,6 +95,9 @@ We can also download the table-level comments from a database with
 describe_db(l2t)
 ```
 
+These two forms of metadata are backed up by `l2t_backup` as well. They are 
+stored in a `metadata` folder.
+
 ## Writing
 
 dplyr provides read-only access to a database, so we can't accidentally do 
