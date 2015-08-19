@@ -45,12 +45,12 @@ l2t <- l2t_connect(cnf_file)
 
 # list all the tbls in the database
 src_tbls(l2t)
-#>  [1] "BRIEF"             "Child"             "ChildStudy"       
-#>  [4] "EVT"               "FruitStroop"       "LENA_Admin"       
-#>  [7] "LENA_Hours"        "Literacy"          "MinPair_Admin"    
-#> [10] "MinPair_Responses" "PPVT"              "SES"              
-#> [13] "Scores_TimePoint1" "Study"             "StudyTask"        
-#> [16] "VerbalFluency"
+#>  [1] "BRIEF"             "Caregivers"        "Child"            
+#>  [4] "ChildStudy"        "EVT"               "FruitStroop"      
+#>  [7] "LENA_Admin"        "LENA_Hours"        "Literacy"         
+#> [10] "MinPair_Admin"     "MinPair_Responses" "PPVT"             
+#> [13] "SES"               "Scores_TimePoint1" "Study"            
+#> [16] "StudyTask"         "VerbalFluency"
 
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
@@ -75,45 +75,49 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(l2t, backup_dir)
-#> Writing inst/backup/2015-07-10_10-36/BRIEF.csv
-#> Writing inst/backup/2015-07-10_10-36/Child.csv
-#> Writing inst/backup/2015-07-10_10-36/ChildStudy.csv
-#> Writing inst/backup/2015-07-10_10-36/EVT.csv
-#> Writing inst/backup/2015-07-10_10-36/FruitStroop.csv
-#> Writing inst/backup/2015-07-10_10-36/LENA_Admin.csv
-#> Writing inst/backup/2015-07-10_10-36/LENA_Hours.csv
-#> Writing inst/backup/2015-07-10_10-36/Literacy.csv
-#> Writing inst/backup/2015-07-10_10-36/MinPair_Admin.csv
-#> Writing inst/backup/2015-07-10_10-36/MinPair_Responses.csv
-#> Writing inst/backup/2015-07-10_10-36/PPVT.csv
-#> Writing inst/backup/2015-07-10_10-36/SES.csv
-#> Writing inst/backup/2015-07-10_10-36/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-07-10_10-36/Study.csv
-#> Writing inst/backup/2015-07-10_10-36/StudyTask.csv
-#> Writing inst/backup/2015-07-10_10-36/VerbalFluency.csv
+#> Writing inst/backup/2015-08-15_16-47/BRIEF.csv
+#> Writing inst/backup/2015-08-15_16-47/Caregivers.csv
+#> Writing inst/backup/2015-08-15_16-47/Child.csv
+#> Writing inst/backup/2015-08-15_16-47/ChildStudy.csv
+#> Writing inst/backup/2015-08-15_16-47/EVT.csv
+#> Writing inst/backup/2015-08-15_16-47/FruitStroop.csv
+#> Writing inst/backup/2015-08-15_16-47/LENA_Admin.csv
+#> Writing inst/backup/2015-08-15_16-47/LENA_Hours.csv
+#> Writing inst/backup/2015-08-15_16-47/Literacy.csv
+#> Writing inst/backup/2015-08-15_16-47/MinPair_Admin.csv
+#> Writing inst/backup/2015-08-15_16-47/MinPair_Responses.csv
+#> Writing inst/backup/2015-08-15_16-47/PPVT.csv
+#> Writing inst/backup/2015-08-15_16-47/SES.csv
+#> Writing inst/backup/2015-08-15_16-47/Scores_TimePoint1.csv
+#> Writing inst/backup/2015-08-15_16-47/Study.csv
+#> Writing inst/backup/2015-08-15_16-47/StudyTask.csv
+#> Writing inst/backup/2015-08-15_16-47/VerbalFluency.csv
+#> Writing inst/backup/2015-08-15_16-47/metadata/field_descriptions.csv
+#> Writing inst/backup/2015-08-15_16-47/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
 data_frame(tbl = names(rows), rows = unlist(rows))
-#> Source: local data frame [16 x 2]
+#> Source: local data frame [17 x 2]
 #> 
 #>                  tbl rows
 #> 1              BRIEF  224
-#> 2              Child  224
-#> 3         ChildStudy  224
-#> 4                EVT  224
-#> 5        FruitStroop    0
-#> 6         LENA_Admin  182
-#> 7         LENA_Hours 2968
-#> 8           Literacy    0
-#> 9      MinPair_Admin  190
-#> 10 MinPair_Responses 7508
-#> 11              PPVT  224
-#> 12               SES    0
-#> 13 Scores_TimePoint1    0
-#> 14             Study    3
-#> 15         StudyTask   12
-#> 16     VerbalFluency    0
+#> 2         Caregivers    0
+#> 3              Child  224
+#> 4         ChildStudy  224
+#> 5                EVT  224
+#> 6        FruitStroop    0
+#> 7         LENA_Admin  182
+#> 8         LENA_Hours 2968
+#> 9           Literacy    0
+#> 10     MinPair_Admin  190
+#> 11 MinPair_Responses 7508
+#> 12              PPVT  224
+#> 13               SES    0
+#> 14 Scores_TimePoint1    0
+#> 15             Study    3
+#> 16         StudyTask   12
+#> 17     VerbalFluency    0
 
 all_tbls$ChildStudy
 #> Source: local data frame [224 x 8]
@@ -171,39 +175,43 @@ We can also download the table-level comments from a database with `describe_db`
 describe_db(l2t)
 #>    Database             Table Rows
 #> 1       l2t             BRIEF  224
-#> 2       l2t             Child  224
-#> 3       l2t        ChildStudy  224
-#> 4       l2t               EVT  224
-#> 5       l2t       FruitStroop    0
-#> 6       l2t        LENA_Admin  182
-#> 7       l2t        LENA_Hours 2968
-#> 8       l2t          Literacy    0
-#> 9       l2t     MinPair_Admin  190
-#> 10      l2t MinPair_Responses 7674
-#> 11      l2t              PPVT  224
-#> 12      l2t               SES    0
-#> 13      l2t Scores_TimePoint1    0
-#> 14      l2t             Study    3
-#> 15      l2t         StudyTask   12
-#> 16      l2t     VerbalFluency    0
-#>                                                   Description
-#> 1  Scores from Behvr Rating Inventory of Exec Func--Preschool
-#> 2         Unique IDs and demographics of children in database
-#> 3                                                            
-#> 4                      Scores on Expressive Vocabulary Test 2
-#> 5                                                            
-#> 6                                    Notes on LENA recordings
-#> 7                  Stats from LENA recordings by hour-of-day.
-#> 8                                                            
-#> 9                                                            
-#> 10                                                           
-#> 11                Scores on Peabody Picture Vocabulary Test 4
-#> 12                                                           
-#> 13                                                           
-#> 14                                                           
-#> 15                                                           
-#> 16
+#> 2       l2t        Caregivers    0
+#> 3       l2t             Child  224
+#> 4       l2t        ChildStudy  224
+#> 5       l2t               EVT  224
+#> 6       l2t       FruitStroop    0
+#> 7       l2t        LENA_Admin  182
+#> 8       l2t        LENA_Hours 2968
+#> 9       l2t          Literacy    0
+#> 10      l2t     MinPair_Admin  190
+#> 11      l2t MinPair_Responses 7674
+#> 12      l2t              PPVT  224
+#> 13      l2t               SES    0
+#> 14      l2t Scores_TimePoint1    0
+#> 15      l2t             Study    3
+#> 16      l2t         StudyTask   12
+#> 17      l2t     VerbalFluency    0
+#>                                                    Description
+#> 1  Scores from Behvr Rating Inventory of Exec Func (Preschool)
+#> 2                        Demographics of children's caregivers
+#> 3          Unique IDs and demographics of children in database
+#> 4                                                             
+#> 5                       Scores on Expressive Vocabulary Test 2
+#> 6                                                             
+#> 7                                              LENA recordings
+#> 8                    Stats from LENA recordings by hour-of-day
+#> 9                                                             
+#> 10             Administrations of the Minimal Pairs experiment
+#> 11      Trials and responses from the Minimal Pairs experiment
+#> 12                 Scores on Peabody Picture Vocabulary Test 4
+#> 13                            Child and household demographics
+#> 14                                                            
+#> 15                                                            
+#> 16                                                            
+#> 17
 ```
+
+These two forms of metadata are backed up by `l2t_backup` as well. They are stored in a `metadata` folder.
 
 Writing
 -------
@@ -234,7 +242,7 @@ append_rows_to_table(
 # After writing
 dbReadTable(l2t_write, "TestWrites")
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1            7  Hello!  2015-07-10 10:36:39
+#> 1           10  Hello!  2015-08-15 16:47:54
 ```
 
 Helpers
