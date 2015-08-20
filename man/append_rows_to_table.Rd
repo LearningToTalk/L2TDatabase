@@ -4,7 +4,17 @@
 \alias{append_rows_to_table}
 \title{Append rows to a database table}
 \usage{
-append_rows_to_table(db_con, tbl_name, rows)
+append_rows_to_table(src, tbl_name, rows)
+}
+\arguments{
+\item{src}{a dplyr-managed database connection or a MySQLConnection}
+
+\item{tbl_name}{name of the table to update}
+
+\item{rows}{a data-frame of new rows}
+}
+\value{
+TRUE if the update succeeded
 }
 \description{
 Append rows to a database table

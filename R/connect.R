@@ -14,14 +14,6 @@ l2t_connect <- function(cnf_file, db_name = "l2t") {
     default.file = cnf_file)
 }
 
-#' Connect to the L2T database with RMySQL
-#' @inheritParams l2t_connect
-#' @return a database connection via RMySQL capable of writing to the database.
-#' @export
-l2t_writer_connect <- function(cnf_file, db_name = "l2t") {
-  dbConnect(MySQL(), dbname = db_name, default.file = cnf_file)
-}
-
 #' Create a MySQL config file
 #' @param dest file-name where to save the .cnf file
 #' @param user login credential for db connection. Defaults to "".
