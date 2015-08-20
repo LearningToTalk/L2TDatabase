@@ -24,9 +24,12 @@ cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 This R package contains helper functions for working with the MySQL database for
 the [Learning To Talk](http://learningtotalk.org) project.
 
-Connections to the database are managed by [.cnf files][cnf-ref]. This
-package provides `make_cnf_file` which creates a cnf file from login and
-connection information.
+## Connect with .cnf files
+
+Connections to the database are managed by [.cnf files][cnf-ref]. We use these 
+files so that login credentials and connection information are not hard-coded 
+into the analysis script. This package provides `make_cnf_file` which creates a
+cnf file from login and connection information.
 
 ```{r, results = 'hide'}
 library("L2TDatabase")
@@ -39,7 +42,7 @@ make_cnf_file(dest = "my_connection.cnf", user = "tj", password = "",
               db = "my_db", host = "localhost", port = 3306)
 ```
 
-Once we've create a .cnf file, we can connect to the database using 
+Once we've created a .cnf file, we can connect to the database using 
 `l2t_connect`. We can view the names of all the tables in the database with 
 `dplyr::src_tbls`. See the dplyr [vignette on databases][dplyr-db] for how to 
 work with remotely stored data using dplyr; it's really great stuff.
@@ -62,6 +65,8 @@ studies <- "Study" %from% l2t
 head(studies)
 ```
 
+## Back up
+
 We can download and backup each table in the database with `l2t_backup`.
 
 ```{r}
@@ -82,7 +87,8 @@ As I've worked on the back-end of the database, I've been using the Comment
 fields to describe the data that goes into each field. We can download these
 comments along with other pieces of information about a table by using
 `describe_tbl`. With this function, we can quickly create a "codebook" to
-accompany our data.
+accompany our data. I have [blogged about][blog-backup] the implementation of 
+these metadata-related functions.
 
 ```{r}
 describe_tbl(l2t, "EVT")
@@ -158,3 +164,4 @@ chrono_age("2014-01-20", "2011-11-20")
 
 [cnf-ref]: http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html
 [dplyr-db]: http://cran.r-project.org/web/packages/dplyr/vignettes/databases.html
+[blog-backup]: http://tjmahr.com/post/127080928329/using-dplyr-to-back-up-a-mysql-database

@@ -4,7 +4,10 @@ L2TDatabase
 
 This R package contains helper functions for working with the MySQL database for the [Learning To Talk](http://learningtotalk.org) project.
 
-Connections to the database are managed by [.cnf files](http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html). This package provides `make_cnf_file` which creates a cnf file from login and connection information.
+Connect with .cnf files
+-----------------------
+
+Connections to the database are managed by [.cnf files](http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html). We use these files so that login credentials and connection information are not hard-coded into the analysis script. This package provides `make_cnf_file` which creates a cnf file from login and connection information.
 
 ``` r
 library("L2TDatabase")
@@ -35,7 +38,7 @@ make_cnf_file(dest = "my_connection.cnf", user = "tj", password = "",
 #> database=my_db
 ```
 
-Once we've create a .cnf file, we can connect to the database using `l2t_connect`. We can view the names of all the tables in the database with `dplyr::src_tbls`. See the dplyr [vignette on databases](http://cran.r-project.org/web/packages/dplyr/vignettes/databases.html) for how to work with remotely stored data using dplyr; it's really great stuff.
+Once we've created a .cnf file, we can connect to the database using `l2t_connect`. We can view the names of all the tables in the database with `dplyr::src_tbls`. See the dplyr [vignette on databases](http://cran.r-project.org/web/packages/dplyr/vignettes/databases.html) for how to work with remotely stored data using dplyr; it's really great stuff.
 
 ``` r
 library("dplyr", warn.conflicts = FALSE)
@@ -69,31 +72,34 @@ head(studies)
 #> 3       3 TimePoint3    L 2015-06-26 14:44:06
 ```
 
+Back up
+-------
+
 We can download and backup each table in the database with `l2t_backup`.
 
 ``` r
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(l2t, backup_dir)
-#> Writing inst/backup/2015-08-15_16-47/BRIEF.csv
-#> Writing inst/backup/2015-08-15_16-47/Caregivers.csv
-#> Writing inst/backup/2015-08-15_16-47/Child.csv
-#> Writing inst/backup/2015-08-15_16-47/ChildStudy.csv
-#> Writing inst/backup/2015-08-15_16-47/EVT.csv
-#> Writing inst/backup/2015-08-15_16-47/FruitStroop.csv
-#> Writing inst/backup/2015-08-15_16-47/LENA_Admin.csv
-#> Writing inst/backup/2015-08-15_16-47/LENA_Hours.csv
-#> Writing inst/backup/2015-08-15_16-47/Literacy.csv
-#> Writing inst/backup/2015-08-15_16-47/MinPair_Admin.csv
-#> Writing inst/backup/2015-08-15_16-47/MinPair_Responses.csv
-#> Writing inst/backup/2015-08-15_16-47/PPVT.csv
-#> Writing inst/backup/2015-08-15_16-47/SES.csv
-#> Writing inst/backup/2015-08-15_16-47/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-08-15_16-47/Study.csv
-#> Writing inst/backup/2015-08-15_16-47/StudyTask.csv
-#> Writing inst/backup/2015-08-15_16-47/VerbalFluency.csv
-#> Writing inst/backup/2015-08-15_16-47/metadata/field_descriptions.csv
-#> Writing inst/backup/2015-08-15_16-47/metadata/table_descriptions.csv
+#> Writing inst/backup/2015-08-20_10-47/BRIEF.csv
+#> Writing inst/backup/2015-08-20_10-47/Caregivers.csv
+#> Writing inst/backup/2015-08-20_10-47/Child.csv
+#> Writing inst/backup/2015-08-20_10-47/ChildStudy.csv
+#> Writing inst/backup/2015-08-20_10-47/EVT.csv
+#> Writing inst/backup/2015-08-20_10-47/FruitStroop.csv
+#> Writing inst/backup/2015-08-20_10-47/LENA_Admin.csv
+#> Writing inst/backup/2015-08-20_10-47/LENA_Hours.csv
+#> Writing inst/backup/2015-08-20_10-47/Literacy.csv
+#> Writing inst/backup/2015-08-20_10-47/MinPair_Admin.csv
+#> Writing inst/backup/2015-08-20_10-47/MinPair_Responses.csv
+#> Writing inst/backup/2015-08-20_10-47/PPVT.csv
+#> Writing inst/backup/2015-08-20_10-47/SES.csv
+#> Writing inst/backup/2015-08-20_10-47/Scores_TimePoint1.csv
+#> Writing inst/backup/2015-08-20_10-47/Study.csv
+#> Writing inst/backup/2015-08-20_10-47/StudyTask.csv
+#> Writing inst/backup/2015-08-20_10-47/VerbalFluency.csv
+#> Writing inst/backup/2015-08-20_10-47/metadata/field_descriptions.csv
+#> Writing inst/backup/2015-08-20_10-47/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
@@ -141,7 +147,7 @@ all_tbls$ChildStudy
 Metadata
 --------
 
-As I've worked on the back-end of the database, I've been using the Comment fields to describe the data that goes into each field. We can download these comments along with other pieces of information about a table by using `describe_tbl`. With this function, we can quickly create a "codebook" to accompany our data.
+As I've worked on the back-end of the database, I've been using the Comment fields to describe the data that goes into each field. We can download these comments along with other pieces of information about a table by using `describe_tbl`. With this function, we can quickly create a "codebook" to accompany our data. I have [blogged about](http://tjmahr.com/post/127080928329/using-dplyr-to-back-up-a-mysql-database) the implementation of these metadata-related functions.
 
 ``` r
 describe_tbl(l2t, "EVT")
@@ -220,6 +226,7 @@ dplyr provides read-only access to a database, so we can't accidentally do stupi
 
 ``` r
 library("RMySQL")
+#> Warning: package 'RMySQL' was built under R version 3.2.2
 #> Loading required package: DBI
 l2t_write <- l2t_writer_connect(cnf_file, db_name = "l2ttest")
 
@@ -242,7 +249,7 @@ append_rows_to_table(
 # After writing
 dbReadTable(l2t_write, "TestWrites")
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1           10  Hello!  2015-08-15 16:47:54
+#> 1           13  Hello!  2015-08-20 10:47:12
 ```
 
 Helpers
