@@ -81,25 +81,25 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(l2t, backup_dir)
-#> Writing inst/backup/2015-08-20_10-54/BRIEF.csv
-#> Writing inst/backup/2015-08-20_10-54/Caregivers.csv
-#> Writing inst/backup/2015-08-20_10-54/Child.csv
-#> Writing inst/backup/2015-08-20_10-54/ChildStudy.csv
-#> Writing inst/backup/2015-08-20_10-54/EVT.csv
-#> Writing inst/backup/2015-08-20_10-54/FruitStroop.csv
-#> Writing inst/backup/2015-08-20_10-54/LENA_Admin.csv
-#> Writing inst/backup/2015-08-20_10-54/LENA_Hours.csv
-#> Writing inst/backup/2015-08-20_10-54/Literacy.csv
-#> Writing inst/backup/2015-08-20_10-54/MinPair_Admin.csv
-#> Writing inst/backup/2015-08-20_10-54/MinPair_Responses.csv
-#> Writing inst/backup/2015-08-20_10-54/PPVT.csv
-#> Writing inst/backup/2015-08-20_10-54/SES.csv
-#> Writing inst/backup/2015-08-20_10-54/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-08-20_10-54/Study.csv
-#> Writing inst/backup/2015-08-20_10-54/StudyTask.csv
-#> Writing inst/backup/2015-08-20_10-54/VerbalFluency.csv
-#> Writing inst/backup/2015-08-20_10-54/metadata/field_descriptions.csv
-#> Writing inst/backup/2015-08-20_10-54/metadata/table_descriptions.csv
+#> Writing inst/backup/2015-08-20_15-33/BRIEF.csv
+#> Writing inst/backup/2015-08-20_15-33/Caregivers.csv
+#> Writing inst/backup/2015-08-20_15-33/Child.csv
+#> Writing inst/backup/2015-08-20_15-33/ChildStudy.csv
+#> Writing inst/backup/2015-08-20_15-33/EVT.csv
+#> Writing inst/backup/2015-08-20_15-33/FruitStroop.csv
+#> Writing inst/backup/2015-08-20_15-33/LENA_Admin.csv
+#> Writing inst/backup/2015-08-20_15-33/LENA_Hours.csv
+#> Writing inst/backup/2015-08-20_15-33/Literacy.csv
+#> Writing inst/backup/2015-08-20_15-33/MinPair_Admin.csv
+#> Writing inst/backup/2015-08-20_15-33/MinPair_Responses.csv
+#> Writing inst/backup/2015-08-20_15-33/PPVT.csv
+#> Writing inst/backup/2015-08-20_15-33/SES.csv
+#> Writing inst/backup/2015-08-20_15-33/Scores_TimePoint1.csv
+#> Writing inst/backup/2015-08-20_15-33/Study.csv
+#> Writing inst/backup/2015-08-20_15-33/StudyTask.csv
+#> Writing inst/backup/2015-08-20_15-33/VerbalFluency.csv
+#> Writing inst/backup/2015-08-20_15-33/metadata/field_descriptions.csv
+#> Writing inst/backup/2015-08-20_15-33/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
@@ -119,7 +119,7 @@ data_frame(tbl = names(rows), rows = unlist(rows))
 #> 10     MinPair_Admin  190
 #> 11 MinPair_Responses 7508
 #> 12              PPVT  224
-#> 13               SES    0
+#> 13               SES  224
 #> 14 Scores_TimePoint1    0
 #> 15             Study    3
 #> 16         StudyTask   12
@@ -192,7 +192,7 @@ describe_db(l2t)
 #> 10      l2t     MinPair_Admin  190
 #> 11      l2t MinPair_Responses 7674
 #> 12      l2t              PPVT  224
-#> 13      l2t               SES    0
+#> 13      l2t               SES  224
 #> 14      l2t Scores_TimePoint1    0
 #> 15      l2t             Study    3
 #> 16      l2t         StudyTask   12
@@ -222,34 +222,25 @@ These two forms of metadata are backed up by `l2t_backup` as well. They are stor
 Writing
 -------
 
-dplyr provides read-only access to a database, so we can't accidentally do stupid things to our data. In order to write to the database in R, we have use the interface provided by the package RMySQL. We connect to the database using `l2t_connect_writer`. For the purposes of this demo, we will work on the separate `l2t_test` database.
+dplyr provides read-only access to a database, so we can't accidentally do stupid things to our data. We want to use R to migrate existing dataframes into the database, but we also don't want to do stupid things either. Therefore, I've developed very conservative helper functions for writing data. In fact there is only such function so far: `append_rows_to_table`. (I'd like to add an `overwrite_rows_in_table` eventually.) These functions work on dplyr-managed database connections. For the purposes of this demo, we will work on the separate `l2t_test` database.
 
 ``` r
-library("RMySQL")
-#> Warning: package 'RMySQL' was built under R version 3.2.2
-#> Loading required package: DBI
-l2t_write <- l2t_writer_connect(cnf_file, db_name = "l2ttest")
-
-# Table listing
-dbListTables(l2t_write)
-#> [1] "ChildTest"  "TestWrites"
-
-# Before writing
-dbReadTable(l2t_write, "TestWrites")
-#> [1] TestWritesID         Message              TestWrites_TimeStamp
-#> <0 rows> (or 0-length row.names)
+l2t_test <- l2t_connect(cnf_file, db_name = "l2ttest")
 
 # Add rows to table
 append_rows_to_table(
-  db_con = l2t_write, 
+  src = l2t_test, 
   tbl_name = "TestWrites", 
   rows = data_frame(Message = "Hello!"))
 #> [1] TRUE
 
 # After writing
-dbReadTable(l2t_write, "TestWrites")
+tbl(l2t_test, "TestWrites")
+#> Source: mysql 5.6.20 [mahr_data@l2t-db.cla.umn.edu:/l2ttest]
+#> From: TestWrites [1 x 3]
+#> 
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1           14  Hello!  2015-08-20 10:54:09
+#> 1           17  Hello!  2015-08-20 15:33:20
 ```
 
 Helpers

@@ -107,33 +107,29 @@ stored in a `metadata` folder.
 ## Writing
 
 dplyr provides read-only access to a database, so we can't accidentally do 
-stupid things to our data. In order to write to the database in R, we have use
-the interface provided by the package RMySQL. We connect to the database using 
-`l2t_connect_writer`. For the purposes of this demo, we will work on the 
+stupid things to our data. We want to use R to migrate existing dataframes into 
+the database, but we also don't want to do stupid things either. Therefore, I've
+developed very conservative helper functions for writing data. In fact there is 
+only such function so far: `append_rows_to_table`. (I'd like to add an
+`overwrite_rows_in_table` eventually.) These functions work on dplyr-managed
+database connections. For the purposes of this demo, we will work on the
 separate `l2t_test` database.
 
 ```{r}
-library("RMySQL")
-l2t_write <- l2t_writer_connect(cnf_file, db_name = "l2ttest")
-
-# Table listing
-dbListTables(l2t_write)
-
-# Before writing
-dbReadTable(l2t_write, "TestWrites")
+l2t_test <- l2t_connect(cnf_file, db_name = "l2ttest")
 
 # Add rows to table
 append_rows_to_table(
-  db_con = l2t_write, 
+  src = l2t_test, 
   tbl_name = "TestWrites", 
   rows = data_frame(Message = "Hello!"))
 
 # After writing
-dbReadTable(l2t_write, "TestWrites")
+tbl(l2t_test, "TestWrites")
 ```
 
 ```{r clean up, echo = FALSE, results = 'hide'}
-dbSendQuery(l2t_write, "DELETE FROM `l2ttest`.`TestWrites`")
+DBI::dbSendQuery(l2t_test$con, "DELETE FROM `l2ttest`.`TestWrites`")
 file.remove("db.cnf")
 file.remove("my_connection.cnf")
 ```
