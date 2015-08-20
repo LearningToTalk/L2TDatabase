@@ -7,7 +7,7 @@ This R package contains helper functions for working with the MySQL database for
 Connect with .cnf files
 -----------------------
 
-Connections to the database are managed by [.cnf files](http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html). We use these files so that login credentials and connection information are not hard-coded into the analysis script. This package provides `make_cnf_file` which creates a cnf file from login and connection information.
+Connections to the database are managed by [.cnf files](http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html). We use these files so that login credentials and connection information are not hard-coded into analysis scripts. This package provides `make_cnf_file` which creates a cnf file from login and connection information.
 
 ``` r
 library("L2TDatabase")
@@ -81,25 +81,25 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(l2t, backup_dir)
-#> Writing inst/backup/2015-08-20_10-47/BRIEF.csv
-#> Writing inst/backup/2015-08-20_10-47/Caregivers.csv
-#> Writing inst/backup/2015-08-20_10-47/Child.csv
-#> Writing inst/backup/2015-08-20_10-47/ChildStudy.csv
-#> Writing inst/backup/2015-08-20_10-47/EVT.csv
-#> Writing inst/backup/2015-08-20_10-47/FruitStroop.csv
-#> Writing inst/backup/2015-08-20_10-47/LENA_Admin.csv
-#> Writing inst/backup/2015-08-20_10-47/LENA_Hours.csv
-#> Writing inst/backup/2015-08-20_10-47/Literacy.csv
-#> Writing inst/backup/2015-08-20_10-47/MinPair_Admin.csv
-#> Writing inst/backup/2015-08-20_10-47/MinPair_Responses.csv
-#> Writing inst/backup/2015-08-20_10-47/PPVT.csv
-#> Writing inst/backup/2015-08-20_10-47/SES.csv
-#> Writing inst/backup/2015-08-20_10-47/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-08-20_10-47/Study.csv
-#> Writing inst/backup/2015-08-20_10-47/StudyTask.csv
-#> Writing inst/backup/2015-08-20_10-47/VerbalFluency.csv
-#> Writing inst/backup/2015-08-20_10-47/metadata/field_descriptions.csv
-#> Writing inst/backup/2015-08-20_10-47/metadata/table_descriptions.csv
+#> Writing inst/backup/2015-08-20_10-54/BRIEF.csv
+#> Writing inst/backup/2015-08-20_10-54/Caregivers.csv
+#> Writing inst/backup/2015-08-20_10-54/Child.csv
+#> Writing inst/backup/2015-08-20_10-54/ChildStudy.csv
+#> Writing inst/backup/2015-08-20_10-54/EVT.csv
+#> Writing inst/backup/2015-08-20_10-54/FruitStroop.csv
+#> Writing inst/backup/2015-08-20_10-54/LENA_Admin.csv
+#> Writing inst/backup/2015-08-20_10-54/LENA_Hours.csv
+#> Writing inst/backup/2015-08-20_10-54/Literacy.csv
+#> Writing inst/backup/2015-08-20_10-54/MinPair_Admin.csv
+#> Writing inst/backup/2015-08-20_10-54/MinPair_Responses.csv
+#> Writing inst/backup/2015-08-20_10-54/PPVT.csv
+#> Writing inst/backup/2015-08-20_10-54/SES.csv
+#> Writing inst/backup/2015-08-20_10-54/Scores_TimePoint1.csv
+#> Writing inst/backup/2015-08-20_10-54/Study.csv
+#> Writing inst/backup/2015-08-20_10-54/StudyTask.csv
+#> Writing inst/backup/2015-08-20_10-54/VerbalFluency.csv
+#> Writing inst/backup/2015-08-20_10-54/metadata/field_descriptions.csv
+#> Writing inst/backup/2015-08-20_10-54/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
@@ -249,7 +249,7 @@ append_rows_to_table(
 # After writing
 dbReadTable(l2t_write, "TestWrites")
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1           13  Hello!  2015-08-20 10:47:12
+#> 1           14  Hello!  2015-08-20 10:54:09
 ```
 
 Helpers

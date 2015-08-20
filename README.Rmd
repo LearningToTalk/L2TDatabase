@@ -28,7 +28,7 @@ the [Learning To Talk](http://learningtotalk.org) project.
 
 Connections to the database are managed by [.cnf files][cnf-ref]. We use these 
 files so that login credentials and connection information are not hard-coded 
-into the analysis script. This package provides `make_cnf_file` which creates a
+into analysis scripts. This package provides `make_cnf_file` which creates a
 cnf file from login and connection information.
 
 ```{r, results = 'hide'}
