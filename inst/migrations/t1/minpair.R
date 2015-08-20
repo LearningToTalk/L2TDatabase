@@ -48,8 +48,7 @@ rows_to_add <- anti_join(with_ids, curr_admins) %>%
 rows_to_add
 
 # Add the rows
-l2t_write <- l2t_writer_connect("inst/l2t_db.cnf")
-append_rows_to_table(l2t_write, "MinPair_Admin", rows_to_add)
+append_rows_to_table(l2t, "MinPair_Admin", rows_to_add)
 tbl(l2t, "MinPair_Admin")
 
 # Attach local responses to remote administration records using the eprime
@@ -69,5 +68,5 @@ responses_to_add <- with_responses %>%
   arrange(MinPairID, Running, Trial)
 responses_to_add
 
-append_rows_to_table(l2t_write, "MinPair_Responses", responses_to_add)
+append_rows_to_table(l2t, "MinPair_Responses", responses_to_add)
 

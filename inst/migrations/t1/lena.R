@@ -46,8 +46,7 @@ t1_admins <- anti_join(t1_admins, admins) %>%
 t1_admins
 
 # Update db
-l2t_write <- l2t_writer_connect("inst/l2t_db.cnf")
-append_rows_to_table(l2t_write, "LENA_Admin", t1_admins)
+append_rows_to_table(l2t, "LENA_Admin", t1_admins)
 
 # Add local hourly data to remote admin table
 lena_admins <- collect("LENA_Admin" %from% l2t)
@@ -75,6 +74,7 @@ t1_hours <- anti_join(with_hours, db_hours, by = c("LENAID", "Hour")) %>%
   arrange(LENAID, Hour)
 t1_hours
 
-# Update db
-append_rows_to_table(l2t_write, "LENA_Hours", t1_hours)
+# Update the remote table. An error here is a good thing if there are no new
+# rows to add
+append_rows_to_table(l2t, "PPVT", to_add)
 

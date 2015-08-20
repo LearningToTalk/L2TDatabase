@@ -12,8 +12,6 @@ new_children <- anti_join(l2t_dl$Child, l2t_dl$SES) %>%
   select(ChildID) %>%
   mutate(SES_Notes = "Entry seeded. Need to enter data")
 
-# Update the remote table
-l2t_write <- l2t_writer_connect("inst/l2t_db.cnf", "l2t")
-
-# An error here is a good thing if there are no new rows to add
-append_rows_to_table(l2t_write, "SES", new_children)
+# Update the remote table. An error here is a good thing if there are no new
+# rows to add.
+append_rows_to_table(l2t, "SES", new_children)

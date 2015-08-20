@@ -82,11 +82,9 @@ to_add <- match_columns(to_add, current_rows) %>%
   arrange(ChildStudyID)
 to_add
 
-# Update the remote table
-l2t_write <- l2t_writer_connect("inst/l2t_db.cnf", "l2t")
-
-# An error here is a good thing if there are no new rows to add
-append_rows_to_table(l2t_write, "BRIEF", to_add)
+# Update the remote table. An error here is a good thing if there are no new
+# rows to add
+append_rows_to_table(l2t, "PPVT", to_add)
 
 # Check that composite scores were added correctly
 brief <- collect("BRIEF" %from% l2t) %>% left_join(cds)
