@@ -66,10 +66,21 @@ cds
 # Attach the database identifiers to the BRIEF scores
 with_brief <- left_join(t1, cds)
 
+# Check the raw data first
+filter(with_brief, Inhibit_Raw + EC_Raw != ISCI_Raw) %>% glimpse
+filter(with_brief, Inhibit_Raw + EC_Raw != ISCI_Raw)
+filter(with_brief, Shift_Raw + EC_Raw != FI_Raw)
+filter(with_brief, WM_Raw + PO_Raw != EMI_Raw)
+filter(with_brief, Inhibit_Raw + Shift_Raw + EC_Raw + WM_Raw + PO_Raw != GEC_Raw) %>%
+  select(ShortResearchID, Inhibit_Raw, Shift_Raw, EC_Raw, WM_Raw, PO_Raw, GEC_Raw)
+
 # Remove duplicate rows (any row with matching ChildStudyID and BRIEF_Completion
 # values)
 current_rows <- l2t_dl$BRIEF
 current_empties <- filter(current_rows, is.na(BRIEF_Completion))
+
+# Check for raw-data rows not in the output
+anti_join(current_rows, with_brief) %>% inner_join(cds) %>% glimpse
 
 to_add <- with_brief %>%
   anti_join(current_rows, by = c("ChildStudyID", "BRIEF_Completion")) %>%
@@ -98,4 +109,3 @@ filter(brief, WM_Raw + PO_Raw != EMI_Raw)
 
 filter(brief, Inhibit_Raw + Shift_Raw + EC_Raw + WM_Raw + PO_Raw != GEC_Raw) %>%
   select(ShortResearchID, Inhibit_Raw, Shift_Raw, EC_Raw, WM_Raw, PO_Raw, GEC_Raw)
-
