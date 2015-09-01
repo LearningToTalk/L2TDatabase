@@ -42,18 +42,20 @@ Once we've created a .cnf file, we can connect to the database using `l2t_connec
 
 ``` r
 library("dplyr", warn.conflicts = FALSE)
+#> Warning: package 'dplyr' was built under R version 3.2.2
 
 # connect to the database
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file = cnf_file, db_name = "l2t")
 
 # list all the tbls in the database
 src_tbls(l2t)
-#>  [1] "BRIEF"             "Caregivers"        "Child"            
-#>  [4] "ChildStudy"        "EVT"               "FruitStroop"      
-#>  [7] "LENA_Admin"        "LENA_Hours"        "Literacy"         
-#> [10] "MinPair_Admin"     "MinPair_Responses" "PPVT"             
-#> [13] "SES"               "Scores_TimePoint1" "Study"            
-#> [16] "StudyTask"         "VerbalFluency"
+#>  [1] "BRIEF"             "Caregivers"        "Caregivers_Entry" 
+#>  [4] "Child"             "ChildStudy"        "EVT"              
+#>  [7] "FruitStroop"       "LENA_Admin"        "LENA_Hours"       
+#> [10] "Literacy"          "MinPair_Admin"     "MinPair_Responses"
+#> [13] "PPVT"              "SES"               "SES_Entry"        
+#> [16] "Scores_TimePoint1" "Study"             "StudyTask"        
+#> [19] "VerbalFluency"
 
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
@@ -80,50 +82,54 @@ We can download and backup each table in the database with `l2t_backup`.
 ``` r
 # backup each tbl
 backup_dir <- "inst/backup"
-all_tbls <- l2t_backup(l2t, backup_dir)
-#> Writing inst/backup/2015-08-20_15-33/BRIEF.csv
-#> Writing inst/backup/2015-08-20_15-33/Caregivers.csv
-#> Writing inst/backup/2015-08-20_15-33/Child.csv
-#> Writing inst/backup/2015-08-20_15-33/ChildStudy.csv
-#> Writing inst/backup/2015-08-20_15-33/EVT.csv
-#> Writing inst/backup/2015-08-20_15-33/FruitStroop.csv
-#> Writing inst/backup/2015-08-20_15-33/LENA_Admin.csv
-#> Writing inst/backup/2015-08-20_15-33/LENA_Hours.csv
-#> Writing inst/backup/2015-08-20_15-33/Literacy.csv
-#> Writing inst/backup/2015-08-20_15-33/MinPair_Admin.csv
-#> Writing inst/backup/2015-08-20_15-33/MinPair_Responses.csv
-#> Writing inst/backup/2015-08-20_15-33/PPVT.csv
-#> Writing inst/backup/2015-08-20_15-33/SES.csv
-#> Writing inst/backup/2015-08-20_15-33/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-08-20_15-33/Study.csv
-#> Writing inst/backup/2015-08-20_15-33/StudyTask.csv
-#> Writing inst/backup/2015-08-20_15-33/VerbalFluency.csv
-#> Writing inst/backup/2015-08-20_15-33/metadata/field_descriptions.csv
-#> Writing inst/backup/2015-08-20_15-33/metadata/table_descriptions.csv
+all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
+#> Writing inst/backup/2015-09-01_10-26/BRIEF.csv
+#> Writing inst/backup/2015-09-01_10-26/Caregivers.csv
+#> Writing inst/backup/2015-09-01_10-26/Caregivers_Entry.csv
+#> Writing inst/backup/2015-09-01_10-26/Child.csv
+#> Writing inst/backup/2015-09-01_10-26/ChildStudy.csv
+#> Writing inst/backup/2015-09-01_10-26/EVT.csv
+#> Writing inst/backup/2015-09-01_10-26/FruitStroop.csv
+#> Writing inst/backup/2015-09-01_10-26/LENA_Admin.csv
+#> Writing inst/backup/2015-09-01_10-26/LENA_Hours.csv
+#> Writing inst/backup/2015-09-01_10-26/Literacy.csv
+#> Writing inst/backup/2015-09-01_10-26/MinPair_Admin.csv
+#> Writing inst/backup/2015-09-01_10-26/MinPair_Responses.csv
+#> Writing inst/backup/2015-09-01_10-26/PPVT.csv
+#> Writing inst/backup/2015-09-01_10-26/SES.csv
+#> Writing inst/backup/2015-09-01_10-26/SES_Entry.csv
+#> Writing inst/backup/2015-09-01_10-26/Scores_TimePoint1.csv
+#> Writing inst/backup/2015-09-01_10-26/Study.csv
+#> Writing inst/backup/2015-09-01_10-26/StudyTask.csv
+#> Writing inst/backup/2015-09-01_10-26/VerbalFluency.csv
+#> Writing inst/backup/2015-09-01_10-26/metadata/field_descriptions.csv
+#> Writing inst/backup/2015-09-01_10-26/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
 data_frame(tbl = names(rows), rows = unlist(rows))
-#> Source: local data frame [17 x 2]
+#> Source: local data frame [19 x 2]
 #> 
 #>                  tbl rows
 #> 1              BRIEF  224
 #> 2         Caregivers    0
-#> 3              Child  224
-#> 4         ChildStudy  224
-#> 5                EVT  224
-#> 6        FruitStroop    0
-#> 7         LENA_Admin  182
-#> 8         LENA_Hours 2968
-#> 9           Literacy    0
-#> 10     MinPair_Admin  190
-#> 11 MinPair_Responses 7508
-#> 12              PPVT  224
-#> 13               SES  224
-#> 14 Scores_TimePoint1    0
-#> 15             Study    3
-#> 16         StudyTask   12
-#> 17     VerbalFluency    0
+#> 3   Caregivers_Entry   91
+#> 4              Child  224
+#> 5         ChildStudy  224
+#> 6                EVT  224
+#> 7        FruitStroop    0
+#> 8         LENA_Admin  182
+#> 9         LENA_Hours 2968
+#> 10          Literacy    0
+#> 11     MinPair_Admin  190
+#> 12 MinPair_Responses 7508
+#> 13              PPVT  224
+#> 14               SES  224
+#> 15         SES_Entry  215
+#> 16 Scores_TimePoint1    0
+#> 17             Study    3
+#> 18         StudyTask   12
+#> 19     VerbalFluency    0
 
 all_tbls$ChildStudy
 #> Source: local data frame [224 x 8]
@@ -150,7 +156,7 @@ Metadata
 As I've worked on the back-end of the database, I've been using the Comment fields to describe the data that goes into each field. We can download these comments along with other pieces of information about a table by using `describe_tbl`. With this function, we can quickly create a "codebook" to accompany our data. I have [blogged about](http://tjmahr.com/post/127080928329/using-dplyr-to-back-up-a-mysql-database) the implementation of these metadata-related functions.
 
 ``` r
-describe_tbl(l2t, "EVT")
+describe_tbl(src = l2t, tbl_name = "EVT")
 #>    Table          Field Index      DataType      DefaultValue NullAllowed
 #> 1    EVT   ChildStudyID   UNI       int(11)              <NA>          NO
 #> 2    EVT          EVTID   PRI       int(11)              <NA>          NO
@@ -178,46 +184,67 @@ describe_tbl(l2t, "EVT")
 We can also download the table-level comments from a database with `describe_db`, although these descriptions have a much tighter length limit.
 
 ``` r
-describe_db(l2t)
+describe_db(src = l2t)
 #>    Database             Table Rows
 #> 1       l2t             BRIEF  224
 #> 2       l2t        Caregivers    0
-#> 3       l2t             Child  224
-#> 4       l2t        ChildStudy  224
-#> 5       l2t               EVT  224
-#> 6       l2t       FruitStroop    0
-#> 7       l2t        LENA_Admin  182
-#> 8       l2t        LENA_Hours 2968
-#> 9       l2t          Literacy    0
-#> 10      l2t     MinPair_Admin  190
-#> 11      l2t MinPair_Responses 7674
-#> 12      l2t              PPVT  224
-#> 13      l2t               SES  224
-#> 14      l2t Scores_TimePoint1    0
-#> 15      l2t             Study    3
-#> 16      l2t         StudyTask   12
-#> 17      l2t     VerbalFluency    0
+#> 3       l2t  Caregivers_Entry   91
+#> 4       l2t             Child  224
+#> 5       l2t        ChildStudy  224
+#> 6       l2t               EVT  224
+#> 7       l2t       FruitStroop    0
+#> 8       l2t        LENA_Admin  182
+#> 9       l2t        LENA_Hours 2968
+#> 10      l2t          Literacy    0
+#> 11      l2t     MinPair_Admin  190
+#> 12      l2t MinPair_Responses 7674
+#> 13      l2t              PPVT  224
+#> 14      l2t               SES  224
+#> 15      l2t         SES_Entry  215
+#> 16      l2t Scores_TimePoint1    0
+#> 17      l2t             Study    3
+#> 18      l2t         StudyTask   12
+#> 19      l2t     VerbalFluency    0
 #>                                                    Description
 #> 1  Scores from Behvr Rating Inventory of Exec Func (Preschool)
 #> 2                        Demographics of children's caregivers
-#> 3          Unique IDs and demographics of children in database
-#> 4                                                             
-#> 5                       Scores on Expressive Vocabulary Test 2
-#> 6                                                             
-#> 7                                              LENA recordings
-#> 8                    Stats from LENA recordings by hour-of-day
-#> 9                                                             
-#> 10             Administrations of the Minimal Pairs experiment
-#> 11      Trials and responses from the Minimal Pairs experiment
-#> 12                 Scores on Peabody Picture Vocabulary Test 4
-#> 13                            Child and household demographics
-#> 14                                                            
+#> 3                        Demographics of children's caregivers
+#> 4          Unique IDs and demographics of children in database
+#> 5                                                             
+#> 6                       Scores on Expressive Vocabulary Test 2
+#> 7                                                             
+#> 8                                              LENA recordings
+#> 9                    Stats from LENA recordings by hour-of-day
+#> 10                                                            
+#> 11             Administrations of the Minimal Pairs experiment
+#> 12      Trials and responses from the Minimal Pairs experiment
+#> 13                 Scores on Peabody Picture Vocabulary Test 4
+#> 14                            Child and household demographics
 #> 15                                                            
 #> 16                                                            
-#> 17
+#> 17                                                            
+#> 18                                                            
+#> 19
 ```
 
 These two forms of metadata are backed up by `l2t_backup` as well. They are stored in a `metadata` folder.
+
+Dumping the database
+--------------------
+
+A final option for backing up the database is `dump_database`. This function calls on the `mysqldump` utility which exports a database into a series of SQL statements that can be used to reconstruct the database.
+
+``` r
+dump_database(
+  cnf_file = cnf_file, 
+  backup_dir = "inst/backup",
+  db_name = "l2t")
+#> Checking inst/backup/l2t_2015-09-01_10-26.sql
+#> ..file size: 1040.606 kB
+#> ..line count: 670
+#> ..first line: -- MySQL dump 10.13  Distrib 5.6.26, for Win64 (x86_64)
+#> ..final line: -- Dump completed on 2015-09-01 10:26:59
+```
 
 Writing
 -------
@@ -240,7 +267,7 @@ tbl(l2t_test, "TestWrites")
 #> From: TestWrites [1 x 3]
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1           17  Hello!  2015-08-20 15:33:20
+#> 1           21  Hello!  2015-09-01 10:27:00
 ```
 
 Helpers

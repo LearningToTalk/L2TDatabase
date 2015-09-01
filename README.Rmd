@@ -51,7 +51,7 @@ work with remotely stored data using dplyr; it's really great stuff.
 library("dplyr", warn.conflicts = FALSE)
 
 # connect to the database
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file = cnf_file, db_name = "l2t")
 
 # list all the tbls in the database
 src_tbls(l2t)
@@ -72,7 +72,7 @@ We can download and backup each table in the database with `l2t_backup`.
 ```{r}
 # backup each tbl
 backup_dir <- "inst/backup"
-all_tbls <- l2t_backup(l2t, backup_dir)
+all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
@@ -91,18 +91,31 @@ accompany our data. I have [blogged about][blog-backup] the implementation of
 these metadata-related functions.
 
 ```{r}
-describe_tbl(l2t, "EVT")
+describe_tbl(src = l2t, tbl_name = "EVT")
 ```
 
 We can also download the table-level comments from a database with
 `describe_db`, although these descriptions have a much tighter length limit.
 
 ```{r}
-describe_db(l2t)
+describe_db(src = l2t)
 ```
 
 These two forms of metadata are backed up by `l2t_backup` as well. They are 
 stored in a `metadata` folder.
+
+## Dumping the database
+
+A final option for backing up the database is `dump_database`. This function
+calls on the `mysqldump` utility which exports a database into a series of SQL
+statements that can be used to reconstruct the database.
+
+```{r}
+dump_database(
+  cnf_file = cnf_file, 
+  backup_dir = "inst/backup",
+  db_name = "l2t")
+```
 
 ## Writing
 
