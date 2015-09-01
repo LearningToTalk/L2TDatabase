@@ -13,3 +13,15 @@ on_failure(has_table) <- function(call, env) {
           tbl_name, db_name)
 }
 
+
+# Check that a utility is available on the system path
+on_path <- devtools::on_path
+
+on_failure(on_path) <- function(call, env) {
+  # first element in a call is a function
+  commands <- eval(call[[-1]], env)
+  sprintf("%s not found on system path", commands)
+}
+
+# assert_that(on_path("pandoc"))
+# #> Error: pandoc not found on system path
