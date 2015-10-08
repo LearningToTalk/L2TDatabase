@@ -1,12 +1,17 @@
 
 #' Backup a database as a sequence of SQL statements
 #'
-#' https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html
+#' This function calls \code{mysqldump} on a database connection described in a
+#' cnf file. Consider reading the
+#' \href{https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html}{documentation
+#' of mysqldump}.
+#'
+#' The command-line call uses the \code{--single-transaction} flag because it
+#' doesn't need LOCKED TABLES privilege.
 #'
 #' @inheritParams l2t_connect
 #' @inheritParams l2t_backup
-#' @return Nothing. Information about the dump command and output are printed to
-#'   the console
+#' @return Nothing. Information about the dump output is printed to the console
 #' @export
 dump_database <- function(cnf_file, backup_dir, db_name = "l2t") {
   # Check that utility is installed and that only one DB is being backed up

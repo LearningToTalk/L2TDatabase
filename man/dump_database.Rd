@@ -14,10 +14,16 @@ dump_database(cnf_file, backup_dir, db_name = "l2t")
 \item{db_name}{the name of the database to connect to. Defaults to "l2t".}
 }
 \value{
-Nothing. Information about the dump command and output are printed to
-  the console
+Nothing. Information about the dump output is printed to the console
 }
 \description{
-https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html
+This function calls \code{mysqldump} on a database connection described in a
+cnf file. Consider reading the
+\href{https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html}{documentation
+of mysqldump}.
+}
+\details{
+The command-line call uses the \code{--single-transaction} flag because it
+doesn't need LOCKED TABLES privilege.
 }
 
