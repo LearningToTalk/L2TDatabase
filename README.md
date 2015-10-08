@@ -83,58 +83,60 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
-#> Writing inst/backup/2015-09-01_10-26/BRIEF.csv
-#> Writing inst/backup/2015-09-01_10-26/Caregivers.csv
-#> Writing inst/backup/2015-09-01_10-26/Caregivers_Entry.csv
-#> Writing inst/backup/2015-09-01_10-26/Child.csv
-#> Writing inst/backup/2015-09-01_10-26/ChildStudy.csv
-#> Writing inst/backup/2015-09-01_10-26/EVT.csv
-#> Writing inst/backup/2015-09-01_10-26/FruitStroop.csv
-#> Writing inst/backup/2015-09-01_10-26/LENA_Admin.csv
-#> Writing inst/backup/2015-09-01_10-26/LENA_Hours.csv
-#> Writing inst/backup/2015-09-01_10-26/Literacy.csv
-#> Writing inst/backup/2015-09-01_10-26/MinPair_Admin.csv
-#> Writing inst/backup/2015-09-01_10-26/MinPair_Responses.csv
-#> Writing inst/backup/2015-09-01_10-26/PPVT.csv
-#> Writing inst/backup/2015-09-01_10-26/SES.csv
-#> Writing inst/backup/2015-09-01_10-26/SES_Entry.csv
-#> Writing inst/backup/2015-09-01_10-26/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-09-01_10-26/Study.csv
-#> Writing inst/backup/2015-09-01_10-26/StudyTask.csv
-#> Writing inst/backup/2015-09-01_10-26/VerbalFluency.csv
-#> Writing inst/backup/2015-09-01_10-26/metadata/field_descriptions.csv
-#> Writing inst/backup/2015-09-01_10-26/metadata/table_descriptions.csv
+#> Writing inst/backup/2015-10-08_10-00/BRIEF.csv
+#> Writing inst/backup/2015-10-08_10-00/Caregivers.csv
+#> Writing inst/backup/2015-10-08_10-00/Caregivers_Entry.csv
+#> Writing inst/backup/2015-10-08_10-00/Child.csv
+#> Writing inst/backup/2015-10-08_10-00/ChildStudy.csv
+#> Writing inst/backup/2015-10-08_10-00/EVT.csv
+#> Writing inst/backup/2015-10-08_10-00/FruitStroop.csv
+#> Writing inst/backup/2015-10-08_10-00/LENA_Admin.csv
+#> Writing inst/backup/2015-10-08_10-00/LENA_Hours.csv
+#> Writing inst/backup/2015-10-08_10-00/Literacy.csv
+#> Writing inst/backup/2015-10-08_10-00/MinPair_Admin.csv
+#> Writing inst/backup/2015-10-08_10-00/MinPair_Responses.csv
+#> Writing inst/backup/2015-10-08_10-00/PPVT.csv
+#> Writing inst/backup/2015-10-08_10-00/SES.csv
+#> Writing inst/backup/2015-10-08_10-00/SES_Entry.csv
+#> Writing inst/backup/2015-10-08_10-00/Scores_TimePoint1.csv
+#> Writing inst/backup/2015-10-08_10-00/Study.csv
+#> Writing inst/backup/2015-10-08_10-00/StudyTask.csv
+#> Writing inst/backup/2015-10-08_10-00/VerbalFluency.csv
+#> Writing inst/backup/2015-10-08_10-00/metadata/field_descriptions.csv
+#> Writing inst/backup/2015-10-08_10-00/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
 data_frame(tbl = names(rows), rows = unlist(rows))
 #> Source: local data frame [19 x 2]
 #> 
-#>                  tbl rows
-#> 1              BRIEF  224
-#> 2         Caregivers    0
-#> 3   Caregivers_Entry   91
-#> 4              Child  224
-#> 5         ChildStudy  224
-#> 6                EVT  224
-#> 7        FruitStroop    0
-#> 8         LENA_Admin  182
-#> 9         LENA_Hours 2968
-#> 10          Literacy    0
-#> 11     MinPair_Admin  190
-#> 12 MinPair_Responses 7508
-#> 13              PPVT  224
-#> 14               SES  224
-#> 15         SES_Entry  215
-#> 16 Scores_TimePoint1    0
-#> 17             Study    3
-#> 18         StudyTask   12
-#> 19     VerbalFluency    0
+#>                  tbl  rows
+#>                (chr) (int)
+#> 1              BRIEF   224
+#> 2         Caregivers     0
+#> 3   Caregivers_Entry   477
+#> 4              Child   224
+#> 5         ChildStudy   224
+#> 6                EVT   224
+#> 7        FruitStroop     0
+#> 8         LENA_Admin   182
+#> 9         LENA_Hours  2968
+#> 10          Literacy   207
+#> 11     MinPair_Admin   190
+#> 12 MinPair_Responses  7508
+#> 13              PPVT   224
+#> 14               SES   224
+#> 15         SES_Entry   215
+#> 16 Scores_TimePoint1     0
+#> 17             Study     3
+#> 18         StudyTask    12
+#> 19     VerbalFluency     0
 
 all_tbls$ChildStudy
 #> Source: local data frame [224 x 8]
 #> 
 #>    ChildStudyID ChildID StudyID ShortResearchID FullResearchID
+#>           (int)   (int)   (int)           (chr)          (chr)
 #> 1             1      23       1            600L      600L37MS2
 #> 2             2      24       1            601L      601L28MS1
 #> 3             3      25       1            602L      602L34MS2
@@ -188,14 +190,14 @@ describe_db(src = l2t)
 #>    Database             Table Rows
 #> 1       l2t             BRIEF  224
 #> 2       l2t        Caregivers    0
-#> 3       l2t  Caregivers_Entry   91
+#> 3       l2t  Caregivers_Entry  444
 #> 4       l2t             Child  224
 #> 5       l2t        ChildStudy  224
 #> 6       l2t               EVT  224
 #> 7       l2t       FruitStroop    0
 #> 8       l2t        LENA_Admin  182
 #> 9       l2t        LENA_Hours 2968
-#> 10      l2t          Literacy    0
+#> 10      l2t          Literacy  207
 #> 11      l2t     MinPair_Admin  190
 #> 12      l2t MinPair_Responses 7674
 #> 13      l2t              PPVT  224
@@ -208,7 +210,7 @@ describe_db(src = l2t)
 #>                                                    Description
 #> 1  Scores from Behvr Rating Inventory of Exec Func (Preschool)
 #> 2                        Demographics of children's caregivers
-#> 3                        Demographics of children's caregivers
+#> 3      Demographics of children's caregivers (temp data-entry)
 #> 4          Unique IDs and demographics of children in database
 #> 5                                                             
 #> 6                       Scores on Expressive Vocabulary Test 2
@@ -220,7 +222,7 @@ describe_db(src = l2t)
 #> 12      Trials and responses from the Minimal Pairs experiment
 #> 13                 Scores on Peabody Picture Vocabulary Test 4
 #> 14                            Child and household demographics
-#> 15                                                            
+#> 15          Child and household demographics (temp data-entry)
 #> 16                                                            
 #> 17                                                            
 #> 18                                                            
@@ -239,11 +241,11 @@ dump_database(
   cnf_file = cnf_file, 
   backup_dir = "inst/backup",
   db_name = "l2t")
-#> Checking inst/backup/l2t_2015-09-01_10-26.sql
-#> ..file size: 1040.606 kB
-#> ..line count: 670
+#> Checking inst/backup/l2t_2015-10-08_10-00.sql
+#> ..file size: 1131.692 kB
+#> ..line count: 671
 #> ..first line: -- MySQL dump 10.13  Distrib 5.6.26, for Win64 (x86_64)
-#> ..final line: -- Dump completed on 2015-09-01 10:26:59
+#> ..final line: -- Dump completed on 2015-10-08 10:00:26
 ```
 
 Writing
@@ -267,7 +269,8 @@ tbl(l2t_test, "TestWrites")
 #> From: TestWrites [1 x 3]
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
-#> 1           21  Hello!  2015-09-01 10:27:00
+#>          (int)   (chr)                (chr)
+#> 1           23  Hello!  2015-10-08 10:00:26
 ```
 
 Helpers
