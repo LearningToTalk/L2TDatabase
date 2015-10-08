@@ -92,9 +92,9 @@ append_rows_to_table(l2t, dest_table, to_add)
 
 
 ## Compare remote to local
-updated_rows <- collect(dest_table %from% l2t) %>% 
-  anti_join(to_add)
+updated_rows <- anti_join(to_add, collect(dest_table %from% l2t))
 updated_rows
+
 
 # Other checks to run on the remote table
 # ...
