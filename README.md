@@ -54,8 +54,8 @@ src_tbls(l2t)
 #>  [7] "FruitStroop"       "LENA_Admin"        "LENA_Hours"       
 #> [10] "Literacy"          "MinPair_Admin"     "MinPair_Responses"
 #> [13] "PPVT"              "SES"               "SES_Entry"        
-#> [16] "Scores_TimePoint1" "Study"             "StudyTask"        
-#> [19] "VerbalFluency"
+#> [16] "Scores_TimePoint1" "Siblings"          "Study"            
+#> [19] "StudyTask"         "VerbalFluency"
 
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
@@ -83,32 +83,33 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
-#> Writing inst/backup/2015-10-08_10-00/BRIEF.csv
-#> Writing inst/backup/2015-10-08_10-00/Caregivers.csv
-#> Writing inst/backup/2015-10-08_10-00/Caregivers_Entry.csv
-#> Writing inst/backup/2015-10-08_10-00/Child.csv
-#> Writing inst/backup/2015-10-08_10-00/ChildStudy.csv
-#> Writing inst/backup/2015-10-08_10-00/EVT.csv
-#> Writing inst/backup/2015-10-08_10-00/FruitStroop.csv
-#> Writing inst/backup/2015-10-08_10-00/LENA_Admin.csv
-#> Writing inst/backup/2015-10-08_10-00/LENA_Hours.csv
-#> Writing inst/backup/2015-10-08_10-00/Literacy.csv
-#> Writing inst/backup/2015-10-08_10-00/MinPair_Admin.csv
-#> Writing inst/backup/2015-10-08_10-00/MinPair_Responses.csv
-#> Writing inst/backup/2015-10-08_10-00/PPVT.csv
-#> Writing inst/backup/2015-10-08_10-00/SES.csv
-#> Writing inst/backup/2015-10-08_10-00/SES_Entry.csv
-#> Writing inst/backup/2015-10-08_10-00/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-10-08_10-00/Study.csv
-#> Writing inst/backup/2015-10-08_10-00/StudyTask.csv
-#> Writing inst/backup/2015-10-08_10-00/VerbalFluency.csv
-#> Writing inst/backup/2015-10-08_10-00/metadata/field_descriptions.csv
-#> Writing inst/backup/2015-10-08_10-00/metadata/table_descriptions.csv
+#> Writing inst/backup/2015-10-19_15-01/BRIEF.csv
+#> Writing inst/backup/2015-10-19_15-01/Caregivers.csv
+#> Writing inst/backup/2015-10-19_15-01/Caregivers_Entry.csv
+#> Writing inst/backup/2015-10-19_15-01/Child.csv
+#> Writing inst/backup/2015-10-19_15-01/ChildStudy.csv
+#> Writing inst/backup/2015-10-19_15-01/EVT.csv
+#> Writing inst/backup/2015-10-19_15-01/FruitStroop.csv
+#> Writing inst/backup/2015-10-19_15-01/LENA_Admin.csv
+#> Writing inst/backup/2015-10-19_15-01/LENA_Hours.csv
+#> Writing inst/backup/2015-10-19_15-01/Literacy.csv
+#> Writing inst/backup/2015-10-19_15-01/MinPair_Admin.csv
+#> Writing inst/backup/2015-10-19_15-01/MinPair_Responses.csv
+#> Writing inst/backup/2015-10-19_15-01/PPVT.csv
+#> Writing inst/backup/2015-10-19_15-01/SES.csv
+#> Writing inst/backup/2015-10-19_15-01/SES_Entry.csv
+#> Writing inst/backup/2015-10-19_15-01/Scores_TimePoint1.csv
+#> Writing inst/backup/2015-10-19_15-01/Siblings.csv
+#> Writing inst/backup/2015-10-19_15-01/Study.csv
+#> Writing inst/backup/2015-10-19_15-01/StudyTask.csv
+#> Writing inst/backup/2015-10-19_15-01/VerbalFluency.csv
+#> Writing inst/backup/2015-10-19_15-01/metadata/field_descriptions.csv
+#> Writing inst/backup/2015-10-19_15-01/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
 data_frame(tbl = names(rows), rows = unlist(rows))
-#> Source: local data frame [19 x 2]
+#> Source: local data frame [20 x 2]
 #> 
 #>                  tbl  rows
 #>                (chr) (int)
@@ -128,9 +129,10 @@ data_frame(tbl = names(rows), rows = unlist(rows))
 #> 14               SES   224
 #> 15         SES_Entry   215
 #> 16 Scores_TimePoint1     0
-#> 17             Study     3
-#> 18         StudyTask    12
-#> 19     VerbalFluency     0
+#> 17          Siblings     0
+#> 18             Study     3
+#> 19         StudyTask    12
+#> 20     VerbalFluency     0
 
 all_tbls$ChildStudy
 #> Source: local data frame [224 x 8]
@@ -204,9 +206,10 @@ describe_db(src = l2t)
 #> 14      l2t               SES  224
 #> 15      l2t         SES_Entry  215
 #> 16      l2t Scores_TimePoint1    0
-#> 17      l2t             Study    3
-#> 18      l2t         StudyTask   12
-#> 19      l2t     VerbalFluency    0
+#> 17      l2t          Siblings    0
+#> 18      l2t             Study    3
+#> 19      l2t         StudyTask   12
+#> 20      l2t     VerbalFluency    0
 #>                                                    Description
 #> 1  Scores from Behvr Rating Inventory of Exec Func (Preschool)
 #> 2                        Demographics of children's caregivers
@@ -224,9 +227,10 @@ describe_db(src = l2t)
 #> 14                            Child and household demographics
 #> 15          Child and household demographics (temp data-entry)
 #> 16                                                            
-#> 17                                                            
+#> 17                              Sibling and Twin Relationships
 #> 18                                                            
-#> 19
+#> 19                                                            
+#> 20
 ```
 
 These two forms of metadata are backed up by `l2t_backup` as well. They are stored in a `metadata` folder.
@@ -241,11 +245,11 @@ dump_database(
   cnf_file = cnf_file, 
   backup_dir = "inst/backup",
   db_name = "l2t")
-#> Checking inst/backup/l2t_2015-10-08_10-00.sql
-#> ..file size: 1131.692 kB
-#> ..line count: 671
+#> Checking inst/backup/l2t_2015-10-19_15-01.sql
+#> ..file size: 1135.978 kB
+#> ..line count: 699
 #> ..first line: -- MySQL dump 10.13  Distrib 5.6.26, for Win64 (x86_64)
-#> ..final line: -- Dump completed on 2015-10-08 10:00:26
+#> ..final line: -- Dump completed on 2015-10-19 15:02:06
 ```
 
 Writing
@@ -270,7 +274,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          (int)   (chr)                (chr)
-#> 1           23  Hello!  2015-10-08 10:00:26
+#> 1           25  Hello!  2015-10-19 15:02:06
 ```
 
 Helpers
