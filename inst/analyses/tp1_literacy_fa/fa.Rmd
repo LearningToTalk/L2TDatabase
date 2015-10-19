@@ -1,0 +1,125 @@
+---
+title: "TP1 Literacy Factor Analysis"
+author: "Tristan Mahr"
+date: "October 19, 2015"
+output: 
+  html_document: 
+    fig_caption: yes
+    keep_md: yes
+---
+
+```{r, message = FALSE}
+library("knitr")
+opts_chunk$set(comment = "#>", collapse = TRUE)
+
+library("L2TDatabase")
+library("dplyr", warn.conflicts = FALSE)
+
+# connect to the database using my cnf file
+cnf_file <- file.path("../../l2t_db.cnf")
+l2t <- l2t_connect(cnf_file)
+```
+
+First, we prepare the data-set by downloading the tables of child-study IDs, of 
+study names, and of responses to the literacy survey. We combine those tables
+together to generate the raw data-set.
+
+```{r}
+# Download child, study mappings
+child_study <- "ChildStudy" %from% l2t %>% 
+  left_join("Study" %from% l2t) %>% 
+  collect
+
+# Download literacy scores, attaching matching child-study columns
+df_lit <- collect("Literacy" %from% l2t) %>% 
+  inner_join(child_study)
+
+# Keep just the literarcy related columns
+df_lit <- df_lit %>% 
+  select(Study, ShortResearchID, ReadingBedtime:TeachReading, 
+         Exclude, ExcludeNotes)
+```
+
+We next examine the kinds of responses in each literacy column. (`A data.frame` 
+is a `list` of columns so using `lapply(df, func)` lets us apply a function to 
+each column.)
+
+```{r}
+# Display the kinds ofs values in each column
+df_lit %>% 
+  select(ReadingBedtime:TeachReading) %>% 
+  lapply(unique) %>% 
+  lapply(sort)
+
+# Count the number of NA values in each column
+df_lit %>% 
+  select(ReadingBedtime:TeachReading) %>% 
+  lapply(function(xs) length(Filter(is.na, xs))) %>% 
+  str
+```
+
+Re-encode the literacy responses as ordinal measures. Conveniently, the ordering
+of each column's values from smallest to largest is also the alphabetical order
+of those values.
+
+```{r}
+# For now ignore reading onset
+df_lit$ReadingOnset <- NULL
+
+# Set each column between from ReadingBedtime to TeachReading as ordinal
+df_lit <- df_lit %>% 
+  mutate_each(funs(factor(., order = TRUE)), ReadingBedtime:TeachReading)
+
+# Confirm level orderings
+df_lit %>% 
+  lapply(levels) %>% 
+  Filter(Negate(is.null), .)
+```
+
+Impute missing values.
+
+```{r}
+library("mice")
+library("tidyr")
+
+# Which rows have missing data
+kids_with_missing_data <- df_lit %>% 
+  gather(Item, Value, -Study, -ShortResearchID, -ExcludeNotes, -Exclude) %>% 
+  filter(is.na(Value)) %>% 
+  select(Study:ShortResearchID) %>% 
+  distinct
+kids_with_missing_data$ShortResearchID
+
+# Impute with default imputation methods (it will use "polr" (proportion odds
+# model) because the values are ordinal)
+df_values <- df_lit %>% select(ReadingBedtime:TeachReading)
+imputed <- mice(df_values, m = 10, print = FALSE)
+imputed
+
+# Combine original and imputed values
+with_imputed <- df_lit %>% 
+  bind_cols(mice::complete(imputed, "broad", include = TRUE)) %>% 
+  # Drop unmarked columns since the ColName.0 columns have original values
+  select(-(ReadingBedtime:ExcludeNotes)) %>%
+  # Look only at rows with missing data
+  semi_join(kids_with_missing_data) 
+
+# Convert to long format, separate ColName.ImputationNum into separate columns,
+# convert back to wide to show how each NA was imputed.
+each_imputation <- with_imputed %>% 
+  gather(Item, Value, -Study, -ShortResearchID) %>% 
+  separate(Item, into = c("Item", "Imputation")) %>% 
+  mutate(Imputation = paste0("Imp", Imputation),
+         Imputation = ifelse(Imputation == "Imp0", "Raw", Imputation)) %>% 
+  spread(Imputation, Value) %>% 
+  filter(is.na(Raw)) %>% 
+  select(ShortResearchID, Item, Raw, Imp1, Imp2:Imp9, Imp10) %>% 
+  arrange(Item)
+
+kable(each_imputation, format = "markdown")
+```
+
+Hmmm... the imputations look a little unstable. I need to see what else I can
+include here, like including a measure of age at survey administration or
+including other child-level measures.
+
