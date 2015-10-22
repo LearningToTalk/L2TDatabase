@@ -1,0 +1,205 @@
+---
+title: "Normalizing Eyetracking Data"
+author: "Tristan Mahr"
+date: "October 22, 2015"
+output: 
+  html_document: 
+    keep_md: yes
+---
+
+## Gameplan
+
+Our goal today is to prepare our eyetracking data to be inserted into a
+database.
+
+For database normalization, we want there to be five tables:
+
+* Experiments: 1 row per administration of experiment.
+* Trials: 1 row per trial of an eye-tracking experiment.
+* Frames: 1 row per frame of eyetracking data in a trial.
+* ExperimentsInfo: 1 row per attribute of a experiment
+* TrialInfo: 1 row per attribute of a trial
+
+The first three tables are meant to be nice and nested "wide" dataframes. We 
+have looks nested in trials nested in experiment administrations, and each row 
+is one thing (a frame, a trial, an experiment). These three tables are
+experiment agnostic.
+
+The other tables are meant to be a grab-bag of key-value pairs, containing 
+things like the target word of each trial or the dialect of the experiment 
+administration. These will be "long" dataframes, such that there are multiple 
+rows for a single trial or experiment. The specific attributes that 
+differentiate trials and experiments live in these tables. These tables will
+allow the other three to be completely task agnostic.
+
+## Eyetracking data from lookr
+
+Use lookr to load and reduce some eye-tracking data.
+
+```{r, warning = FALSE, message = FALSE}
+library("lookr")
+library("purrr")
+library("knitr")
+library("dplyr")
+opts_chunk$set(comment = "#>", collapse = TRUE)
+```
+
+
+```{r}
+# Load some example data bundled in lookr
+mp_long <- file.path(find.package("lookr"), "docs/data/MP_WFFArea_Long/")
+trials <- suppressMessages(Task(mp_long))
+trials
+
+# Light preprocessing: Set time 0 to target onset, map gaze locations to AOIs,
+# interpolate spans of missing data up to 150ms in duration
+trials <- AdjustTimes(trials, "TargetOnset")
+trials <- AddAOIData(trials)
+trials <- InterpolateMissingFrames(trials)
+```
+
+Note that each `Trial` object is just `data.frame` with several associated
+`attributes`.
+
+```{r}
+print(trials[[1]], width = 80, strict.width = "wrap")
+```
+
+Extracting just the data-frame parts and combining them will provide us with the
+rows for the Frames table. The Experiments/Trials rows will come from the
+attributes. 
+
+To link trials to administrations, we will create a new attribute `TrialName`
+attibute that will uniquely identify trials.
+
+```{r}
+# Uniquely name each trial
+trials %@% "TrialName" <- 
+  sprintf("%s_%02.0f", trials %@% "Basename", trials %@% "TrialNo")
+```
+
+## Creating the wide tables
+
+Now we can create the three main "wide" (task-invariant) tables. We `Basename`
+to link experiment administrations to `TrialName` and `TrialName` to link to
+eye-tracking frames.
+
+```{r}
+tbl_exps <- trials %>% 
+  gather_attributes(c("Basename", "DateTime", "Subject", "Task")) %>% 
+  as_data_frame %>% 
+  distinct
+tbl_exps
+
+tbl_trials <- trials %>% 
+  gather_attributes(c("TrialName", "Basename", "TrialNo")) %>% 
+  as_data_frame %>% 
+  distinct
+tbl_trials
+
+# Make a function that extracts the columns of gaze data from a Trial, then 
+# apply it to each Trial
+collect_looks <- function(x) {
+  x_name <- x %@% "TrialName"
+  # c(x) to strip attributes
+  x <- c(x) %>% 
+    as_data_frame %>% 
+    mutate(TrialName = x_name) %>% 
+    select(TrialName, Time, XMean, YMean, GazeByImageAOI, GazeByAOI)
+  x
+}
+
+looks <- trials %>% map(collect_looks) %>% bind_rows
+
+# Convert screen proportions to pixel locations
+tbl_looks <- looks %>% 
+  mutate(XMean = round(XMean * lwl_constants$screen_width),
+         YMean = round(YMean * lwl_constants$screen_height))
+tbl_looks
+```
+
+
+## Creating the grab-bag tables
+
+### Prepare experimental grab-bag and flatten AOI definitions
+
+Now we need to make the grab-bags of trial and experiment attributes. But first
+let's unpack the implicit AOI definitions used in the experiments.
+
+```{r}
+library("tidyr")
+library("stringr")
+
+# hard-coded inside lookr:::GetImageAOI
+AOIs <- list(
+  UpperLeftImage = list(x_pix = c(410, 860), y_pix = c(700, 1150)), 
+  LowerLeftImage = list(x_pix = c(410, 860), y_pix = c(50, 500)), 
+  UpperRightImage = list(x_pix = c(1060, 1510), y_pix = c(700, 1150)), 
+  LowerRightImage = list(x_pix = c(1060, 1510), y_pix = c(50, 500)), 
+  FixationImage = list(x_pix = c(885, 1035), y_pix = c(525, 675)), 
+  ImageL = list(x_pix = c(100, 700), y_pix = c(300, 900)), 
+  ImageR = list(x_pix = c(1220, 1820), y_pix = c(300, 900)))
+
+# Break apart names from unlist(...) into separate columns
+aoi_table <- unlist(AOIs) %>% 
+  data_frame(Image = names(.), Pixel = .) %>% 
+  separate(Image, into = c("AOI", "Dimension", "Number")) %>% 
+  mutate(Number = str_replace(Number, "pix", ""),
+         AOIBoundary = "AOI_Boundary")
+  
+# Keep only values used in the data and combine columns into Key, Value
+aoi_table <- aoi_table %>% 
+  filter(AOI %in% unique(looks$GazeByAOI)) %>% 
+  unite(col = AOI_Boundary, AOIBoundary, AOI:Number) %>% 
+  rename(Key = AOI_Boundary, Value = Pixel)
+aoi_table
+```
+
+Now we assembly the experiment key-value grab-bag and attach the AOI definitions.
+
+```{r}
+# Gather experiment attributes
+tbl_exps_gb <- trials %>% 
+  gather_attributes(c("Basename", "Dialect", "Protocol")) %>% 
+  as_data_frame %>% 
+  distinct %>% 
+  # Other hard-wired constants
+  mutate(FrameRate = lwl_constants$ms_per_frame,
+         ScreenWidth = lwl_constants$screen_width,
+         ScreenHeight = lwl_constants$screen_height) %>% 
+  gather(key = Key, value = Value, -Basename) 
+
+# Create all combinations of basename and AOI property name
+aoi_rows <- list(Basename = tbl_exps$Basename, Key = aoi_table$Key) %>% 
+  cross_n %>% 
+  bind_rows %>% 
+  left_join(aoi_table) %>% 
+  mutate(Value = as.character(Value))
+aoi_rows
+
+# Combine AOI attributes with other ones
+tbl_exps_attrs <- bind_rows(tbl_exps_gb, aoi_rows) %>% 
+  arrange(Basename, Key)
+tbl_exps_attrs
+```
+
+### Prepare trial grab-bag
+
+Now we can do the trials attributes.
+
+```{r}
+trial_attrs <- 
+  c("TrialName", "StimType", "WordGroup", "TargetWord",
+    "TargetImage", "DistractorImage", "ImageL", "ImageR", 
+    "FamiliarImage", "UnfamiliarImage", 
+    "Audio", "Attention", "InterpolationWindow",
+    # trial events
+    "ImageOnset",
+    "FixationOnset", "FixationDur", 
+    "CarrierOnset", "CarrierEnd",
+    "TargetOnset", "TargetEnd", 
+    "AttentionOnset", "AttentionEnd")
+
+
+```
+
