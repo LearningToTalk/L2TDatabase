@@ -1,19 +1,21 @@
 Package: L2TDatabase
 Type: Package
-Title: What the Package Does (Title Case)
+Title: Helper Functions for the Learning-To-Talk 'MySQL' Database
 Version: 0.1
 Date: 2015-06-25
-Author: Who wrote it
-Maintainer: Who to complain to <yourfault@somewhere.net>
-Description: More about what it does (maybe more than one line)
-License: What license is it under?
+Author: Tristan Mahr <mahr@wisc.edu>
+Maintainer: Tristan Mahr <mahr@wisc.edu>
+Description: This package provides helper functions for interacting
+  with the Learning To Talk lab's 'MySQL' database.
+License: GPL-2 | file LICENSE
 LazyData: TRUE
 Suggests: testthat
-Imports: 
+Imports:
     RMySQL,
     assertthat,
     dplyr,
     lubridate,
     readr,
     stringr,
-    devtools
+    devtools,
+    DBI
