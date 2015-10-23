@@ -15,7 +15,12 @@ on_failure(has_table) <- function(call, env) {
 
 
 # Check that a utility is available on the system path
-on_path <- devtools::on_path
+# Taken from devtools::on_path
+on_path <- function (...) {
+  commands <- c(...)
+  stopifnot(is.character(commands))
+  unname(Sys.which(commands) != "")
+}
 
 on_failure(on_path) <- function(call, env) {
   # first element in a call is a function

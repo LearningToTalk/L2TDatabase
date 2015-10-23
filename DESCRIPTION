@@ -17,5 +17,4 @@ Imports:
     lubridate,
     readr,
     stringr,
-    devtools,
     DBI
