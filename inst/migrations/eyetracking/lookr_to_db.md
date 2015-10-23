@@ -33,10 +33,12 @@ Use lookr to load and reduce some eye-tracking data.
 
 
 ```r
-library("lookr")
-library("purrr")
 library("knitr")
-library("dplyr")
+library("lookr")
+library("purrr") # manipulate lists
+library("dplyr") # manipulate tables
+library("tidyr") # wide/long tables
+
 opts_chunk$set(comment = "#>", collapse = TRUE)
 ```
 
@@ -44,15 +46,101 @@ opts_chunk$set(comment = "#>", collapse = TRUE)
 
 ```r
 # Load some example data bundled in lookr
-mp_long <- file.path(find.package("lookr"), "docs/data/MP_WFFArea_Long/")
-trials <- suppressMessages(Task(mp_long))
+mp_long <- "MP_TP1"
+trials <- Task(mp_long)
+#> Reading stimdata in MP_TP1/001L/MP_Block1_001L28FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/001L/MP_Block2_001L28FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/002L/MP_Block1_002L38FS2.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/002L/MP_Block2_002L38FS2.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/003L/MP_Block1_003L31FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/003L/MP_Block2_003L31FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/004L/MP_Block1_004L32FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/004L/MP_Block2_004L32FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/005L/MP_Block1_005L31MS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/005L/MP_Block2_005L31MS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/006L/MP_Block1_006L28FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/006L/MP_Block2_006L28FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/007L/MP_Block1_007L32FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/007L/MP_Block2_007L32FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/008L/MP_Block1_008L30MS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/008L/MP_Block2_008L30MS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/009L/MP_Block1_009L31FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/009L/MP_Block2_009L31FS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/010L/MP_Block1_010L32MS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/010L/MP_Block2_010L32MS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/011L/MP_Block1_011L36MS2.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/011L/MP_Block2_011L36MS2.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/012L/MP_Block1_012L30MS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/012L/MP_Block2_012L30MS1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/013L/MP_Block1_013L32MA1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: AAE
+#> Reading stimdata in MP_TP1/013L/MP_Block2_013L32MA1.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: AAE
+#> Reading stimdata in MP_TP1/014L/MP_Block1_014L39MS2.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/014L/MP_Block2_014L39MS2.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/020L/MP_Block1_020L37FS2.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
+#> Reading stimdata in MP_TP1/020L/MP_Block2_020L37FS2.txt
+#> Task: MP,  Protocol: WFF_Area,  Dialect: SAE
 trials
-#> Task object with 2 Subject IDs and 144 trials: 
-#>   SubjectID            Basename Trials
-#> 1 001P00XA1 MP_Block1_001P00XA1     36
-#> 2 001P00XA1 MP_Block2_001P00XA1     36
-#> 3 001P00XS1 MP_Block1_001P00XS1     36
-#> 4 001P00XS1 MP_Block2_001P00XS1     36
+#> Task object with 15 Subject IDs and 1080 trials: 
+#>    SubjectID            Basename Trials
+#> 1  001L28FS1 MP_Block1_001L28FS1     36
+#> 2  001L28FS1 MP_Block2_001L28FS1     36
+#> 3  002L38FS2 MP_Block1_002L38FS2     36
+#> 4  002L38FS2 MP_Block2_002L38FS2     36
+#> 5  003L31FS1 MP_Block1_003L31FS1     36
+#> 6  003L31FS1 MP_Block2_003L31FS1     36
+#> 7  004L32FS1 MP_Block1_004L32FS1     36
+#> 8  004L32FS1 MP_Block2_004L32FS1     36
+#> 9  005L31MS1 MP_Block1_005L31MS1     36
+#> 10 005L31MS1 MP_Block2_005L31MS1     36
+#> 11 006L28FS1 MP_Block1_006L28FS1     36
+#> 12 006L28FS1 MP_Block2_006L28FS1     36
+#> 13 007L32FS1 MP_Block1_007L32FS1     36
+#> 14 007L32FS1 MP_Block2_007L32FS1     36
+#> 15 008L30MS1 MP_Block1_008L30MS1     36
+#> 16 008L30MS1 MP_Block2_008L30MS1     36
+#> 17 009L31FS1 MP_Block1_009L31FS1     36
+#> 18 009L31FS1 MP_Block2_009L31FS1     36
+#> 19 010L32MS1 MP_Block1_010L32MS1     36
+#> 20 010L32MS1 MP_Block2_010L32MS1     36
+#> 21 011L36MS2 MP_Block1_011L36MS2     36
+#> 22 011L36MS2 MP_Block2_011L36MS2     36
+#> 23 012L30MS1 MP_Block1_012L30MS1     36
+#> 24 012L30MS1 MP_Block2_012L30MS1     36
+#> 25 013L32MA1 MP_Block1_013L32MA1     36
+#> 26 013L32MA1 MP_Block2_013L32MA1     36
+#> 27 014L39MS2 MP_Block1_014L39MS2     36
+#> 28 014L39MS2 MP_Block2_014L39MS2     36
+#> 29 020L37FS2 MP_Block1_020L37FS2     36
+#> 30 020L37FS2 MP_Block2_020L37FS2     36
 
 # Light preprocessing: Set time 0 to target onset, map gaze locations to AOIs,
 # interpolate spans of missing data up to 150ms in duration
@@ -61,44 +149,44 @@ trials <- AddAOIData(trials)
 trials <- InterpolateMissingFrames(trials)
 ```
 
-Note that each `Trial` is a `data.frame` object with several associated
+Note that each `Trial` object is just `data.frame` with several associated
 `attributes`.
 
 
 ```r
 print(trials[[1]], width = 80, strict.width = "wrap")
-#> Classes 'Trial' and 'data.frame':	407 obs. of  26 variables:
+#> Classes 'Trial' and 'data.frame':	449 obs. of  26 variables:
 #> $ Task : chr "MP" "MP" "MP" "MP" ...
-#> $ Subject : chr "001P00XA1" "001P00XA1" "001P00XA1" "001P00XA1" ...
+#> $ Subject : chr "001L28FS1" "001L28FS1" "001L28FS1" "001L28FS1" ...
 #> $ BlockNo : int 1 1 1 1 1 1 1 1 1 1 ...
-#> $ Basename : chr "MP_Block1_001P00XA1" "MP_Block1_001P00XA1"
-#>    "MP_Block1_001P00XA1" "MP_Block1_001P00XA1" ...
+#> $ Basename : chr "MP_Block1_001L28FS1" "MP_Block1_001L28FS1"
+#>    "MP_Block1_001L28FS1" "MP_Block1_001L28FS1" ...
 #> $ TrialNo : int 1 1 1 1 1 1 1 1 1 1 ...
-#> $ Time : num -3164 -3148 -3131 -3114 -3098 ...
-#> $ XLeft : num NA NA 0.392 0.392 0.389 ...
-#> $ XRight : num NA NA 0.388 0.386 0.374 ...
-#> $ XMean : num NaN NaN 0.39 0.389 0.382 ...
-#> $ YLeft : num NA NA 0.125 0.141 0.135 ...
-#> $ YRight : num NA NA 0.16 0.167 0.152 ...
-#> $ YMean : num NaN NaN 0.142 0.154 0.144 ...
-#> $ ZLeft : num NA NA 592 592 592 ...
-#> $ ZRight : num NA NA 594 594 594 ...
-#> $ ZMean : num NaN NaN 593 593 593 ...
-#> $ DiameterLeft : num NA NA 2.77 2.78 2.8 ...
-#> $ DiameterRight : num NA NA 2.76 2.81 2.86 ...
-#> $ DiameterMean : num NaN NaN 2.76 2.79 2.83 ...
-#> $ YMeanToTarget : num NaN NaN 0.142 0.154 0.144 ...
-#> $ YRightToTarget: num NA NA 0.16 0.167 0.152 ...
-#> $ YLeftToTarget : num NA NA 0.125 0.141 0.135 ...
-#> $ XMeanToTarget : num NaN NaN 0.39 0.389 0.382 ...
-#> $ XRightToTarget: num NA NA 0.388 0.386 0.374 ...
-#> $ XLeftToTarget : num NA NA 0.392 0.392 0.389 ...
-#> $ GazeByAOI : chr NA NA "tracked" "tracked" ...
-#> $ GazeByImageAOI: chr NA NA "tracked" "tracked" ...
+#> $ Time : num -3464 -3448 -3431 -3414 -3398 ...
+#> $ XLeft : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ XRight : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ XMean : num NaN NaN NaN NaN NaN NaN NaN NaN NaN NaN ...
+#> $ YLeft : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ YRight : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ YMean : num NaN NaN NaN NaN NaN NaN NaN NaN NaN NaN ...
+#> $ ZLeft : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ ZRight : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ ZMean : num NaN NaN NaN NaN NaN NaN NaN NaN NaN NaN ...
+#> $ DiameterLeft : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ DiameterRight : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ DiameterMean : num NaN NaN NaN NaN NaN NaN NaN NaN NaN NaN ...
+#> $ YMeanToTarget : num NaN NaN NaN NaN NaN NaN NaN NaN NaN NaN ...
+#> $ YRightToTarget: num NA NA NA NA NA NA NA NA NA NA ...
+#> $ YLeftToTarget : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ XMeanToTarget : num NaN NaN NaN NaN NaN NaN NaN NaN NaN NaN ...
+#> $ XRightToTarget: num NA NA NA NA NA NA NA NA NA NA ...
+#> $ XLeftToTarget : num NA NA NA NA NA NA NA NA NA NA ...
+#> $ GazeByAOI : chr NA NA NA NA ...
+#> $ GazeByImageAOI: chr NA NA NA NA ...
 #> - attr(*, "Task")= chr "MP"
 #> - attr(*, "Protocol")= chr "WFF_Area"
-#> - attr(*, "DateTime")= chr "2013-01-21 08:55:16"
-#> - attr(*, "Subject")= chr "001P00XA1"
+#> - attr(*, "DateTime")= chr "2013-07-10 09:59:38"
+#> - attr(*, "Subject")= chr "001L28FS1"
 #> - attr(*, "Block")= num 1
 #> - attr(*, "TrialNo")= num 1
 #> - attr(*, "TargetWord")= chr "girl"
@@ -110,28 +198,28 @@ print(trials[[1]], width = 80, strict.width = "wrap")
 #> - attr(*, "UnfamiliarImage")= chr "marmoset1"
 #> - attr(*, "WordGroup")= chr "girl"
 #> - attr(*, "StimType")= chr "real"
-#> - attr(*, "ImageOnset")= num -3056
-#> - attr(*, "Audio")= chr "AAE_girl_312_10"
-#> - attr(*, "Attention")= chr "AAE_check2_10"
-#> - attr(*, "AttentionDur")= num 914
-#> - attr(*, "CarrierOnset")= num -968
-#> - attr(*, "FixationOnset")= num -1503
-#> - attr(*, "DelayTargetOnset")= num 8
+#> - attr(*, "ImageOnset")= num -3357
+#> - attr(*, "Audio")= chr "SAE_girl_112_26"
+#> - attr(*, "Attention")= chr "SAE_Check_3_1"
+#> - attr(*, "AttentionDur")= num 1264
+#> - attr(*, "CarrierOnset")= num -1336
+#> - attr(*, "FixationOnset")= num -1803
+#> - attr(*, "DelayTargetOnset")= num 3
 #> - attr(*, "TargetOnset")= num 0
-#> - attr(*, "TargetDur")= num 712
-#> - attr(*, "CarrierDur")= num 960
-#> - attr(*, "AttentionOnset")= num 1720
-#> - attr(*, "Dialect")= chr "AAE"
-#> - attr(*, "AttentionEnd")= num 2634
-#> - attr(*, "FixationDur")= num 535
-#> - attr(*, "CarrierEnd")= num -8
-#> - attr(*, "TargetEnd")= num 712
-#> - attr(*, "Basename")= chr "MP_Block1_001P00XA1"
+#> - attr(*, "TargetDur")= num 767
+#> - attr(*, "CarrierDur")= num 1333
+#> - attr(*, "AttentionOnset")= num 1770
+#> - attr(*, "Dialect")= chr "SAE"
+#> - attr(*, "AttentionEnd")= num 3034
+#> - attr(*, "FixationDur")= num 467
+#> - attr(*, "CarrierEnd")= num -3
+#> - attr(*, "TargetEnd")= num 767
+#> - attr(*, "Basename")= chr "MP_Block1_001L28FS1"
 #> - attr(*, "FrameRate")= num 16.7
 #> - attr(*, "AlignedBy")= chr "TargetOnset"
-#> - attr(*, "InterpolatedPoints")= num 21
-#> - attr(*, "CorrectedFrames")= num 60 61 62 121 122 123 145 149 182 183 ...
-#> - attr(*, "CorrectedTimes")= num -2182 -2165 -2148 -1166 -1149 ...
+#> - attr(*, "InterpolatedPoints")= num 2
+#> - attr(*, "CorrectedFrames")= num 34 35
+#> - attr(*, "CorrectedTimes")= num -2915 -2898
 #> - attr(*, "InterpolationWindow")= num 150
 ```
 
@@ -151,7 +239,9 @@ trials %@% "TrialName" <-
 
 ## Creating the wide tables
 
-Now we can create the three main "wide" (task-invariant) tables
+Now we can create the three main "wide" (task-invariant) tables. We `Basename`
+to link experiment administrations to `TrialName` and `TrialName` to link to
+eye-tracking frames.
 
 
 ```r
@@ -160,34 +250,41 @@ tbl_exps <- trials %>%
   as_data_frame %>% 
   distinct
 tbl_exps
-#> Source: local data frame [4 x 4]
+#> Source: local data frame [30 x 4]
 #> 
-#>              Basename            DateTime   Subject  Task
-#>                 (chr)               (chr)     (chr) (chr)
-#> 1 MP_Block1_001P00XA1 2013-01-21 08:55:16 001P00XA1    MP
-#> 2 MP_Block2_001P00XA1 2013-03-13 09:01:31 001P00XA1    MP
-#> 3 MP_Block1_001P00XS1 2012-10-17 09:06:47 001P00XS1    MP
-#> 4 MP_Block2_001P00XS1 2012-11-16 09:12:05 001P00XS1    MP
+#>               Basename            DateTime   Subject  Task
+#>                  (chr)               (chr)     (chr) (chr)
+#> 1  MP_Block1_001L28FS1 2013-07-10 09:59:38 001L28FS1    MP
+#> 2  MP_Block2_001L28FS1 2013-07-03 09:17:43 001L28FS1    MP
+#> 3  MP_Block1_002L38FS2 2012-10-17 09:06:47 002L38FS2    MP
+#> 4  MP_Block2_002L38FS2 2012-11-16 09:12:05 002L38FS2    MP
+#> 5  MP_Block1_003L31FS1 2012-11-27 12:26:35 003L31FS1    MP
+#> 6  MP_Block2_003L31FS1 2012-11-02 09:04:09 003L31FS1    MP
+#> 7  MP_Block1_004L32FS1 2012-10-22 16:26:49 004L32FS1    MP
+#> 8  MP_Block2_004L32FS1 2012-10-29 16:53:30 004L32FS1    MP
+#> 9  MP_Block1_005L31MS1 2012-12-07 16:07:24 005L31MS1    MP
+#> 10 MP_Block2_005L31MS1 2012-10-24 09:00:58 005L31MS1    MP
+#> ..                 ...                 ...       ...   ...
 
 tbl_trials <- trials %>% 
   gather_attributes(c("TrialName", "Basename", "TrialNo")) %>% 
   as_data_frame %>% 
   distinct
 tbl_trials
-#> Source: local data frame [144 x 3]
+#> Source: local data frame [1,080 x 3]
 #> 
 #>                 TrialName            Basename TrialNo
 #>                     (chr)               (chr)   (dbl)
-#> 1  MP_Block1_001P00XA1_01 MP_Block1_001P00XA1       1
-#> 2  MP_Block1_001P00XA1_02 MP_Block1_001P00XA1       2
-#> 3  MP_Block1_001P00XA1_03 MP_Block1_001P00XA1       3
-#> 4  MP_Block1_001P00XA1_04 MP_Block1_001P00XA1       4
-#> 5  MP_Block1_001P00XA1_05 MP_Block1_001P00XA1       5
-#> 6  MP_Block1_001P00XA1_06 MP_Block1_001P00XA1       6
-#> 7  MP_Block1_001P00XA1_07 MP_Block1_001P00XA1       7
-#> 8  MP_Block1_001P00XA1_08 MP_Block1_001P00XA1       8
-#> 9  MP_Block1_001P00XA1_09 MP_Block1_001P00XA1       9
-#> 10 MP_Block1_001P00XA1_10 MP_Block1_001P00XA1      10
+#> 1  MP_Block1_001L28FS1_01 MP_Block1_001L28FS1       1
+#> 2  MP_Block1_001L28FS1_02 MP_Block1_001L28FS1       2
+#> 3  MP_Block1_001L28FS1_03 MP_Block1_001L28FS1       3
+#> 4  MP_Block1_001L28FS1_04 MP_Block1_001L28FS1       4
+#> 5  MP_Block1_001L28FS1_05 MP_Block1_001L28FS1       5
+#> 6  MP_Block1_001L28FS1_06 MP_Block1_001L28FS1       6
+#> 7  MP_Block1_001L28FS1_07 MP_Block1_001L28FS1       7
+#> 8  MP_Block1_001L28FS1_08 MP_Block1_001L28FS1       8
+#> 9  MP_Block1_001L28FS1_09 MP_Block1_001L28FS1       9
+#> 10 MP_Block1_001L28FS1_10 MP_Block1_001L28FS1      10
 #> ..                    ...                 ...     ...
 
 # Make a function that extracts the columns of gaze data from a Trial, then 
@@ -208,21 +305,23 @@ looks <- trials %>% map(collect_looks) %>% bind_rows
 tbl_looks <- looks %>% 
   mutate(XMean = round(XMean * lwl_constants$screen_width),
          YMean = round(YMean * lwl_constants$screen_height))
+pryr::object_size(tbl_looks)
+#> 23.2 MB
 tbl_looks
-#> Source: local data frame [60,825 x 6]
+#> Source: local data frame [480,744 x 6]
 #> 
 #>                 TrialName      Time XMean YMean GazeByImageAOI GazeByAOI
 #>                     (chr)     (dbl) (dbl) (dbl)          (chr)     (chr)
-#> 1  MP_Block1_001P00XA1_01 -3164.374   NaN   NaN             NA        NA
-#> 2  MP_Block1_001P00XA1_01 -3147.719   NaN   NaN             NA        NA
-#> 3  MP_Block1_001P00XA1_01 -3131.065   749   171        tracked   tracked
-#> 4  MP_Block1_001P00XA1_01 -3114.410   747   185        tracked   tracked
-#> 5  MP_Block1_001P00XA1_01 -3097.756   732   172        tracked   tracked
-#> 6  MP_Block1_001P00XA1_01 -3081.101   752   189        tracked   tracked
-#> 7  MP_Block1_001P00XA1_01 -3064.446   741   185        tracked   tracked
-#> 8  MP_Block1_001P00XA1_01 -3047.792   742   180        tracked   tracked
-#> 9  MP_Block1_001P00XA1_01 -3031.137   742   181        tracked   tracked
-#> 10 MP_Block1_001P00XA1_01 -3014.483   746   186        tracked   tracked
+#> 1  MP_Block1_001L28FS1_01 -3464.157   NaN   NaN             NA        NA
+#> 2  MP_Block1_001L28FS1_01 -3447.502   NaN   NaN             NA        NA
+#> 3  MP_Block1_001L28FS1_01 -3430.848   NaN   NaN             NA        NA
+#> 4  MP_Block1_001L28FS1_01 -3414.193   NaN   NaN             NA        NA
+#> 5  MP_Block1_001L28FS1_01 -3397.538   NaN   NaN             NA        NA
+#> 6  MP_Block1_001L28FS1_01 -3380.884   NaN   NaN             NA        NA
+#> 7  MP_Block1_001L28FS1_01 -3364.229   NaN   NaN             NA        NA
+#> 8  MP_Block1_001L28FS1_01 -3347.575   NaN   NaN             NA        NA
+#> 9  MP_Block1_001L28FS1_01 -3330.920   NaN   NaN             NA        NA
+#> 10 MP_Block1_001L28FS1_01 -3314.265   NaN   NaN             NA        NA
 #> ..                    ...       ...   ...   ...            ...       ...
 ```
 
@@ -237,7 +336,6 @@ let's unpack the implicit AOI definitions used in the experiments.
 
 ```r
 library("tidyr")
-#> Warning: package 'tidyr' was built under R version 3.2.2
 library("stringr")
 
 # hard-coded inside lookr:::GetImageAOI
@@ -300,40 +398,40 @@ aoi_rows <- list(Basename = tbl_exps$Basename, Key = aoi_table$Key) %>%
   mutate(Value = as.character(Value))
 #> Joining by: "Key"
 aoi_rows
-#> Source: local data frame [32 x 3]
+#> Source: local data frame [240 x 3]
 #> 
 #>               Basename                     Key Value
 #>                  (chr)                   (chr) (chr)
-#> 1  MP_Block1_001P00XA1 AOI_Boundary_ImageL_x_1   100
-#> 2  MP_Block2_001P00XA1 AOI_Boundary_ImageL_x_1   100
-#> 3  MP_Block1_001P00XS1 AOI_Boundary_ImageL_x_1   100
-#> 4  MP_Block2_001P00XS1 AOI_Boundary_ImageL_x_1   100
-#> 5  MP_Block1_001P00XA1 AOI_Boundary_ImageL_x_2   700
-#> 6  MP_Block2_001P00XA1 AOI_Boundary_ImageL_x_2   700
-#> 7  MP_Block1_001P00XS1 AOI_Boundary_ImageL_x_2   700
-#> 8  MP_Block2_001P00XS1 AOI_Boundary_ImageL_x_2   700
-#> 9  MP_Block1_001P00XA1 AOI_Boundary_ImageL_y_1   300
-#> 10 MP_Block2_001P00XA1 AOI_Boundary_ImageL_y_1   300
+#> 1  MP_Block1_001L28FS1 AOI_Boundary_ImageL_x_1   100
+#> 2  MP_Block2_001L28FS1 AOI_Boundary_ImageL_x_1   100
+#> 3  MP_Block1_002L38FS2 AOI_Boundary_ImageL_x_1   100
+#> 4  MP_Block2_002L38FS2 AOI_Boundary_ImageL_x_1   100
+#> 5  MP_Block1_003L31FS1 AOI_Boundary_ImageL_x_1   100
+#> 6  MP_Block2_003L31FS1 AOI_Boundary_ImageL_x_1   100
+#> 7  MP_Block1_004L32FS1 AOI_Boundary_ImageL_x_1   100
+#> 8  MP_Block2_004L32FS1 AOI_Boundary_ImageL_x_1   100
+#> 9  MP_Block1_005L31MS1 AOI_Boundary_ImageL_x_1   100
+#> 10 MP_Block2_005L31MS1 AOI_Boundary_ImageL_x_1   100
 #> ..                 ...                     ...   ...
 
 # Combine AOI attributes with other ones
 tbl_exps_attrs <- bind_rows(tbl_exps_gb, aoi_rows) %>% 
   arrange(Basename, Key)
 tbl_exps_attrs
-#> Source: local data frame [52 x 3]
+#> Source: local data frame [390 x 3]
 #> 
 #>               Basename                     Key   Value
 #>                  (chr)                   (chr)   (chr)
-#> 1  MP_Block1_001P00XA1 AOI_Boundary_ImageL_x_1     100
-#> 2  MP_Block1_001P00XA1 AOI_Boundary_ImageL_x_2     700
-#> 3  MP_Block1_001P00XA1 AOI_Boundary_ImageL_y_1     300
-#> 4  MP_Block1_001P00XA1 AOI_Boundary_ImageL_y_2     900
-#> 5  MP_Block1_001P00XA1 AOI_Boundary_ImageR_x_1    1220
-#> 6  MP_Block1_001P00XA1 AOI_Boundary_ImageR_x_2    1820
-#> 7  MP_Block1_001P00XA1 AOI_Boundary_ImageR_y_1     300
-#> 8  MP_Block1_001P00XA1 AOI_Boundary_ImageR_y_2     900
-#> 9  MP_Block1_001P00XA1                 Dialect     AAE
-#> 10 MP_Block1_001P00XA1               FrameRate 16.6546
+#> 1  MP_Block1_001L28FS1 AOI_Boundary_ImageL_x_1     100
+#> 2  MP_Block1_001L28FS1 AOI_Boundary_ImageL_x_2     700
+#> 3  MP_Block1_001L28FS1 AOI_Boundary_ImageL_y_1     300
+#> 4  MP_Block1_001L28FS1 AOI_Boundary_ImageL_y_2     900
+#> 5  MP_Block1_001L28FS1 AOI_Boundary_ImageR_x_1    1220
+#> 6  MP_Block1_001L28FS1 AOI_Boundary_ImageR_x_2    1820
+#> 7  MP_Block1_001L28FS1 AOI_Boundary_ImageR_y_1     300
+#> 8  MP_Block1_001L28FS1 AOI_Boundary_ImageR_y_2     900
+#> 9  MP_Block1_001L28FS1                 Dialect     SAE
+#> 10 MP_Block1_001L28FS1               FrameRate 16.6546
 #> ..                 ...                     ...     ...
 ```
 
@@ -355,5 +453,14 @@ trial_attrs <-
     "TargetOnset", "TargetEnd", 
     "AttentionOnset", "AttentionEnd")
 
+tbl_trial_attrs <- trials %>% 
+  gather_attributes(trial_attrs, omit_na = TRUE) %>% 
+  as_data_frame %>% 
+  gather(Key, Value, -TrialName) %>% 
+  arrange(TrialName, Key) %>% 
+  mutate(Key = as.character(Key))
+pryr::object_size(tbl_trial_attrs)
+#> 661 kB
 ```
 
+Now these tables can be inserted into the database with the following steps.

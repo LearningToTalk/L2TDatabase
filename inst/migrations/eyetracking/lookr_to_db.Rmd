@@ -37,18 +37,20 @@ allow the other three to be completely task agnostic.
 Use lookr to load and reduce some eye-tracking data.
 
 ```{r, warning = FALSE, message = FALSE}
-library("lookr")
-library("purrr")
 library("knitr")
-library("dplyr")
+library("lookr")
+library("purrr") # manipulate lists
+library("dplyr") # manipulate tables
+library("tidyr") # wide/long tables
+
 opts_chunk$set(comment = "#>", collapse = TRUE)
 ```
 
 
 ```{r}
 # Load some example data bundled in lookr
-mp_long <- file.path(find.package("lookr"), "docs/data/MP_WFFArea_Long/")
-trials <- suppressMessages(Task(mp_long))
+mp_long <- "MP_TP1"
+trials <- Task(mp_long)
 trials
 
 # Light preprocessing: Set time 0 to target onset, map gaze locations to AOIs,
@@ -115,6 +117,7 @@ looks <- trials %>% map(collect_looks) %>% bind_rows
 tbl_looks <- looks %>% 
   mutate(XMean = round(XMean * lwl_constants$screen_width),
          YMean = round(YMean * lwl_constants$screen_height))
+pryr::object_size(tbl_looks)
 tbl_looks
 ```
 
@@ -200,6 +203,13 @@ trial_attrs <-
     "TargetOnset", "TargetEnd", 
     "AttentionOnset", "AttentionEnd")
 
-
+tbl_trial_attrs <- trials %>% 
+  gather_attributes(trial_attrs, omit_na = TRUE) %>% 
+  as_data_frame %>% 
+  gather(Key, Value, -TrialName) %>% 
+  arrange(TrialName, Key) %>% 
+  mutate(Key = as.character(Key))
+pryr::object_size(tbl_trial_attrs)
 ```
 
+Now these tables can be inserted into the database with the following steps.
