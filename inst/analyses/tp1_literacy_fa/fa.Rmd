@@ -45,7 +45,7 @@ is a `list` of columns so using `lapply(df, func)` lets us apply a function to
 each column.)
 
 ```{r}
-# Display the kinds ofs values in each column
+# Display the kinds of values in each column
 df_lit %>% 
   select(ReadingBedtime:TeachReading) %>% 
   lapply(unique) %>% 
@@ -63,7 +63,7 @@ of each column's values from smallest to largest is also the alphabetical order
 of those values.
 
 ```{r}
-# For now ignore reading onset
+# Ignore reading onset
 df_lit$ReadingOnset <- NULL
 
 # Set each column between from ReadingBedtime to TeachReading as ordinal
@@ -75,6 +75,84 @@ df_lit %>%
   lapply(levels) %>% 
   Filter(Negate(is.null), .)
 ```
+
+### Item Responses
+
+Let's use the [`likert` package](https://github.com/jbryer/likert) to visualize
+responses.
+
+```{r}
+library("likert")
+df_likert <- df_lit
+```
+
+First, let's define some constants for our "codebook". We define a look-up 
+vector of column names and column descriptions using the `describe_tbl` 
+function. Three of the questions ask about the frequency of events, so we recode
+their 1:5 values as "Never":"Very Often". The other questions--about reading at
+bed time, reading outside of bed time and number of books in child's
+house--already have informative values, so we don't touch those.
+
+```{r}
+# Used to convert column names to full-length questions
+survey_description <- describe_tbl(l2t, "Literacy")
+name_lookup <- survey_description$Description %>% 
+  setNames(survey_description$Field)
+
+frequency_labels <- c("Never", "Seldom", "Sometimes", "Often", "Very Often")
+
+as_freq_q <- function(xs) {
+  factor(xs, levels = 1:5, labels = frequency_labels, ordered = TRUE)
+}
+
+df_likert <- df_likert %>% 
+  mutate_each(funs(as_freq_q), ReadingRequests, TeachPrinting, TeachReading)
+```
+
+We analyze the frequency items together:
+
+```{r}
+df_freq_data <- df_likert %>% 
+  select(ReadingRequests, TeachPrinting, TeachReading) %>% 
+  as.data.frame
+names(df_freq_data) <- name_lookup[names(df_freq_data)]
+
+df_freq_data <- likert(df_freq_data)
+plot(df_freq_data, wrap = 20)
+plot(df_freq_data, type = "heat", wrap = 20)
+```
+
+Next, we can visualize the reading frequencies together.
+
+```{r}
+df_reading <- df_likert %>% 
+  select(ReadingBedtime, ReadingOther) %>% 
+  as.data.frame
+names(df_reading) <- name_lookup[names(df_reading)]
+df_reading_data <- likert(df_reading)
+plot(df_reading_data, wrap = 20)
+```
+
+```{r, fig.width=9}
+plot(df_reading_data, type = "heat", wrap = 20)
+```
+
+
+Finally, we can visualize the number of books question.
+
+```{r}
+df_books <- df_likert %>% 
+  select(NumChildBooks) %>% 
+  as.data.frame
+names(df_books) <- name_lookup[names(df_books)]
+
+df_books_data <- likert(df_books)
+plot(df_books_data, wrap = 30)
+glimpse(df_books_data$results)
+```
+
+
+### Imputation
 
 Impute missing values.
 

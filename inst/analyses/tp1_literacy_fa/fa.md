@@ -5,24 +5,11 @@ October 19, 2015
 
 ```r
 library("knitr")
-```
-
-```
-## Warning: package 'knitr' was built under R version 3.2.2
-```
-
-```r
 opts_chunk$set(comment = "#>", collapse = TRUE)
 
 library("L2TDatabase")
 library("dplyr", warn.conflicts = FALSE)
-```
 
-```
-## Warning: package 'dplyr' was built under R version 3.2.2
-```
-
-```r
 # connect to the database using my cnf file
 cnf_file <- file.path("../../l2t_db.cnf")
 l2t <- l2t_connect(cnf_file)
@@ -57,7 +44,7 @@ each column.)
 
 
 ```r
-# Display the kinds ofs values in each column
+# Display the kinds of values in each column
 df_lit %>% 
   select(ReadingBedtime:TeachReading) %>% 
   lapply(unique) %>% 
@@ -97,7 +84,7 @@ df_lit %>%
 #>  $ ReadingOther   : int 2
 #>  $ ReadingRequests: int 4
 #>  $ NumChildBooks  : int 1
-#>  $ ReadingOnset   : int 10
+#>  $ ReadingOnset   : int 8
 #>  $ TeachPrinting  : int 0
 #>  $ TeachReading   : int 0
 ```
@@ -108,7 +95,7 @@ of those values.
 
 
 ```r
-# For now ignore reading onset
+# Ignore reading onset
 df_lit$ReadingOnset <- NULL
 
 # Set each column between from ReadingBedtime to TeachReading as ordinal
@@ -141,18 +128,127 @@ df_lit %>%
 #> [1] "1" "2" "3" "4" "5"
 ```
 
+### Item Responses
+
+Let's use the [`likert` package](https://github.com/jbryer/likert) to visualize
+responses.
+
+
+```r
+library("likert")
+#> Loading required package: ggplot2
+#> Loading required package: xtable
+df_likert <- df_lit
+```
+
+First, let's define some constants for our "codebook". We define a look-up 
+vector of column names and column descriptions using the `describe_tbl` 
+function. Three of the questions ask about the frequency of events, so we recode
+their 1:5 values as "Never":"Very Often". The other questions--about reading at
+bed time, reading outside of bed time and number of books in child's
+house--already have informative values, so we don't touch those.
+
+
+```r
+# Used to convert column names to full-length questions
+survey_description <- describe_tbl(l2t, "Literacy")
+name_lookup <- survey_description$Description %>% 
+  setNames(survey_description$Field)
+
+frequency_labels <- c("Never", "Seldom", "Sometimes", "Often", "Very Often")
+
+as_freq_q <- function(xs) {
+  factor(xs, levels = 1:5, labels = frequency_labels, ordered = TRUE)
+}
+
+df_likert <- df_likert %>% 
+  mutate_each(funs(as_freq_q), ReadingRequests, TeachPrinting, TeachReading)
+```
+
+We analyze the frequency items together:
+
+
+```r
+df_freq_data <- df_likert %>% 
+  select(ReadingRequests, TeachPrinting, TeachReading) %>% 
+  as.data.frame
+names(df_freq_data) <- name_lookup[names(df_freq_data)]
+
+df_freq_data <- likert(df_freq_data)
+plot(df_freq_data, wrap = 20)
+```
+
+![](fa_files/figure-html/unnamed-chunk-7-1.png) 
+
+```r
+plot(df_freq_data, type = "heat", wrap = 20)
+#> Warning: Non Lab interpolation is deprecated
+```
+
+![](fa_files/figure-html/unnamed-chunk-7-2.png) 
+
+Next, we can visualize the reading frequencies together.
+
+
+```r
+df_reading <- df_likert %>% 
+  select(ReadingBedtime, ReadingOther) %>% 
+  as.data.frame
+names(df_reading) <- name_lookup[names(df_reading)]
+df_reading_data <- likert(df_reading)
+plot(df_reading_data, wrap = 20)
+```
+
+![](fa_files/figure-html/unnamed-chunk-8-1.png) 
+
+
+```r
+plot(df_reading_data, type = "heat", wrap = 20)
+#> Warning: Non Lab interpolation is deprecated
+```
+
+![](fa_files/figure-html/unnamed-chunk-9-1.png) 
+
+
+Finally, we can visualize the number of books question.
+
+
+```r
+df_books <- df_likert %>% 
+  select(NumChildBooks) %>% 
+  as.data.frame
+names(df_books) <- name_lookup[names(df_books)]
+
+df_books_data <- likert(df_books)
+plot(df_books_data, wrap = 30)
+```
+
+![](fa_files/figure-html/unnamed-chunk-10-1.png) 
+
+```r
+glimpse(df_books_data$results)
+#> Observations: 1
+#> Variables: 6
+#> $ Item         (fctr) Estimate the number of children's books that are...
+#> $ 1-20         (dbl) 8.737864
+#> $ 21-40        (dbl) 13.59223
+#> $ 41-60        (dbl) 13.59223
+#> $ 61-80        (dbl) 28.64078
+#> $ more than 80 (dbl) 35.43689
+```
+
+
+### Imputation
+
 Impute missing values.
 
 
 ```r
 library("mice")
 #> Loading required package: Rcpp
-#> Warning: package 'Rcpp' was built under R version 3.2.2
 #> Loading required package: lattice
-#> Warning: package 'lattice' was built under R version 3.2.1
 #> mice 2.22 2014-06-10
 library("tidyr")
-#> Warning: package 'tidyr' was built under R version 3.2.2
 #> 
 #> Attaching package: 'tidyr'
 #> 
@@ -238,15 +334,15 @@ kable(each_imputation, format = "markdown")
 
 
 
-|ShortResearchID |Item            |Raw |Imp1  |Imp2  |Imp3  |Imp4         |Imp5         |Imp6  |Imp7  |Imp8         |Imp9         |Imp10        |
-|:---------------|:---------------|:---|:-----|:-----|:-----|:------------|:------------|:-----|:-----|:------------|:------------|:------------|
-|080L            |NumChildBooks   |NA  |41-60 |61-80 |41-60 |more than 80 |more than 80 |61-80 |41-60 |more than 80 |more than 80 |more than 80 |
-|120L            |ReadingOther    |NA  |2     |5     |0     |4            |2            |1     |2     |3            |2            |0            |
-|125L            |ReadingOther    |NA  |2     |1     |1     |1            |0            |5     |0     |1            |1            |1            |
-|051L            |ReadingRequests |NA  |3     |5     |3     |3            |4            |3     |4     |4            |5            |5            |
-|071L            |ReadingRequests |NA  |4     |5     |5     |5            |4            |5     |4     |4            |4            |5            |
-|109L            |ReadingRequests |NA  |5     |4     |5     |5            |5            |5     |5     |5            |5            |1            |
-|667L            |ReadingRequests |NA  |4     |5     |5     |5            |4            |5     |2     |4            |5            |4            |
+|ShortResearchID |Item            |Raw |Imp1  |Imp2         |Imp3  |Imp4  |Imp5  |Imp6         |Imp7  |Imp8         |Imp9         |Imp10 |
+|:---------------|:---------------|:---|:-----|:------------|:-----|:-----|:-----|:------------|:-----|:------------|:------------|:-----|
+|080L            |NumChildBooks   |NA  |61-80 |more than 80 |41-60 |21-40 |61-80 |more than 80 |41-60 |more than 80 |more than 80 |61-80 |
+|120L            |ReadingOther    |NA  |2     |3            |2     |0     |4     |4            |2     |2            |6            |2     |
+|125L            |ReadingOther    |NA  |2     |1            |0     |2     |3     |0            |0     |more than 7  |1            |4     |
+|051L            |ReadingRequests |NA  |4     |3            |3     |5     |3     |3            |3     |5            |3            |4     |
+|071L            |ReadingRequests |NA  |4     |5            |5     |5     |4     |5            |5     |3            |4            |5     |
+|109L            |ReadingRequests |NA  |5     |4            |4     |4     |5     |5            |5     |5            |5            |5     |
+|667L            |ReadingRequests |NA  |5     |4            |4     |4     |5     |3            |5     |5            |5            |5     |
 
 Hmmm... the imputations look a little unstable. I need to see what else I can
 include here, like including a measure of age at survey administration or
