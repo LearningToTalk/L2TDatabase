@@ -9,9 +9,9 @@ Description: This package provides helper functions for interacting
     with the Learning To Talk lab's 'MySQL' database.
 License: GPL-2 | file LICENSE
 LazyData: TRUE
-Suggests:
+Suggests: 
     testthat
-Imports:
+Imports: 
     RMySQL,
     assertthat,
     dplyr,
@@ -19,4 +19,6 @@ Imports:
     readr,
     stringr,
     DBI,
+    tidyr,
+    daff
 RoxygenNote: 5.0.1

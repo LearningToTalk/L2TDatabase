@@ -47,25 +47,62 @@ with_evt <- left_join(t1_evt, cds)
 
 # Calculate chronological ages, default to NA if error encountered
 chr_age <- failwith(NA, chrono_age)
+
 with_evt <- with_evt %>%
   mutate(EVT_Age = unlist(Map(chr_age, EVT_Completion, Birthdate)))
 
-# Remove duplicate rows (any row with matching ChildStudyID and EVT_Completion
-# values)
-current_rows <- l2t_dl$EVT
-current_empties <- filter(current_rows, is.na(EVT_Completion))
-
-to_add <- with_evt %>%
-  anti_join(current_rows, by = c("ChildStudyID", "EVT_Completion")) %>%
-  # In case the doesn't work on NA completion dates, keep rows with matching ids
-  # but blank completion dates from being added.
-  anti_join(current_empties, by = c("ChildStudyID"))
-
-# Choose final columns and update rows
-to_add <- match_columns(to_add, current_rows) %>%
+# Find completely new records that need to be added
+latest_data <- match_columns(with_evt, l2t_dl$EVT) %>%
   arrange(ChildStudyID)
-to_add
+
+to_add <- latest_data %>%
+  anti_join(l2t_dl$EVT, by = c("ChildStudyID"))
 
 # Update the remote table. An error here is a good thing if there are no new
 # rows to add
-append_rows_to_table(l2t, "PPVT", to_add)
+append_rows_to_table(l2t, "EVT", to_add)
+
+
+
+## Find records that need to be updated
+
+# Redownload the table
+current_data <- collect("EVT" %from% l2t)
+
+# Attach the database keys to latest data
+current_indices <- current_data %>%
+  select(ChildStudyID, EVTID)
+
+latest_data <- latest_data %>%
+  inner_join(current_row_ids) %>%
+  filter(!is.na(EVT_Raw))
+
+# Keep just the columns in the latest data
+current_data <- match_columns(current_data, latest_data)
+
+# Preview changes with daff
+library("daff")
+daff <- diff_data(current_data, latest_data, context = 0)
+render_diff(daff)
+
+# Or see them itemized in a long data-frame
+create_diff_table(latest_data, current_data, "EVTID")
+
+
+
+merge_values_into_table(l2t, "EVT", rows = latest_data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
