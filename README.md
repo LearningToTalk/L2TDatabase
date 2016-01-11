@@ -48,15 +48,13 @@ l2t <- l2t_connect(cnf_file = cnf_file, db_name = "l2t")
 
 # list all the tbls in the database
 src_tbls(l2t)
-#>  [1] "BRIEF"               "Caregivers"          "Caregivers_Entry"   
-#>  [4] "Child"               "ChildStudy"          "EVT"                
-#>  [7] "FruitStroop"         "LENA_Admin"          "LENA_Hours"         
-#> [10] "LWL_BlockAttributes" "LWL_Blocks"          "LWL_Looks"          
-#> [13] "LWL_TrialAttributes" "LWL_Trials"          "Literacy"           
-#> [16] "MinPair_Admin"       "MinPair_Responses"   "PPVT"               
-#> [19] "SES"                 "SES_Entry"           "Scores_TimePoint1"  
-#> [22] "Siblings"            "Study"               "StudyTask"          
-#> [25] "VerbalFluency"
+#>  [1] "BRIEF"             "Caregivers"        "Caregivers_Entry" 
+#>  [4] "Child"             "ChildStudy"        "EVT"              
+#>  [7] "FruitStroop"       "LENA_Admin"        "LENA_Hours"       
+#> [10] "Literacy"          "MinPair_Admin"     "MinPair_Responses"
+#> [13] "PPVT"              "SES"               "SES_Entry"        
+#> [16] "Scores_TimePoint1" "Siblings"          "Study"            
+#> [19] "StudyTask"         "VerbalFluency"
 
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
@@ -84,52 +82,56 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
-#> Writing inst/backup/2015-10-23_16-06/BRIEF.csv
-#> Writing inst/backup/2015-10-23_16-06/Caregivers.csv
-#> Writing inst/backup/2015-10-23_16-06/Caregivers_Entry.csv
-#> Writing inst/backup/2015-10-23_16-06/Child.csv
-#> Writing inst/backup/2015-10-23_16-06/ChildStudy.csv
-#> Writing inst/backup/2015-10-23_16-06/EVT.csv
-#> Writing inst/backup/2015-10-23_16-06/FruitStroop.csv
-#> Writing inst/backup/2015-10-23_16-06/LENA_Admin.csv
-#> Writing inst/backup/2015-10-23_16-06/LENA_Hours.csv
-#> Writing inst/backup/2015-10-23_16-06/LWL_BlockAttributes.csv
-#> Writing inst/backup/2015-10-23_16-06/LWL_Blocks.csv
-#> Writing inst/backup/2015-10-23_16-06/LWL_Looks.csv
-#> Writing inst/backup/2015-10-23_16-06/LWL_TrialAttributes.csv
-#> Writing inst/backup/2015-10-23_16-06/LWL_Trials.csv
-#> Writing inst/backup/2015-10-23_16-06/Literacy.csv
-#> Writing inst/backup/2015-10-23_16-06/MinPair_Admin.csv
-#> Writing inst/backup/2015-10-23_16-06/MinPair_Responses.csv
-#> Writing inst/backup/2015-10-23_16-06/PPVT.csv
-#> Writing inst/backup/2015-10-23_16-06/SES.csv
-#> Writing inst/backup/2015-10-23_16-06/SES_Entry.csv
-#> Writing inst/backup/2015-10-23_16-06/Scores_TimePoint1.csv
-#> Writing inst/backup/2015-10-23_16-06/Siblings.csv
-#> Writing inst/backup/2015-10-23_16-06/Study.csv
-#> Writing inst/backup/2015-10-23_16-06/StudyTask.csv
-#> Writing inst/backup/2015-10-23_16-06/VerbalFluency.csv
-#> Writing inst/backup/2015-10-23_16-06/metadata/field_descriptions.csv
-#> Writing inst/backup/2015-10-23_16-06/metadata/table_descriptions.csv
+#> Writing inst/backup/2016-01-11_09-12/BRIEF.csv
+#> Writing inst/backup/2016-01-11_09-12/Caregivers.csv
+#> Writing inst/backup/2016-01-11_09-12/Caregivers_Entry.csv
+#> Writing inst/backup/2016-01-11_09-12/Child.csv
+#> Writing inst/backup/2016-01-11_09-12/ChildStudy.csv
+#> Writing inst/backup/2016-01-11_09-12/EVT.csv
+#> Writing inst/backup/2016-01-11_09-12/FruitStroop.csv
+#> Writing inst/backup/2016-01-11_09-12/LENA_Admin.csv
+#> Writing inst/backup/2016-01-11_09-12/LENA_Hours.csv
+#> Writing inst/backup/2016-01-11_09-12/Literacy.csv
+#> Writing inst/backup/2016-01-11_09-12/MinPair_Admin.csv
+#> Writing inst/backup/2016-01-11_09-12/MinPair_Responses.csv
+#> Writing inst/backup/2016-01-11_09-12/PPVT.csv
+#> Writing inst/backup/2016-01-11_09-12/SES.csv
+#> Writing inst/backup/2016-01-11_09-12/SES_Entry.csv
+#> Writing inst/backup/2016-01-11_09-12/Scores_TimePoint1.csv
+#> Writing inst/backup/2016-01-11_09-12/Siblings.csv
+#> Writing inst/backup/2016-01-11_09-12/Study.csv
+#> Writing inst/backup/2016-01-11_09-12/StudyTask.csv
+#> Writing inst/backup/2016-01-11_09-12/VerbalFluency.csv
+#> Writing inst/backup/2016-01-11_09-12/metadata/field_descriptions.csv
+#> Writing inst/backup/2016-01-11_09-12/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
 data_frame(tbl = names(rows), rows = unlist(rows))
-#> Source: local data frame [25 x 2]
+#> Source: local data frame [20 x 2]
 #> 
-#>                    tbl  rows
-#>                  (chr) (int)
-#> 1                BRIEF   224
-#> 2           Caregivers     0
-#> 3     Caregivers_Entry   477
-#> 4                Child   224
-#> 5           ChildStudy   224
-#> 6                  EVT   224
-#> 7          FruitStroop     0
-#> 8           LENA_Admin   182
-#> 9           LENA_Hours  2968
-#> 10 LWL_BlockAttributes  1995
-#> ..                 ...   ...
+#>                  tbl  rows
+#>                (chr) (int)
+#> 1              BRIEF   224
+#> 2         Caregivers     0
+#> 3   Caregivers_Entry   477
+#> 4              Child   224
+#> 5         ChildStudy   224
+#> 6                EVT   224
+#> 7        FruitStroop     0
+#> 8         LENA_Admin   182
+#> 9         LENA_Hours  2968
+#> 10          Literacy   207
+#> 11     MinPair_Admin   190
+#> 12 MinPair_Responses  7508
+#> 13              PPVT   224
+#> 14               SES   224
+#> 15         SES_Entry   216
+#> 16 Scores_TimePoint1     0
+#> 17          Siblings     0
+#> 18             Study     3
+#> 19         StudyTask    12
+#> 20     VerbalFluency     0
 
 all_tbls$ChildStudy
 #> Source: local data frame [224 x 8]
@@ -186,32 +188,27 @@ We can also download the table-level comments from a database with `describe_db`
 
 ``` r
 describe_db(src = l2t)
-#>    Database               Table    Rows
-#> 1       l2t               BRIEF     224
-#> 2       l2t          Caregivers       0
-#> 3       l2t    Caregivers_Entry     444
-#> 4       l2t               Child     224
-#> 5       l2t          ChildStudy     224
-#> 6       l2t                 EVT     224
-#> 7       l2t         FruitStroop       0
-#> 8       l2t          LENA_Admin     182
-#> 9       l2t          LENA_Hours    2968
-#> 10      l2t LWL_BlockAttributes    1995
-#> 11      l2t          LWL_Blocks     399
-#> 12      l2t           LWL_Looks 2870972
-#> 13      l2t LWL_TrialAttributes  471868
-#> 14      l2t          LWL_Trials   14154
-#> 15      l2t            Literacy     207
-#> 16      l2t       MinPair_Admin     190
-#> 17      l2t   MinPair_Responses    7674
-#> 18      l2t                PPVT     224
-#> 19      l2t                 SES     224
-#> 20      l2t           SES_Entry     215
-#> 21      l2t   Scores_TimePoint1       0
-#> 22      l2t            Siblings       0
-#> 23      l2t               Study       3
-#> 24      l2t           StudyTask      12
-#> 25      l2t       VerbalFluency       0
+#>    Database             Table Rows
+#> 1       l2t             BRIEF  224
+#> 2       l2t        Caregivers    0
+#> 3       l2t  Caregivers_Entry  444
+#> 4       l2t             Child  224
+#> 5       l2t        ChildStudy  224
+#> 6       l2t               EVT  224
+#> 7       l2t       FruitStroop    0
+#> 8       l2t        LENA_Admin  182
+#> 9       l2t        LENA_Hours 2968
+#> 10      l2t          Literacy  207
+#> 11      l2t     MinPair_Admin  190
+#> 12      l2t MinPair_Responses 7674
+#> 13      l2t              PPVT  224
+#> 14      l2t               SES  224
+#> 15      l2t         SES_Entry  215
+#> 16      l2t Scores_TimePoint1    0
+#> 17      l2t          Siblings    0
+#> 18      l2t             Study    3
+#> 19      l2t         StudyTask   12
+#> 20      l2t     VerbalFluency    0
 #>                                                    Description
 #> 1  Scores from Behvr Rating Inventory of Exec Func (Preschool)
 #> 2                        Demographics of children's caregivers
@@ -222,22 +219,17 @@ describe_db(src = l2t)
 #> 7                                                             
 #> 8                                              LENA recordings
 #> 9                    Stats from LENA recordings by hour-of-day
-#> 10          Various key-value pairs for each eyetracking block
-#> 11                  Administrations of eyetracking experiments
-#> 12               Gaze locations during eyetracking experiments
-#> 13                                                            
-#> 14                                                            
-#> 15                                                            
-#> 16             Administrations of the Minimal Pairs experiment
-#> 17      Trials and responses from the Minimal Pairs experiment
-#> 18                 Scores on Peabody Picture Vocabulary Test 4
-#> 19                            Child and household demographics
-#> 20          Child and household demographics (temp data-entry)
-#> 21                                                            
-#> 22                              Sibling and Twin Relationships
-#> 23                                                            
-#> 24                                                            
-#> 25
+#> 10                                                            
+#> 11             Administrations of the Minimal Pairs experiment
+#> 12      Trials and responses from the Minimal Pairs experiment
+#> 13                 Scores on Peabody Picture Vocabulary Test 4
+#> 14                            Child and household demographics
+#> 15          Child and household demographics (temp data-entry)
+#> 16                                                            
+#> 17                              Sibling and Twin Relationships
+#> 18                                                            
+#> 19                                                            
+#> 20
 ```
 
 These two forms of metadata are backed up by `l2t_backup` as well. They are stored in a `metadata` folder.
@@ -252,11 +244,11 @@ dump_database(
   cnf_file = cnf_file, 
   backup_dir = "inst/backup",
   db_name = "l2t")
-#> Checking inst/backup/l2t_2015-10-23_16-09.sql
-#> ..file size: 237425.833 kB
-#> ..line count: 1074
+#> Checking inst/backup/l2t_2016-01-11_09-12.sql
+#> ..file size: 1137.552 kB
+#> ..line count: 699
 #> ..first line: -- MySQL dump 10.13  Distrib 5.6.26, for Win64 (x86_64)
-#> ..final line: -- Dump completed on 2015-10-23 16:12:12
+#> ..final line: -- Dump completed on 2016-01-11  9:12:26
 ```
 
 Writing
@@ -281,7 +273,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          (int)   (chr)                (chr)
-#> 1            1  Hello!  2015-10-23 16:12:22
+#> 1            1  Hello!  2016-01-11 09:12:26
 ```
 
 Helpers
