@@ -128,7 +128,7 @@ merge_values_into_table <- function(src, tbl_name, rows, preview = TRUE) {
     message("Performing queries")
     for (query in queries_to_run) {
       message("\t", query)
-      dbGetQuery(src, statement = this_query)
+      dbGetQuery(src, statement = query)
     }
   }
 

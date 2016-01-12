@@ -74,8 +74,7 @@ current_indices <- current_data %>%
   select(ChildStudyID, EVTID)
 
 latest_data <- latest_data %>%
-  inner_join(current_row_ids) %>%
-  filter(!is.na(EVT_Raw))
+  inner_join(current_indices)
 
 # Keep just the columns in the latest data
 current_data <- match_columns(current_data, latest_data)
@@ -88,21 +87,6 @@ render_diff(daff)
 # Or see them itemized in a long data-frame
 create_diff_table(latest_data, current_data, "EVTID")
 
-
-
-merge_values_into_table(l2t, "EVT", rows = latest_data)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+merge_values_into_table(l2t, "EVT", rows = latest_data, preview = TRUE)
+merge_values_into_table(l2t, "EVT", rows = latest_data, preview = FALSE)
 
