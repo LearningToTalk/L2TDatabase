@@ -1,0 +1,37 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+---
+
+```{r}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "norm-demo-"
+)
+```
+
+
+```{r}
+library("L2TDatabase")
+library("dplyr")
+
+# Connect to norms database
+cnf_file <- "inst/l2t_db.cnf"
+norm_db <- l2t_connect(cnf_file, "norms")
+
+# Download table and query some scores
+evt_norms <- tbl(norm_db, "EVT2") %>% collect
+evt_norms %>% filter(Raw == 30, Age %in% c(30, 40, 50))
+
+# Get field descriptions
+describe_tbl(norm_db, "EVT2") %>% select(Field, Description)
+
+# Download table and query some scores
+ppvt_norms <- tbl(norm_db, "PPVT4") %>% collect
+ppvt_norms %>% filter(Raw == 30, Age %in% c(30, 40, 50))
+
+# Get field descriptions
+describe_tbl(norm_db, "PPVT4") %>% select(Field, Description)
+```
