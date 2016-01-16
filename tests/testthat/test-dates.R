@@ -21,3 +21,27 @@ test_that("Chronological age in months", {
   # Reversed arguments
   expect_equal(chrono_age("2012-01-20", "2014-01-20"), 24)
 })
+
+test_that("Excel date recovery", {
+  # xls file
+  dates <- readxl::read_excel("data/dates.xls")
+
+  # parse expected date (string -> date)
+  dates$exp_date <- as.Date(dates$Expected)
+
+  # convert excel date (string -> time -> date)
+  dates$new_date <- suppressWarnings(as.Date(undo_excel_date(dates$Date)))
+
+  expect_equal(dates$new_date, dates$exp_date)
+
+  # xlsx file
+  x_dates <- readxl::read_excel("data/dates.xlsx")
+
+  # parse expected date (string -> date)
+  x_dates$exp_date <- as.Date(x_dates$Expected)
+
+  # convert excel date (string -> time -> date)
+  x_dates$new_date <- suppressWarnings(as.Date(undo_excel_date(x_dates$Date)))
+
+  expect_equal(x_dates$new_date, x_dates$exp_date)
+})
