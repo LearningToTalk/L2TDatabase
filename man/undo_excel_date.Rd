@@ -18,6 +18,10 @@ Excel stores dates as an integer representing the number of days since
 1/1/1900. Undo that. See
 http://www.exceltactics.com/definitive-guide-using-dates-times-excel/
 }
+\note{
+This function is only valid for years 1901 and beyond. Excel wrongly
+  assumes 1900 was a leap year. See ?format.Date for more information.
+}
 \examples{
 undo_excel_date("41659")
 #> "2014-01-20 UTC"

@@ -29,6 +29,9 @@ match_columns <- function(df1, df2) {
 #' 1/1/1900. Undo that. See
 #' http://www.exceltactics.com/definitive-guide-using-dates-times-excel/
 #'
+#' @note This function is only valid for years 1901 and beyond. Excel wrongly
+#'   assumes 1900 was a leap year. See ?format.Date for more information.
+#'
 #' @param dates a vector of dates (either numeric or character) originating
 #'   from an Excel spreadsheet.
 #' @return the dates converted to POSIXct objects (see ?DateTimeClasses)
