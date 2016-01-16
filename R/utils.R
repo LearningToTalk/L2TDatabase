@@ -90,6 +90,7 @@ chrono_age <- function(t1, t2) {
   t2 <- ymd(t2)
   timespan <- as.period(interval(t1, t2))
 
+  # integer division rounds down to nearest month
   months <- abs(timespan %/% months(1))
   months
 }
