@@ -20,6 +20,11 @@ test_that("Chronological age in months", {
 
   # Reversed arguments
   expect_equal(chrono_age("2012-01-20", "2014-01-20"), 24)
+
+  # Checks against EVT/PPVT examples
+  expect_equal(chrono_age("2007-06-29", "2001-03-03"),  (6 * 12) + 3)
+  expect_equal(chrono_age("2007-05-08", "1999-08-02"),  (7 * 12) + 9)
+  expect_equal(chrono_age("2007-08-13", "1985-11-24"), (21 * 12) + 8)
 })
 
 test_that("Excel date recovery", {

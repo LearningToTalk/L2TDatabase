@@ -83,14 +83,43 @@ undo_excel_date <- function(dates) {
 #' chrono_age("2012-01-20", "2014-01-20")
 #' #> 24
 chrono_age <- function(t1, t2) {
+  difference <- diff_date(t1, t2)
+  12 * difference$y  + difference$m
+}
+
+#' Compute the difference between two dates
+diff_date <- function(t1, t2) {
   assert_that(!is.na(t1), !is.na(t2))
   assert_that(length(t1) == 1, length(t2) == 1)
 
   t1 <- ymd(t1)
   t2 <- ymd(t2)
-  timespan <- as.period(interval(t1, t2))
 
-  # integer division rounds down to nearest month
-  months <- abs(timespan %/% months(1))
-  months
+  # Sort dates and convert to a list
+  d1 <- as_date_list(min(t1, t2))
+  d2 <- as_date_list(max(t1, t2))
+
+  # Borrow a month
+  if (d2$d < d1$d) {
+    d2$m <- d2$m - 1
+    d2$d <- d2$d + 30
+  }
+
+  # Borrow a year
+  if (d2$m < d1$m) {
+    d2$y <- d2$y - 1
+    d2$m <- d2$m + 12
+  }
+
+  diff <- list(
+    y = d2$y - d1$y,
+    m = d2$m - d1$m,
+    d = d2$d - d1$d
+  )
+  diff
+}
+
+# A lightweight data structure for hand-manipulating dates
+as_date_list <- function(date) {
+  list(y = year(date), m = month(date), d = day(date))
 }
