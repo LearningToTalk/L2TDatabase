@@ -5,7 +5,6 @@ library("L2TDatabase")
 cnf_file <- "inst/l2t_db.cnf"
 db_backstage <- l2t_connect(cnf_file, "l2tBackstage")
 
-
 ## Workflow to add new paths to the database
 
 # # The new paths should be stored in a list
@@ -39,15 +38,16 @@ db_backstage <- l2t_connect(cnf_file, "l2tBackstage")
 
 
 # Download the paths and store in a list
-df_current_paths <- db_backstage %>%
-  tbl("LocalPaths") %>%
-  collect
+get_paths <- function(src) {
+  df_current_paths <- src %>%
+    tbl("LocalPaths") %>%
+    collect
 
-paths <- structure(
-  .Data = as.list(df_current_paths$PathValue),
-  names = df_current_paths$PathKey)
+  paths <- structure(
+    .Data = as.list(df_current_paths$PathValue),
+    names = df_current_paths$PathKey)
 
-# Disconnect db and remove data-frames
-invisible(RMySQL::dbDisconnect(db_backstage$con))
-rm(db_backstage)
-rm(df_current_paths)
+  paths
+}
+
+paths <- get_paths(db_backstage)
