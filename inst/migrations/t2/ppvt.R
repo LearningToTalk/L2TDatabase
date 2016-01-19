@@ -49,7 +49,6 @@ t2_ppvt <- t2 %>%
   lapply(get_ppvt_part) %>%
   bind_rows
 
-
 # Combine child-study-childstudy tbls
 cds <- l2t_dl$ChildStudy %>%
   left_join(l2t_dl$Study) %>%
@@ -85,28 +84,31 @@ append_rows_to_table(l2t, "PPVT", to_add)
 
 ## Find records that need to be updated
 
-# # Redownload the table
-# current_data <- collect("PPVT" %from% l2t)
-#
-# # Attach the database keys to latest data
-# current_indices <- current_data %>%
-#   select(ChildStudyID, PPVTID)
-#
-# latest_data <- latest_data %>%
-#   inner_join(current_indices)
-#
-# # Keep just the columns in the latest data
-# current_data <- match_columns(current_data, latest_data) %>%
-#   filter(ChildStudyID %in% latest_data$ChildStudyID)
-#
-# # Preview changes with daff
-# library("daff")
-# daff <- diff_data(current_data, latest_data, context = 0)
-# render_diff(daff)
-#
-# # Or see them itemized in a long data-frame
-# create_diff_table(latest_data, current_data, "PPVTID")
-#
-# merge_values_into_table(l2t, "PPVT", rows = latest_data, preview = TRUE)
-# merge_values_into_table(l2t, "PPVT", rows = latest_data, preview = FALSE)
+# Redownload the table
+remote_data <- collect("PPVT" %from% l2t)
+
+# Attach the database keys to latest data
+current_indices <- remote_data %>%
+  select(ChildStudyID, PPVTID)
+
+latest_data <- latest_data %>%
+  inner_join(current_indices)
+
+# Keep just the columns in the latest data
+remote_data <- match_columns(remote_data, latest_data) %>%
+  filter(ChildStudyID %in% latest_data$ChildStudyID)
+
+# Preview changes with daff
+library("daff")
+daff <- diff_data(remote_data, latest_data, context = 0)
+render_diff(daff)
+
+# Or see them itemized in a long data-frame
+create_diff_table(latest_data, remote_data, "PPVTID")
+
+overwrite_rows_in_table(l2t, "PPVT", rows = latest_data, preview = TRUE)
+overwrite_rows_in_table(l2t, "PPVT", rows = latest_data, preview = FALSE)
+
+
+
 

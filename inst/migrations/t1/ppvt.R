@@ -48,25 +48,50 @@ with_ppvt <- left_join(t1_ppvt, cds)
 
 # Calculate chronological ages, default to NA if error encountered
 chr_age <- failwith(NA, chrono_age)
+
 with_ppvt <- with_ppvt %>%
   mutate(PPVT_Age = unlist(Map(chr_age, PPVT_Completion, Birthdate)))
 
-# Remove duplicate rows (any row with matching ChildStudyID and PPVT_Completion
-# values)
-current_rows <- l2t_dl$PPVT
-current_empties <- filter(current_rows, is.na(PPVT_Completion))
-
-to_add <- with_ppvt %>%
-  anti_join(current_rows, by = c("ChildStudyID", "PPVT_Completion")) %>%
-  # In case the doesn't work on NA completion dates, keep rows with matching ids
-  # but blank completion dates from being added.
-  anti_join(current_empties, by = c("ChildStudyID"))
-
-# Choose final columns and update rows
-to_add <- match_columns(to_add, current_rows) %>%
+# Find completely new records that need to be added
+latest_data <- match_columns(with_ppvt, l2t_dl$PPVT) %>%
   arrange(ChildStudyID)
-to_add
+
+to_add <- latest_data %>%
+  anti_join(l2t_dl$PPVT, by = c("ChildStudyID")) %>%
+  arrange(ChildStudyID)
 
 # Update the remote table. An error here is a good thing if there are no new
 # rows to add
 append_rows_to_table(l2t, "PPVT", to_add)
+
+
+
+
+## Find records that need to be updated
+
+# Redownload the table
+remote_data <- collect("PPVT" %from% l2t)
+
+# Attach the database keys to latest data
+current_indices <- remote_data %>%
+  select(ChildStudyID, PPVTID)
+
+latest_data <- latest_data %>%
+  inner_join(current_indices)
+
+# Keep just the columns in the latest data
+remote_data <- match_columns(remote_data, latest_data) %>%
+  filter(ChildStudyID %in% latest_data$ChildStudyID)
+
+# Preview changes with daff
+library("daff")
+daff <- diff_data(remote_data, latest_data, context = 0)
+render_diff(daff)
+
+# Or see them itemized in a long data-frame
+create_diff_table(latest_data, remote_data, "PPVTID")
+
+overwrite_rows_in_table(l2t, "PPVT", rows = latest_data, preview = TRUE)
+overwrite_rows_in_table(l2t, "PPVT", rows = latest_data, preview = FALSE)
+
+
