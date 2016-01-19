@@ -34,18 +34,14 @@ append_rows_to_table <- function(src, tbl_name, rows) {
 }
 
 
-
-
-
-
 #' Update records in a table
 #' @param src a dplyr-managed database connection or a MySQLConnection
 #' @param tbl_name name of the table to update
 #' @param rows a data-frame of rows with new data
 #' @param preview whether the update should be performed or just previewed
-#' @return nothing is returning
+#' @return TRUE if the update succeeded.
 #' @export
-merge_values_into_table <- function(src, tbl_name, rows, preview = TRUE) {
+overwrite_rows_in_table <- function(src, tbl_name, rows, preview = TRUE) {
   # Unpack dplyr connection
   if (inherits(src, "src_mysql")) {
     db_name <- src$info$dbname
@@ -59,18 +55,15 @@ merge_values_into_table <- function(src, tbl_name, rows, preview = TRUE) {
   # Make sure data exists.
   assert_that(not_empty(rows))
 
-  # Make sure table exists. Otherwise the dbWriteTable will create a new table.
+  # Make sure table exists.
   assert_that(has_table(src, tbl_name))
-#
-#   # dbWriteTable doesn't like dplyr tbl objects
-#   new_rows <- as.data.frame(rows, stringsAsFactors = FALSE)
-  new_rows <- rows
 
   # Make sure there are not any new columns of data
-  curr_values <- collect(tbl_name %from% dplyr_src)
-  local_col_names <- names(new_rows)
-  remote_col_names <- names(curr_values)
-  assert_that(all(local_col_names %in% remote_col_names))
+  ref_rows <- collect(tbl_name %from% dplyr_src)
+  rows <- match_columns(rows, ref_rows)
+
+  # Need at least two columns: Primary key and field to be updated
+  assert_that(2 <= ncol(rows))
 
   # Locate the primary key
   tbl_desc <- describe_tbl(src, tbl_name)
@@ -84,30 +77,24 @@ merge_values_into_table <- function(src, tbl_name, rows, preview = TRUE) {
   assert_that(nrow(tbl_primary_key) == 1)
 
   primary_key <- tbl_primary_key$Field
-  assert_that(primary_key %in% names(new_rows))
+  assert_that(primary_key %in% names(rows))
 
   # Get the records that need to be updated
-  old_rows <- curr_values %>%
-    semi_join(new_rows, by = primary_key) %>%
-    match_columns(new_rows)
-
-#   # Which column is only a timestamp?
-#   timestamp_name <- tbl_desc %>%
-#     filter(DefaultValue == "CURRENT_TIMESTAMP") %>%
-#     getElement("Field")
-#
-#   # Ignoret the timestamp
-#   old_rows[[timestamp_name]] <- NULL
-#   new_rows[[timestamp_name]] <- NULL
+  ref_rows <- ref_rows %>%
+    semi_join(rows, by = primary_key) %>%
+    match_columns(rows)
 
   # Make sure classes match
-  for (col in names(new_rows)) {
-    class(new_rows[[col]]) <- class(old_rows[[col]])
+  for (col in names(rows)) {
+    class(rows[[col]]) <- class(ref_rows[[col]])
   }
 
   # Determine which rows changed
-  df_diff <- create_diff_table(new_rows, old_rows, primary_key)
-  if (nrow(df_diff) == 0) return(FALSE)
+  df_diff <- create_diff_table(rows, ref_rows, primary_key)
+  if (nrow(df_diff) == 0) {
+    message("No rows need to be updated")
+    return(FALSE)
+  }
 
   # Create a version of the conversion function with some arguments filled in
   partial_convert <- function(tbl_diff) {
@@ -128,11 +115,11 @@ merge_values_into_table <- function(src, tbl_name, rows, preview = TRUE) {
     message("Performing queries")
     for (query in queries_to_run) {
       message("\t", query)
-      dbGetQuery(src, statement = query)
+      result <- dbGetQuery(src, statement = query)
     }
   }
 
-  invisible(NULL)
+  TRUE
 }
 
 #' Convert a summary of diffs into a SQL UPDATE query
@@ -154,7 +141,9 @@ convert_diff_to_update_statement <- function(src, tbl_name, primary_key, tbl_dif
   assign_part <- paste0(assignments, collapse = ", ")
 
   # Assuming that the primary key is a single field
-  key_value <- tbl_diff[[primary_key]] %>% unique %>% sql_escape_string(src, .)
+  key_value <- tbl_diff[[primary_key]] %>%
+    unique %>%
+    sql_escape_string(src, .)
 
   where_part <- sprintf("%s = %s", primary_key_esc, key_value)
 
@@ -167,21 +156,30 @@ convert_diff_to_update_statement <- function(src, tbl_name, primary_key, tbl_dif
 
 #' Summarize the changes between two data-frames
 #' @param new_rows a data-frame
-#' @param old_rows a reference version of the data-frame
+#' @param ref_rows a reference version of the data-frame
 #' @param primary_key the name of a column which is used to unique identify rows
 #'   in the data
 #' @return a data-frame with the primary key column(s), and the columns Field,
 #'   OldVersion and NewVersion showing the differences between the two
 #'   data-frames
 #' @export
-create_diff_table <- function(new_rows, old_rows, primary_key) {
-  changes <- find_updates_in_daff(old_rows, new_rows) %>%
+create_diff_table <- function(new_rows, ref_rows, primary_key) {
+  # Identify rows that had values change
+  changes <- find_updates_in_daff(ref_rows, new_rows) %>%
     select(one_of(primary_key))
 
+  # Return an empty data-frame with the expected columns if nothing changed
+  if (nrow(changes) == 0) {
+    changes$Field <- character(0)
+    changes$ReferenceVersion <- character(0)
+    changes$NewVersion <- character(0)
+    return(changes)
+  }
+
   # Combine the old and new data together
-  old_rows$TblVersion <- "old"
-  new_rows$TblVersion <- "new"
-  combined <- bind_rows(old_rows, new_rows) %>%
+  ref_rows$TblVersion <- "Reference"
+  new_rows$TblVersion <- "New"
+  combined <- bind_rows(ref_rows, new_rows) %>%
     semi_join(changes, by = primary_key)
 
   # Exclude the primary key column from the comparison
@@ -190,15 +188,15 @@ create_diff_table <- function(new_rows, old_rows, primary_key) {
     # Gather the data into a long-format data-frame
     tidyr::gather_("Field", "Value", gather_cols = var_names) %>%
     tidyr::spread_("TblVersion", "Value", convert = TRUE) %>%
-    # Keep all rows where `old` is not the same as `new`
+    # Keep all rows where `Reference` is not the same as `New`
     rowwise %>%
-    filter(old %nin% new) %>%
+    filter(Reference %nin% New) %>%
     ungroup
 
   # Tidy up
   df <- df %>%
-    rename(OldVersion = old, NewVersion = new) %>%
-    select(one_of(primary_key), Field, OldVersion, NewVersion) %>%
+    rename(ReferenceVersion = Reference, NewVersion = New) %>%
+    select(one_of(primary_key), Field, ReferenceVersion, NewVersion) %>%
     mutate(Field = as.character(Field))
 
   df
