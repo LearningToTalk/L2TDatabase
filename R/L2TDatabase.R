@@ -3,7 +3,7 @@
 #' @name L2TDatabase
 #' @docType package
 #' @import dplyr RMySQL assertthat readr
-#' @importFrom lubridate ymd as.period interval
+#' @importFrom lubridate ymd as.period interval year month day
 #' @importMethodsFrom lubridate %/%
 NULL
 
