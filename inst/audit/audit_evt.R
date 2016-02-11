@@ -27,7 +27,7 @@ missing_dates
 missing_forms <- with_scores %>%
   filter(is.na(EVT_Form)) %>%
   arrange(Study, ID)
-
+missing_forms
 as.data.frame(missing_forms)
 
 # Get dates and ages
@@ -53,15 +53,14 @@ evt_norms <- l2t_connect(cnf_file, "norms") %>% tbl("EVT2") %>% collect
 norm_check <- with_scores %>%
   # Round age up to 30 months if younger than test norms
   mutate(Age = ifelse(EVT_Age < 30, 30, EVT_Age)) %>%
-  rename(Raw = EVT_Raw, TestAge = EVT_Age,
-         OurStnd = EVT_Standard, OurGSV = EVT_GSV)
+  rename(Raw = EVT_Raw, OurStnd = EVT_Standard, OurGSV = EVT_GSV) %>%
+  select(-EVT_Age)
 
 # Get norms for each Age, Raw Score
 form_a <- norm_check %>%
   filter(EVT_Form %in% "A") %>%
   left_join(evt_norms) %>%
-  rename() %>%
-  select(Study:EVT_Completion, TestAge, NormAge = Age, AgePage,
+  select(Study:EVT_Completion, NormAge = Age, AgePage,
          Raw, OurStnd, Stnd, OurGSV, GSV)
 
 # Look for Form Bs
@@ -69,17 +68,17 @@ norm_check %>%
   filter(EVT_Form == "B")
 
 # Check GSVs
-form_a %>% filter(OurGSV != GSV)
+form_a %>%
+  filter(OurGSV != GSV)
 
 # Check Standard Scores
-form_a %>% filter(OurStnd != Stnd) %>% arrange(Study, ID) %>% as.data.frame
+form_a %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
 
 # Try to checks score where we don't know the form
 form_na <- norm_check %>%
   filter(is.na(EVT_Form)) %>%
   left_join(evt_norms) %>%
-  rename() %>%
-  select(Study:EVT_Completion, TestAge, NormAge = Age, AgePage,
+  select(Study:EVT_Completion, NormAge = Age, AgePage,
          Raw, OurStnd, Stnd, OurGSV, GSV)
 
 # Check GSVs

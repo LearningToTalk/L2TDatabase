@@ -65,21 +65,21 @@ form_a <- norm_check %>%
   filter(PPVT_Form %in% "A") %>%
   left_join(ppvt_norms) %>%
   rename() %>%
-  select(Study:PPVT_Completion, TestAge, NormAge = Age, AgePage,
+  select(Study:PPVT_Completion, NormAge = Age, AgePage,
          Raw, OurStnd, Stnd, OurGSV, GSV)
 
 # Check GSVs
 form_a %>% filter(OurGSV != GSV)
 
 # Check Standard Scores
-form_a %>% filter(OurStnd != Stnd) %>% arrange(Study, ID) %>% as.data.frame
+form_a %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
 
 # Try to checks score where we don't know the form
 form_na <- norm_check %>%
   filter(is.na(PPVT_Form)) %>%
   left_join(ppvt_norms) %>%
   rename() %>%
-  select(Study:PPVT_Completion, TestAge, NormAge = Age, AgePage,
+  select(Study:PPVT_Completion, NormAge = Age, AgePage,
          Raw, OurStnd, Stnd, OurGSV, GSV)
 
 # Check GSVs
