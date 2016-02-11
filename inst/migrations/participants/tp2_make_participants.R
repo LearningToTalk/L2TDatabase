@@ -35,6 +35,10 @@ source(paths$GetSiteInfo)
 tp2 <- GetSiteInfo(sheet = "TimePoint2")
 tp2_visited <- tp2 %>% filter(!is.na(Cohort))
 
+# Peek at the kids whom we think did not visit
+tp2_no_cohort <- tp2 %>% filter(is.na(Cohort))
+tp2_no_cohort
+
 # A non-version-controlled file with db connection info and credentials
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 
@@ -98,7 +102,7 @@ cds
 
 # Assuming that the same child is represented by the same ShortResearchID in the
 # TimePoint1 and TimePoint2 studies, use the ShortResearchID to get the
-# ChildStudyID
+# ChildID
 tp1_ids <- cds %>%
   filter(Study == "TimePoint1") %>%
   select(ChildID, ShortResearchID)
@@ -116,7 +120,8 @@ tp2_final <- tp2_final %>%
 
 # Subtract current rows from new rows to see what data is new
 current_rows <- collect("ChildStudy" %from% l2t)
-new_rows <- anti_join(tp2_final, current_rows) %>%
+new_rows <- tp2_final %>%
+  anti_join(current_rows, by = c("StudyID", "ChildID")) %>%
   arrange(ChildID)
 
 # Add to database
@@ -126,7 +131,44 @@ append_rows_to_table(l2t, "ChildStudy", new_rows)
 
 # Subtract current table from rows-just-added. Result should be empty if every
 # row-just-added has a match in remote table.
-updated_rows <- anti_join(new_rows, collect("ChildStudy" %from% l2t))
+remote_data <- collect("ChildStudy" %from% l2t)
+updated_rows <- anti_join(new_rows, remote_data)
 updated_rows
 
 
+## Find records that need to be updated
+
+# Compare the local and remote data to find fields with different values
+
+# Attach the database keys to latest data
+current_indices <- remote_data %>%
+  select(ChildStudyID, StudyID, ChildID)
+
+latest_data <- tp2_final %>%
+  inner_join(current_indices)
+
+# Keep just the columns in the latest data
+remote_data <- match_columns(remote_data, latest_data) %>%
+  filter(ChildStudyID %in% latest_data$ChildStudyID)
+
+# Now, we have 2 tables with our latest local data and the current remote data,
+# and the tables have same columns and the same database keys. Now we can
+# compare cells between to the two tables and find updated records.
+
+# Preview changes with daff
+library("daff")
+daff <- diff_data(remote_data, latest_data, context = 0)
+render_diff(daff)
+
+# Or see them itemized in a long data-frame
+create_diff_table(latest_data, remote_data, "ChildStudyID")
+
+# Send a SQL query to update the record
+overwrite_rows_in_table(l2t, "ChildStudy", rows = latest_data, preview = TRUE)
+# overwrite_rows_in_table(l2t, "ChildStudy", rows = latest_data, preview = FALSE)
+
+# Subtract remote from local. Should be no differences left.
+remote_data <- collect("ChildStudy" %from% l2t)
+tp2_final %>%
+  anti_join(remote_data) %>%
+  arrange(ChildID)
