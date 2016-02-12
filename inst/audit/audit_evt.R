@@ -1,90 +1,111 @@
-# Check for inconsistencies in the EVT scores in the database
+#' ---
+#' title: "EVT Score Audit"
+#' author: "Tristan Mahr"
+#' ---
 
+#+ setup, include = FALSE
+library("knitr")
+opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
+opts_knit$set(root.dir = "../../")
+
+
+#' Script to check for inconsistencies in the EVT scores in the database.
+
+#+ connect
+# Connect to db
 library("L2TDatabase")
-library("dplyr")
-
-# Download/backup db beforehand
-cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
+library("dplyr", warn.conflicts = FALSE)
+cnf_file <- "./inst/l2t_db.cnf"
 l2t <- l2t_connect(cnf_file)
-l2t_dl <- l2t_backup(l2t, "inst/backup")
 
-# Combine child-study-childstudy tbls
-cds <- l2t_dl$ChildStudy %>%
-  left_join(l2t_dl$Study) %>%
-  left_join(l2t_dl$Child)
-cds
+# Combine child, study, childstudy, and evts tbls
+evts <- tbl(l2t, "ChildStudy")  %>%
+  left_join("Study" %from% l2t) %>%
+  left_join("Child" %from% l2t) %>%
+  left_join("EVT" %from% l2t) %>%
+  # Download rows for kids with raw scores
+  filter(!is.na(EVT_Raw)) %>%
+  select(Study, ID = ShortResearchID, Birthdate, EVT_Form:EVT_Age) %>%
+  collect
 
-evts <- left_join(cds, l2t_dl$EVT) %>%
-  select(Study, ID = ShortResearchID, EVT_Form:EVT_Age)
-
-with_scores <- evts %>%
-  filter(!is.na(EVT_Raw))
-
-missing_dates <- with_scores %>%
-  filter(is.na(EVT_Completion))
-missing_dates
-
-missing_forms <- with_scores %>%
-  filter(is.na(EVT_Form)) %>%
-  arrange(Study, ID)
-missing_forms
-as.data.frame(missing_forms)
-
-# Get dates and ages
-ages <- left_join(cds, l2t_dl$EVT) %>%
-  select(Study, ShortResearchID, Birthdate, EVT_Completion, EVT_Age) %>%
-  filter(!is.na(EVT_Completion))
-
-# Compute chronological age
-ages <- ages %>%
-  rowwise %>%
-  mutate(ChronoAge = chrono_age(Birthdate, EVT_Completion)) %>%
-  ungroup
-
-ages %>% filter(EVT_Age != ChronoAge)
-
-
-
-
-# Check scores against norms
-evt_norms <- l2t_connect(cnf_file, "norms") %>% tbl("EVT2") %>% collect
+# Download Form A norms
+evt_norms <- l2t_connect(cnf_file, "norms") %>%
+  tbl("EVT2") %>%
+  collect
 
 # Make a form of the table amenable for score checking
-norm_check <- with_scores %>%
+norm_check <- evts %>%
   # Round age up to 30 months if younger than test norms
   mutate(Age = ifelse(EVT_Age < 30, 30, EVT_Age)) %>%
   rename(Raw = EVT_Raw, OurStnd = EVT_Standard, OurGSV = EVT_GSV) %>%
-  select(-EVT_Age)
+  select(-EVT_Age, -Birthdate, -EVT_Completion)
+
+
+
+
+#' ## Preliminary checks
+#'
+#' ### Missing Dates
+evts %>%
+  filter(is.na(EVT_Completion)) %>%
+  select(Study:EVT_Completion)
+
+#' ### Missing Forms
+#'
+#' There should be lots of missing forms because both sites haven't documented
+#' the test form consistently.
+evts %>%
+  filter(is.na(EVT_Form)) %>%
+  select(Study:EVT_Completion) %>%
+  arrange(Study, ID) %>%
+  # Print every row
+  as.data.frame()
+
+#' ### Ages
+#'
+#' Recompute test ages and compare to age in EVT table
+evts %>%
+  select(Study, ID, Birthdate, EVT_Completion, EVT_Age) %>%
+  filter(!is.na(EVT_Completion)) %>%
+  mutate(ChronoAge = chrono_age(Birthdate, EVT_Completion)) %>%
+  filter(EVT_Age != ChronoAge) %>%
+  select(-Birthdate)
+
+
+
+#' ## Derived Scores
+
+
+#' ### Form B scores
+#'
+#' We cannot automatically check these scores because we only have the Form A
+#' norms.
+norm_check %>% filter(EVT_Form == "B")
+
+#' ### Form A checks
 
 # Get norms for each Age, Raw Score
 form_a <- norm_check %>%
   filter(EVT_Form %in% "A") %>%
   left_join(evt_norms) %>%
-  select(Study:EVT_Completion, NormAge = Age, AgePage,
-         Raw, OurStnd, Stnd, OurGSV, GSV)
+  select(Study:EVT_Form, NormAge = Age, Raw, OurStnd, Stnd, OurGSV, GSV)
 
-# Look for Form Bs
-norm_check %>%
-  filter(EVT_Form == "B")
+#' #### GSVs
+form_a %>% filter(OurGSV != GSV)
 
-# Check GSVs
-form_a %>%
-  filter(OurGSV != GSV)
-
-# Check Standard Scores
+#' #### Standard Scores
 form_a %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
 
-# Try to checks score where we don't know the form
+#' ### Form NA checks
+#'
+#' Assume that all tests with missing forms are just Form A tests.
 form_na <- norm_check %>%
   filter(is.na(EVT_Form)) %>%
   left_join(evt_norms) %>%
-  select(Study:EVT_Completion, NormAge = Age, AgePage,
-         Raw, OurStnd, Stnd, OurGSV, GSV)
+  select(Study:EVT_Form, NormAge = Age, Raw, OurStnd, Stnd, OurGSV, GSV)
 
-# Check GSVs
+#' #### GSVs
 form_na %>% filter(OurGSV != GSV)
 
-# Check Standard Scores
+#' #### Standard Scores
 form_na %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
-
-
