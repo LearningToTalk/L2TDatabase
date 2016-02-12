@@ -12,6 +12,15 @@ test_that("Chronological age in months", {
   expect_equal(chrono_age("2014-01-20", "2012-02-20"), 23)
   expect_equal(chrono_age("2014-01-20", "2011-12-20"), 25)
 
+  # Multiple dates
+  t1 <- c("2014-01-20", "2014-01-20")
+  t2 <- c("2012-02-20", "2011-12-20")
+  expect_equal(chrono_age(t1, t2), c(23, 25))
+
+  # Missing dates raise warnings and default to NA
+  expect_warning(chrono_age(NA, "2011-12-20"))
+  expect_true(is.na(suppressWarnings(chrono_age(NA, "2011-12-20"))))
+
   # 3 months exactly
   expect_equal(chrono_age("2014-05-10", "2014-02-10"), 3)
 

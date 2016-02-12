@@ -7,10 +7,11 @@
 chrono_age(t1, t2)
 }
 \arguments{
-\item{t1, t2}{dates in ymd format}
+\item{t1, t2}{dates in "yyyy-mm-dd" format}
 }
 \value{
-the chronological age in months
+the chronological ages in months. NA is returned if the age cannot be
+  computed.
 }
 \description{
 Ages are rounded down to the nearest month. A difference of 20 months, 29
@@ -44,5 +45,11 @@ chrono_age("2014-05-10", "2014-02-11")
 # Inverted argument order
 chrono_age("2012-01-20", "2014-01-20")
 #> 24
+
+# Multiple dates
+t1 <- c("2012-01-20", "2014-02-10", "2010-10-10")
+t2 <- c("2014-01-20", "2014-05-10", "2014-11-10")
+chrono_age(t1, t2)
+#> [1] 24  3 49
 }
 
