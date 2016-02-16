@@ -1,91 +1,111 @@
-# Check for inconsistencies in the PPVT scores in the database
+#' ---
+#' title: "PPVT Score Audit"
+#' author: "Tristan Mahr"
+#' ---
 
+#+ setup, include = FALSE
+library("knitr")
+opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
+opts_knit$set(root.dir = "../../")
+
+
+#' Script to check for inconsistencies in the PPVT scores in the database.
+
+#+ connect
+# Connect to db
 library("L2TDatabase")
-library("dplyr")
-
-# Download/backup db beforehand
-cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
+library("dplyr", warn.conflicts = FALSE)
+cnf_file <- "inst/l2t_db.cnf"
 l2t <- l2t_connect(cnf_file)
-l2t_dl <- l2t_backup(l2t, "inst/backup")
 
-# Combine child-study-childstudy tbls
-cds <- l2t_dl$ChildStudy %>%
-  left_join(l2t_dl$Study) %>%
-  left_join(l2t_dl$Child)
-cds
+# Combine child, study, childstudy, and ppvts tbls
+ppvts <- tbl(l2t, "ChildStudy")  %>%
+  left_join("Study" %from% l2t) %>%
+  left_join("Child" %from% l2t) %>%
+  left_join("PPVT" %from% l2t) %>%
+  # Download rows for kids with raw scores
+  filter(!is.na(PPVT_Raw)) %>%
+  select(Study, ID = ShortResearchID, Birthdate, PPVT_Form:PPVT_Age) %>%
+  collect
 
-ppvts <- left_join(cds, l2t_dl$PPVT) %>%
-  select(Study, ID = ShortResearchID, PPVT_Form:PPVT_Age)
-
-with_scores <- ppvts %>%
-  filter(!is.na(PPVT_Raw))
-
-missing_dates <- with_scores %>%
-  filter(is.na(PPVT_Completion))
-missing_dates
-
-missing_forms <- with_scores %>%
-  filter(is.na(PPVT_Form)) %>%
-  arrange(Study, ID)
-
-as.data.frame(missing_forms)
-
-# Get dates and ages
-ages <- left_join(cds, l2t_dl$PPVT) %>%
-  select(Study, ShortResearchID, Birthdate, PPVT_Completion, PPVT_Age) %>%
-  filter(!is.na(PPVT_Completion))
-
-# Compute chronological age
-ages <- ages %>%
-  rowwise %>%
-  mutate(ChronoAge = chrono_age(Birthdate, PPVT_Completion)) %>%
-  ungroup
-
-ages %>% filter(PPVT_Age != ChronoAge)
-
-
-
-
-# Check scores against norms
-ppvt_norms <- l2t_connect(cnf_file, "norms") %>% tbl("PPVT4") %>% collect
+# Download Form A norms
+ppvt_norms <- l2t_connect(cnf_file, "norms") %>%
+  tbl("PPVT4") %>%
+  collect
 
 # Make a form of the table amenable for score checking
-norm_check <- with_scores %>%
+norm_check <- ppvts %>%
   # Round age up to 30 months if younger than test norms
   mutate(Age = ifelse(PPVT_Age < 30, 30, PPVT_Age)) %>%
-  rename(Raw = PPVT_Raw, TestAge = PPVT_Age,
-         OurStnd = PPVT_Standard, OurGSV = PPVT_GSV)
+  rename(Raw = PPVT_Raw, OurStnd = PPVT_Standard, OurGSV = PPVT_GSV) %>%
+  select(-PPVT_Age, -Birthdate, -PPVT_Completion)
 
-# Look for Form Bs
-norm_check %>%
-  filter(PPVT_Form == "B")
+
+
+
+#' ## Preliminary checks
+#'
+#' ### Missing Dates
+ppvts %>%
+  filter(is.na(PPVT_Completion)) %>%
+  select(Study:PPVT_Completion)
+
+#' ### Missing Forms
+#'
+#' There should be lots of missing forms because both sites haven't documented
+#' the test form consistently.
+ppvts %>%
+  filter(is.na(PPVT_Form)) %>%
+  select(Study:PPVT_Completion) %>%
+  arrange(Study, ID) %>%
+  # Print every row
+  as.data.frame
+
+#' ### Ages
+#'
+#' Recompute test ages and compare to age in PPVT table
+ppvts %>%
+  select(Study, ID, Birthdate, PPVT_Completion, PPVT_Age) %>%
+  filter(!is.na(PPVT_Completion)) %>%
+  mutate(ChronoAge = chrono_age(Birthdate, PPVT_Completion)) %>%
+  filter(PPVT_Age != ChronoAge) %>%
+  select(-Birthdate)
+
+
+
+#' ## Derived Scores
+
+
+#' ### Form B scores
+#'
+#' We cannot automatically check these scores because we only have the Form A
+#' norms.
+norm_check %>% filter(PPVT_Form == "B")
+
+#' ### Form A checks
 
 # Get norms for each Age, Raw Score
 form_a <- norm_check %>%
   filter(PPVT_Form %in% "A") %>%
   left_join(ppvt_norms) %>%
-  rename() %>%
-  select(Study:PPVT_Completion, NormAge = Age, AgePage,
-         Raw, OurStnd, Stnd, OurGSV, GSV)
+  select(Study:PPVT_Form, NormAge = Age, Raw, OurStnd, Stnd, OurGSV, GSV)
 
-# Check GSVs
+#' #### GSVs
 form_a %>% filter(OurGSV != GSV)
 
-# Check Standard Scores
+#' #### Standard Scores
 form_a %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
 
-# Try to checks score where we don't know the form
+#' ### Form NA checks
+#'
+#' Assume that all tests with missing forms are just Form A tests.
 form_na <- norm_check %>%
   filter(is.na(PPVT_Form)) %>%
   left_join(ppvt_norms) %>%
-  rename() %>%
-  select(Study:PPVT_Completion, NormAge = Age, AgePage,
-         Raw, OurStnd, Stnd, OurGSV, GSV)
+  select(Study:PPVT_Form, NormAge = Age, Raw, OurStnd, Stnd, OurGSV, GSV)
 
-# Check GSVs
+#' #### GSVs
 form_na %>% filter(OurGSV != GSV)
 
-# Check Standard Scores
+#' #### Standard Scores
 form_na %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
-
-

@@ -15,7 +15,7 @@ opts_knit$set(root.dir = "../../")
 # Connect to db
 library("L2TDatabase")
 library("dplyr", warn.conflicts = FALSE)
-cnf_file <- "./inst/l2t_db.cnf"
+cnf_file <- "inst/l2t_db.cnf"
 l2t <- l2t_connect(cnf_file)
 
 # Combine child, study, childstudy, and evts tbls
@@ -59,7 +59,7 @@ evts %>%
   select(Study:EVT_Completion) %>%
   arrange(Study, ID) %>%
   # Print every row
-  as.data.frame()
+  as.data.frame
 
 #' ### Ages
 #'
