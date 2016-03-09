@@ -1,7 +1,7 @@
 TP1 Data Integrity Check
 ================
 Tristan Mahr
-March 9, 2016
+2016-03-09
 
 In Spring 2015, we had our data-entry team re-enter test scores gathered in the longitudinal study, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
