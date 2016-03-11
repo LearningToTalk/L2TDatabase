@@ -67,7 +67,7 @@ head(studies)
 
 We can download and backup each table in the database with `l2t_backup`.
 
-```{r}
+```{r, warning = FALSE}
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
