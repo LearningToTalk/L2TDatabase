@@ -1,7 +1,7 @@
 TP1 Data Integrity Check
 ================
 Tristan Mahr
-2016-03-09
+2016-03-16
 
 In Spring 2015, we had our data-entry team re-enter test scores gathered in the longitudinal study, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
@@ -87,17 +87,16 @@ Value Comparison
 We now compare the scores in each score-set. This check is only being performed on participants in both score-sets.
 
     #> $EVT_Date
-    #>    ParticipantID Variable       DIRT ParticipantInfo
-    #> 1           020L EVT_Date 2012-02-16      2013-02-16
-    #> 2           045L EVT_Date 2013-09-19            <NA>
-    #> 3           057L EVT_Date 2013-07-01      2013-07-13
-    #> 4           058L EVT_Date 2013-07-13      2013-07-01
-    #> 5           128L EVT_Date 2014-01-31      2014-01-21
-    #> 6           602L EVT_Date 2012-11-27      2012-12-11
-    #> 7           611L EVT_Date 2010-11-19      2012-11-19
-    #> 8           629L EVT_Date 2013-05-17      2013-05-10
-    #> 9           642L EVT_Date 2013-08-26      2013-08-20
-    #> 10          688L EVT_Date 2014-03-08      2014-03-15
+    #>   ParticipantID Variable       DIRT ParticipantInfo
+    #> 1          045L EVT_Date 2013-09-19            <NA>
+    #> 2          057L EVT_Date 2013-07-01      2013-07-13
+    #> 3          058L EVT_Date 2013-07-13      2013-07-01
+    #> 4          128L EVT_Date 2014-01-31      2014-01-21
+    #> 5          602L EVT_Date 2012-11-27      2012-12-11
+    #> 6          611L EVT_Date 2010-11-19      2012-11-19
+    #> 7          629L EVT_Date 2013-05-17      2013-05-10
+    #> 8          642L EVT_Date 2013-08-26      2013-08-20
+    #> 9          688L EVT_Date 2014-03-08      2014-03-15
     #> 
     #> $EVT_Form
     #>   ParticipantID Variable DIRT ParticipantInfo
@@ -107,55 +106,53 @@ We now compare the scores in each score-set. This check is only being performed 
     #>    ParticipantID Variable DIRT ParticipantInfo
     #> 1           057L  EVT_GSV  121             118
     #> 2           058L  EVT_GSV  118             121
-    #> 3           609L  EVT_GSV   NA              85
-    #> 4           614L  EVT_GSV   NA             116
-    #> 5           616L  EVT_GSV   NA             104
-    #> 6           619L  EVT_GSV  118             123
-    #> 7           620L  EVT_GSV   NA             127
-    #> 8           622L  EVT_GSV   NA             122
-    #> 9           631L  EVT_GSV   NA             102
-    #> 10          636L  EVT_GSV   NA              97
-    #> 11          654L  EVT_GSV   NA              90
-    #> 12          657L  EVT_GSV   NA             121
-    #> 13          658L  EVT_GSV   NA             133
-    #> 14          660L  EVT_GSV   NA             114
-    #> 15          661L  EVT_GSV   NA             115
-    #> 16          682L  EVT_GSV   NA             122
-    #> 17          685L  EVT_GSV   NA              54
-    #> 18          686L  EVT_GSV   NA              70
+    #> 3           084L  EVT_GSV  108             107
+    #> 4           609L  EVT_GSV   NA              85
+    #> 5           614L  EVT_GSV   NA             116
+    #> 6           616L  EVT_GSV   NA             104
+    #> 7           619L  EVT_GSV  118             123
+    #> 8           620L  EVT_GSV   NA             127
+    #> 9           622L  EVT_GSV   NA             122
+    #> 10          631L  EVT_GSV   NA             102
+    #> 11          636L  EVT_GSV   NA              97
+    #> 12          654L  EVT_GSV   NA              90
+    #> 13          657L  EVT_GSV   NA             121
+    #> 14          658L  EVT_GSV   NA             133
+    #> 15          660L  EVT_GSV   NA             114
+    #> 16          661L  EVT_GSV   NA             115
+    #> 17          682L  EVT_GSV   NA             122
+    #> 18          685L  EVT_GSV   NA              54
+    #> 19          686L  EVT_GSV   NA              70
     #> 
     #> $EVT_Raw
     #>   ParticipantID Variable DIRT ParticipantInfo
-    #> 1          031L  EVT_Raw   63              54
-    #> 2          037L  EVT_Raw   60              50
-    #> 3          057L  EVT_Raw   43              40
-    #> 4          058L  EVT_Raw   40              43
-    #> 5          609L  EVT_Raw   NA              10
-    #> 6          614L  EVT_Raw   NA              37
-    #> 7          616L  EVT_Raw   NA              24
-    #> 8          620L  EVT_Raw   NA              50
-    #> 9          622L  EVT_Raw   NA              44
+    #> 1          057L  EVT_Raw   43              40
+    #> 2          058L  EVT_Raw   40              43
+    #> 3          609L  EVT_Raw   NA              10
+    #> 4          614L  EVT_Raw   NA              37
+    #> 5          616L  EVT_Raw   NA              24
+    #> 6          620L  EVT_Raw   NA              50
+    #> 7          622L  EVT_Raw   NA              44
     #> 
     #> $EVT_Standard
     #>    ParticipantID     Variable DIRT ParticipantInfo
-    #> 1           037L EVT_Standard  111             118
-    #> 2           057L EVT_Standard  113             114
-    #> 3           058L EVT_Standard  114             113
-    #> 4           609L EVT_Standard   NA              84
-    #> 5           614L EVT_Standard   NA             121
-    #> 6           616L EVT_Standard   NA             102
-    #> 7           620L EVT_Standard   NA             137
-    #> 8           622L EVT_Standard   NA             129
-    #> 9           631L EVT_Standard   NA              99
-    #> 10          636L EVT_Standard   NA              95
-    #> 11          654L EVT_Standard   NA              88
-    #> 12          657L EVT_Standard   NA             128
-    #> 13          658L EVT_Standard   NA             146
-    #> 14          660L EVT_Standard   NA             118
-    #> 15          661L EVT_Standard   NA             120
-    #> 16          682L EVT_Standard   NA             129
-    #> 17          685L EVT_Standard   NA              59
-    #> 18          686L EVT_Standard   NA              72
+    #> 1           057L EVT_Standard  113             114
+    #> 2           058L EVT_Standard  114             113
+    #> 3           609L EVT_Standard   NA              84
+    #> 4           614L EVT_Standard   NA             121
+    #> 5           616L EVT_Standard   NA             102
+    #> 6           620L EVT_Standard   NA             137
+    #> 7           622L EVT_Standard   NA             129
+    #> 8           631L EVT_Standard   NA              99
+    #> 9           636L EVT_Standard   NA              95
+    #> 10          654L EVT_Standard   NA              88
+    #> 11          657L EVT_Standard   NA             128
+    #> 12          658L EVT_Standard   NA             146
+    #> 13          660L EVT_Standard   NA             118
+    #> 14          661L EVT_Standard   NA             120
+    #> 15          682L EVT_Standard   NA             129
+    #> 16          685L EVT_Standard   NA              59
+    #> 17          686L EVT_Standard   NA              72
     #> 
     #> $FruitStroop_Score
     #>   ParticipantID          Variable DIRT ParticipantInfo
