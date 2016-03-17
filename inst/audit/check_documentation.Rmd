@@ -1,0 +1,124 @@
+---
+title: "Documentation Check"
+author: "Tristan Mahr"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include = FALSE, echo = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("knitr")
+opts_chunk$set(echo = TRUE)
+opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
+opts_knit$set(root.dir = "../../")
+```
+
+MySQL allows users to write short documentation comments for database tables
+(up to 80 characters) and for database fields (up to 255 characters). These
+documentation comments can be queried and retrieved like other data, so they
+provide a handy way to store descriptive metadata.
+
+This script checks for missing documentation in database. 
+
+### Preliminaries
+
+```{r Connect, include = TRUE, message = FALSE, warning = FALSE}
+# Connect to the scores database
+library("L2TDatabase")
+library("dplyr")
+
+cnf_file <- "inst/l2t_db.cnf"
+l2t <- l2t_connect(cnf_file)
+```
+
+### We cannot document views
+
+_Views_ are tables that are dynamically show the results of a query. These are
+prefixed in the database with "q_" (for _query_). These view tables, and the
+derived fields computer in them, cannot be documented. We have to ignore these
+tables in our check
+
+The following tables are views and can only have have limited documentation.
+
+```{r}
+describe_db(l2t) %>% 
+  filter(Description == "VIEW")
+```
+
+In the `q_MinPair_Aggregate` view, the proportion correct for non-training
+trials is a derived value. The field `MinPair_ProportionCorrect` is created
+and computed as the query is executed. Therefore, there is no documentation
+available for it.
+
+```{r}
+l2t %>% 
+  describe_tbl("q_MinPair_Aggregate") %>% 
+  filter(Description == "")
+```
+
+
+
+## Undocumented Tables
+
+The following tables are missing documentation:
+
+```{r}
+describe_db(l2t) %>% 
+  filter(Description == "")
+```
+
+## Undocumented Fields
+
+The following fields are missing documentation.
+
+```{r}
+# Omit strings containing a pattern
+str_reject <- function(string, pattern) { 
+  string[!stringr::str_detect(string, pattern)]
+}
+
+non_view_tbls <- src_tbls(l2t) %>% str_reject("q_")
+
+# Get description of each non-view table. Combine them.
+all_descriptions <- Map(function(x) describe_tbl(l2t, x), non_view_tbls) %>% 
+  bind_rows 
+
+# Keep only undocumented rows
+all_descriptions %>% 
+  filter(Description == "") %>% 
+  select(Table, Field, Description) %>% 
+  print(n = nrow(.))
+```
+
+## Name checks
+
+We need to be careful about tables that share field names because they will
+not join correctly. For example, trying to combine an Experiment table with a
+`Dialect` column to a ParticipantInfo table with `Dialect` column will wrongly
+combine experiments and children that share the same values in the Dialect
+column. Which is not what we want, especially the same child is exposed to
+different versions of an experiment with different dialects. 
+
+Ideally, only index fields should be allowed to appear in more than one table,
+and we check that this is the case:
+
+```{r}
+# Get description of each non-view table. Combine them.
+all_descriptions %>% 
+  # Ignore the temporary tables used for mass data-entry
+  mutate(IsEntryTable = stringr::str_detect(Table, "_Entry")) %>% 
+  filter(Index == "", !IsEntryTable) %>% 
+  # Count the occurrence of each field
+  group_by(Field) %>% 
+  mutate(FieldCount = length(Field)) %>% 
+  ungroup %>% 
+  # Keep duplicated fields
+  filter(FieldCount != 1) %>% 
+  select(Field, Table) %>% 
+  arrange(Field) %>% 
+  print(n = nrow(.))
+```
+
+
+
+
+
