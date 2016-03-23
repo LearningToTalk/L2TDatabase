@@ -15,14 +15,31 @@ cds <- tbl(l2t, "Child") %>%
 lena_data <- tbl(l2t, "LENA_Admin") %>%
   left_join("LENA_Hours" %from% l2t)
 
-describe_tbl(l2t, "LENA_Hours")
-
 
 # Keep just hours for timepoint 1 kids and download from db
-d_all <- inner_join(cds, lena_data) %>% collect
+d_all <- cds %>%
+  inner_join(lena_data) %>%
+  collect
+
+# Identify recordings that involve more than one date, find hours from second
+# date. These are overnight hours (after midnight).
+library("lubridate")
+d_hours <- d_all %>%
+  select(ShortResearchID, LENAID, LENAHourID, Hour) %>%
+  group_by(LENAID) %>%
+  mutate(Date = as.Date(Hour),
+         LastDay = max(Date),
+         NumDays = length(unique(Date))) %>%
+  filter(NumDays != 1, Date == LastDay) %>%
+  ungroup
+
+# Exclude the overnight hours
+d_all <- d_all %>% anti_join(d_hours, by = "LENAHourID")
 
 # Keep just the administration notes
-d_notes <- d_all %>% select(LENAID, LENANotes = Notes) %>% distinct
+d_notes <- d_all %>%
+  select(LENAID, LENA_Notes) %>%
+  distinct
 
 # Collapse across hours
 d_sum <- d_all %>%
@@ -42,7 +59,6 @@ d_sum <- d_all %>%
   select(-(Duration:CVC_Actual))
 
 d_final <- d_sum %>%
-  filter(10 <= Hours) %>%
   left_join(d_notes) %>%
   select(-LENAID) %>%
   rename(ResearchID = ShortResearchID)
