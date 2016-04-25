@@ -138,16 +138,15 @@ original_verbal_fluency$VerbalFluency_AgeEquivalent %>%
   sort
 ```
 
-Some of those values have leading spaces. These are the rows with spaces located
-in the score:
+Some of those values used to have leading spaces. These are the rows with spaces
+located in the score. (Empty is good.)
 
 ```{r}
 original_verbal_fluency %>% 
   filter(str_detect(VerbalFluency_AgeEquivalent, " "))
 ```
 
-These are the unique values found in the re-entry score-set. We need to convert
-hyphens into semicolons.
+These are the unique values found in the re-entry score-set.
 
 ```{r}
 # Compare formatting of verbal fluency scores
@@ -158,8 +157,8 @@ df_tp1 %>%
   sort
 ```
 
-These are the rows in the re-entered score set with hyphens instead of
-semicolons (our preferred way to write "Year;Month" chronological ages).
+We used to write chronological ages as "Year-Month" but have since switched to
+"Year;Month", so we still check for these hyphens. (Empty is good.)
 
 ```{r}
 df_tp1 %>%
@@ -172,7 +171,6 @@ We now compare the scores in each score-set. This check is only being performed
 on participants in both score-sets.
 
 ```{r}
-
 in_both_sets <- reentry_participants %>% 
   semi_join(original_participants, by = "ParticipantID") %>% 
   select(ParticipantID)

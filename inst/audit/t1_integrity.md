@@ -1,7 +1,7 @@
 TP1 Data Integrity Check
 ================
 Tristan Mahr
-2016-03-16
+2016-04-25
 
 In Spring 2015, we had our data-entry team re-enter test scores gathered in the longitudinal study, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
@@ -44,37 +44,22 @@ The most fiddly field seems to be the Verbal Fluency age-equivalents score.
 
 These are the unique values found in the original score-set.
 
-    #>  [1] "                           <2;0" " <2;0"                          
-    #>  [3] "<2-0"                            "<2;0"                           
-    #>  [5] "2-1"                             "2-10"                           
-    #>  [7] "2-3"                             "2-5"                            
-    #>  [9] "2-7"                             "2-8"                            
-    #> [11] "2;10"                            "2;3"                            
-    #> [13] "2;8"                             "3-0"                            
-    #> [15] "3-1"                             "3-3"                            
-    #> [17] "3-6"                             "3-7"                            
-    #> [19] "3-9"                             "3;0"                            
-    #> [21] "3;3"                             "3;4"                            
-    #> [23] "3;9"                             "4;10"
+    #>  [1] "<2;0" "2;1"  "2;10" "2;3"  "2;5"  "2;7"  "2;8"  "3;0"  "3;1"  "3;3" 
+    #> [11] "3;4"  "3;6"  "3;7"  "3;9"  "4;10"
 
-Some of those values have leading spaces. These are the rows with spaces located in the score:
+Some of those values used to have leading spaces. These are the rows with spaces located in the score. (Empty is good.)
 
-    #> Source: local data frame [5 x 3]
+    #> Source: local data frame [0 x 3]
     #> 
-    #>   ParticipantID          Source     VerbalFluency_AgeEquivalent
-    #>           (chr)           (chr)                           (chr)
-    #> 1          025L ParticipantInfo                            <2;0
-    #> 2          078L ParticipantInfo                            <2;0
-    #> 3          079L ParticipantInfo                            <2;0
-    #> 4          080L ParticipantInfo                            <2;0
-    #> 5          084L ParticipantInfo                            <2;0
+    #> Variables not shown: ParticipantID (chr), Source (chr),
+    #>   VerbalFluency_AgeEquivalent (chr)
 
-These are the unique values found in the re-entry score-set. We need to convert hyphens into semicolons.
+These are the unique values found in the re-entry score-set.
 
-    #>  [1] "<2;0" "2;0"  "2;1"  "2;10" "2;3"  "2;5"  "2;7"  "2;8"  "3;0"  "3;1" 
-    #> [11] "3;3"  "3;4"  "3;6"  "3;7"  "3;9"  "4;10"
+    #>  [1] "<2;0" "2;1"  "2;10" "2;3"  "2;5"  "2;7"  "2;8"  "3;0"  "3;1"  "3;3" 
+    #> [11] "3;4"  "3;6"  "3;7"  "3;9"  "4;10"
 
-These are the rows in the re-entered score set with hyphens instead of semicolons (our preferred way to write "Year;Month" chronological ages).
+We used to write chronological ages as "Year-Month" but have since switched to "Year;Month", so we still check for these hyphens. (Empty is good.)
 
     #> Source: local data frame [0 x 5]
     #> 
@@ -103,56 +88,31 @@ We now compare the scores in each score-set. This check is only being performed 
     #> 1          624L EVT_Form    A            <NA>
     #> 
     #> $EVT_GSV
-    #>    ParticipantID Variable DIRT ParticipantInfo
-    #> 1           057L  EVT_GSV  121             118
-    #> 2           058L  EVT_GSV  118             121
-    #> 3           084L  EVT_GSV  108             107
-    #> 4           609L  EVT_GSV   NA              85
-    #> 5           614L  EVT_GSV   NA             116
-    #> 6           616L  EVT_GSV   NA             104
-    #> 7           619L  EVT_GSV  118             123
-    #> 8           620L  EVT_GSV   NA             127
-    #> 9           622L  EVT_GSV   NA             122
-    #> 10          631L  EVT_GSV   NA             102
-    #> 11          636L  EVT_GSV   NA              97
-    #> 12          654L  EVT_GSV   NA              90
-    #> 13          657L  EVT_GSV   NA             121
-    #> 14          658L  EVT_GSV   NA             133
-    #> 15          660L  EVT_GSV   NA             114
-    #> 16          661L  EVT_GSV   NA             115
-    #> 17          682L  EVT_GSV   NA             122
-    #> 18          685L  EVT_GSV   NA              54
-    #> 19          686L  EVT_GSV   NA              70
+    #>   ParticipantID Variable DIRT ParticipantInfo
+    #> 1          057L  EVT_GSV  121             118
+    #> 2          058L  EVT_GSV  118             121
+    #> 3          084L  EVT_GSV  108             107
+    #> 4          616L  EVT_GSV   NA             104
+    #> 5          619L  EVT_GSV  118             123
+    #> 6          622L  EVT_GSV   NA             122
+    #> 7          631L  EVT_GSV   NA             102
+    #> 8          657L  EVT_GSV   NA             121
     #> 
     #> $EVT_Raw
     #>   ParticipantID Variable DIRT ParticipantInfo
     #> 1          057L  EVT_Raw   43              40
     #> 2          058L  EVT_Raw   40              43
-    #> 3          609L  EVT_Raw   NA              10
-    #> 4          614L  EVT_Raw   NA              37
-    #> 5          616L  EVT_Raw   NA              24
-    #> 6          620L  EVT_Raw   NA              50
-    #> 7          622L  EVT_Raw   NA              44
+    #> 3          616L  EVT_Raw   NA              24
+    #> 4          622L  EVT_Raw   NA              44
     #> 
     #> $EVT_Standard
-    #>    ParticipantID     Variable DIRT ParticipantInfo
-    #> 1           057L EVT_Standard  113             114
-    #> 2           058L EVT_Standard  114             113
-    #> 3           609L EVT_Standard   NA              84
-    #> 4           614L EVT_Standard   NA             121
-    #> 5           616L EVT_Standard   NA             102
-    #> 6           620L EVT_Standard   NA             137
-    #> 7           622L EVT_Standard   NA             129
-    #> 8           631L EVT_Standard   NA              99
-    #> 9           636L EVT_Standard   NA              95
-    #> 10          654L EVT_Standard   NA              88
-    #> 11          657L EVT_Standard   NA             128
-    #> 12          658L EVT_Standard   NA             146
-    #> 13          660L EVT_Standard   NA             118
-    #> 14          661L EVT_Standard   NA             120
-    #> 15          682L EVT_Standard   NA             129
-    #> 16          685L EVT_Standard   NA              59
-    #> 17          686L EVT_Standard   NA              72
+    #>   ParticipantID     Variable DIRT ParticipantInfo
+    #> 1          057L EVT_Standard  113             114
+    #> 2          058L EVT_Standard  114             113
+    #> 3          616L EVT_Standard   NA             102
+    #> 4          622L EVT_Standard   NA             129
+    #> 5          631L EVT_Standard   NA              99
+    #> 6          657L EVT_Standard   NA             128
     #> 
     #> $FruitStroop_Score
     #>   ParticipantID          Variable DIRT ParticipantInfo
@@ -184,99 +144,35 @@ We now compare the scores in each score-set. This check is only being performed 
     #> 3          635L PPVT_Form <NA>               A
     #> 
     #> $PPVT_GSV
-    #>    ParticipantID Variable DIRT ParticipantInfo
-    #> 1           057L PPVT_GSV  109             105
-    #> 2           058L PPVT_GSV  105             109
-    #> 3           609L PPVT_GSV   NA              90
-    #> 4           614L PPVT_GSV   NA              89
-    #> 5           620L PPVT_GSV   NA             116
-    #> 6           631L PPVT_GSV   NA              70
-    #> 7           654L PPVT_GSV   NA              79
-    #> 8           657L PPVT_GSV   NA              90
-    #> 9           660L PPVT_GSV   NA              70
-    #> 10          661L PPVT_GSV   NA             110
-    #> 11          671L PPVT_GSV   98              97
-    #> 12          685L PPVT_GSV   NA              96
-    #> 13          686L PPVT_GSV   NA              70
+    #>   ParticipantID Variable DIRT ParticipantInfo
+    #> 1          057L PPVT_GSV  109             105
+    #> 2          058L PPVT_GSV  105             109
+    #> 3          631L PPVT_GSV   NA              70
+    #> 4          657L PPVT_GSV   NA              90
+    #> 5          661L PPVT_GSV   NA             110
+    #> 6          671L PPVT_GSV   98              97
     #> 
     #> $PPVT_Raw
     #>   ParticipantID Variable DIRT ParticipantInfo
     #> 1          057L PPVT_Raw   56              51
     #> 2          058L PPVT_Raw   51              56
-    #> 3          609L PPVT_Raw   NA              34
-    #> 4          614L PPVT_Raw   NA              33
-    #> 5          620L PPVT_Raw   NA              64
     #> 
     #> $PPVT_Standard
-    #>    ParticipantID      Variable DIRT ParticipantInfo
-    #> 1           057L PPVT_Standard  110             106
-    #> 2           058L PPVT_Standard  106             110
-    #> 3           118L PPVT_Standard 1121             111
-    #> 4           609L PPVT_Standard   NA             101
-    #> 5           614L PPVT_Standard   NA             100
-    #> 6           620L PPVT_Standard   NA             129
-    #> 7           628L PPVT_Standard  119             116
-    #> 8           631L PPVT_Standard   NA              84
-    #> 9           654L PPVT_Standard   NA              92
-    #> 10          657L PPVT_Standard   NA             101
-    #> 11          660L PPVT_Standard   NA              84
-    #> 12          661L PPVT_Standard   NA             122
-    #> 13          685L PPVT_Standard   NA             106
-    #> 14          686L PPVT_Standard   NA              84
+    #>   ParticipantID      Variable DIRT ParticipantInfo
+    #> 1          057L PPVT_Standard  110             106
+    #> 2          058L PPVT_Standard  106             110
+    #> 3          118L PPVT_Standard 1121             111
+    #> 4          628L PPVT_Standard  119             116
+    #> 5          631L PPVT_Standard   NA              84
+    #> 6          657L PPVT_Standard   NA             101
+    #> 7          661L PPVT_Standard   NA             122
     #> 
     #> $VerbalFluency_AgeEquivalent
-    #>    ParticipantID                    Variable DIRT ParticipantInfo
-    #> 1           602L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 2           605L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 3           606L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 4           607L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 5           609L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 6           610L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 7           612L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 8           613L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 9           614L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 10          616L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 11          619L VerbalFluency_AgeEquivalent  2;3             2;5
-    #> 12          620L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 13          622L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 14          624L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 15          627L VerbalFluency_AgeEquivalent <NA>            <2;0
-    #> 16          629L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 17          630L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 18          631L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 19          632L VerbalFluency_AgeEquivalent  2;0             2;7
-    #> 20          635L VerbalFluency_AgeEquivalent <NA>            <2;0
-    #> 21          636L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 22          638L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 23          639L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 24          640L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 25          641L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 26          642L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 27          643L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 28          645L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 29          646L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 30          649L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 31          651L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 32          654L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 33          657L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 34          659L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 35          660L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 36          661L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 37          665L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 38          666L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 39          671L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 40          673L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 41          675L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 42          676L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 43          677L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 44          678L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 45          680L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 46          681L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 47          682L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 48          684L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 49          685L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 50          686L VerbalFluency_AgeEquivalent  2;0            <2;0
-    #> 51          688L VerbalFluency_AgeEquivalent  2;0            <2;0
+    #>   ParticipantID                    Variable DIRT ParticipantInfo
+    #> 1          619L VerbalFluency_AgeEquivalent  2;3             2;5
+    #> 2          627L VerbalFluency_AgeEquivalent <NA>            <2;0
+    #> 3          632L VerbalFluency_AgeEquivalent <2;0             2;7
+    #> 4          635L VerbalFluency_AgeEquivalent <NA>            <2;0
     #> 
     #> $VerbalFluency_Score
     #>   ParticipantID            Variable DIRT ParticipantInfo
