@@ -32,7 +32,7 @@ source("inst/migrations/dates.R")
 `%!==%` <- Negate(`%===%`)
 
 # Collect dates/scores
-df_dates <- collect_dates(paths$score_dates)
+df_dates <- collect_dates(paths$score_dates, recursive = TRUE)
 
 df_tp1 <- df_dates %>%
   filter(Study == "TimePoint1")
