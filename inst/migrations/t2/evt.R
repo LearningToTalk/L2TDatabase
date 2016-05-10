@@ -25,12 +25,20 @@ is_na_string <- function(xs) is.element(xs, c(NA, "NA"))
 t2 <- GetSiteInfo(sheet = "TimePoint2", separately = TRUE)
 
 # Fix the dates in each spreadsheet to the same type and format
-t2$UW$EVT_COMPLETION_DATE <-
-  t2$UW$EVT_COMPLETION_DATE %>%
+clean_excel_dates <- . %>%
   convert_na_strings %>%
   undo_excel_date %>%
   format
-t2$UMN$EVT_COMPLETION_DATE <- t2$UMN$EVT_COMPLETION_DATE %>% format()
+
+clean_dates <- function(dates) {
+  f <- if (inherits(dates, "POSIXt")) format else clean_excel_dates
+  f(dates)
+}
+
+
+# Fix the dates in each spreadsheet to the same type and format
+t2$UW$EVT_COMPLETION_DATE <- t2$UW$EVT_COMPLETION_DATE %>% clean_dates
+t2$UMN$EVT_COMPLETION_DATE <- t2$UMN$EVT_COMPLETION_DATE %>% clean_dates
 
 # Get the EVT columns for a spreadsheet
 get_evt_part <- . %>%
@@ -60,11 +68,8 @@ cds
 # with corresponding rows in the ChildStudy table
 with_evt <- inner_join(t2_evt, cds)
 
-# Calculate chronological ages, default to NA if error encountered
-chr_age <- failwith(NA, chrono_age)
-
 with_evt <- with_evt %>%
-  mutate(EVT_Age = unlist(Map(chr_age, EVT_Completion, Birthdate)))
+  mutate(EVT_Age = chrono_age(EVT_Completion, Birthdate))
 
 # Find completely new records that need to be added
 latest_data <- match_columns(with_evt, l2t_dl$EVT) %>%
@@ -73,7 +78,7 @@ latest_data <- match_columns(with_evt, l2t_dl$EVT) %>%
 to_add <- latest_data %>%
   anti_join(l2t_dl$EVT, by = c("ChildStudyID")) %>%
   arrange(ChildStudyID)
-
+to_add
 
 
 
