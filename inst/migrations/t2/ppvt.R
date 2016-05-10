@@ -25,12 +25,18 @@ is_na_string <- function(xs) is.element(xs, c(NA, "NA"))
 t2 <- GetSiteInfo(sheet = "TimePoint2", separately = TRUE)
 
 # Fix the dates in each spreadsheet to the same type and format
-t2$UW$PPVT_COMPLETION_DATE <-
-  t2$UW$PPVT_COMPLETION_DATE %>%
+clean_excel_dates <- . %>%
   convert_na_strings %>%
   undo_excel_date %>%
   format
-t2$UMN$PPVT_COMPLETION_DATE <- t2$UMN$PPVT_COMPLETION_DATE %>% format
+
+clean_dates <- function(dates) {
+  f <- if (inherits(dates, "POSIXt")) format else clean_excel_dates
+  f(dates)
+}
+
+t2$UW$PPVT_COMPLETION_DATE <- t2$UW$PPVT_COMPLETION_DATE %>% clean_dates
+t2$UMN$PPVT_COMPLETION_DATE <- t2$UMN$PPVT_COMPLETION_DATE %>% clean_dates
 
 # Get the PPVT columns for a spreadsheet
 get_ppvt_part <- . %>%
@@ -59,11 +65,9 @@ cds
 # with corresponding rows in the ChildStudy table
 with_ppvt <- inner_join(t2_ppvt, cds)
 
-# Calculate chronological ages, default to NA if error encountered
-chr_age <- failwith(NA, chrono_age)
-
+# Determine chronological age at test data
 with_ppvt <- with_ppvt %>%
-  mutate(PPVT_Age = unlist(Map(chr_age, PPVT_Completion, Birthdate)))
+  mutate(PPVT_Age = chrono_age(PPVT_Completion, Birthdate))
 
 # Find completely new records that need to be added
 latest_data <- match_columns(with_ppvt, l2t_dl$PPVT) %>%
@@ -72,7 +76,7 @@ latest_data <- match_columns(with_ppvt, l2t_dl$PPVT) %>%
 to_add <- latest_data %>%
   anti_join(l2t_dl$PPVT, by = c("ChildStudyID")) %>%
   arrange(ChildStudyID)
-
+to_add
 
 
 
