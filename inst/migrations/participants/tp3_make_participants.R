@@ -31,13 +31,18 @@ source(paths$GetSiteInfo)
 
 # Data collect is ongoing. Need to be careful, and only create rows for
 # participants that have visited the lab.
-tp3 <- GetSiteInfo(sheet = "TimePoint3")
+tp3_both <- GetSiteInfo(sheet = "TimePoint3", separately = TRUE)
+
+tp3 <- tp3_both %>%
+  lapply(function(x) select(x, Participant_ID, Cohort, EVT_GSV, `verbalfluency_raw_time5-6`, Cohort, AAE, female, Age = `AgeAtvA_5-6`)) %>%
+  bind_rows
 
 tp3_visited <- tp3 %>% filter(!is.na(Cohort))
+tp3_visited
 
 # Peek at the kids whom we think did not visit
 tp3_no_cohort <- tp3 %>% filter(is.na(Cohort))
-tp3_no_cohort$EVT_COMPLETION_DATE
+tp3_no_cohort$`verbalfluency_raw_time5-6`
 tp3_no_cohort$EVT_GSV
 
 
@@ -66,7 +71,7 @@ glimpse(l2t_dl$ChildStudy)
 # data
 tp3_visited <- tp3_visited %>%
   rename(ShortResearchID = Participant_ID) %>%
-  select(ShortResearchID, Cohort, AAE, female, Age = `AgeAtvA_5-6`) %>%
+  select(ShortResearchID, Cohort, AAE, female, Age) %>%
   mutate(Study = "TimePoint3", ProjectAbbrev = "L",
          Gender = ifelse(female, "F", "M"),
          Dialect = ifelse(AAE, "A", "S"))
@@ -128,6 +133,7 @@ current_rows <- collect("ChildStudy" %from% l2t)
 new_rows <- tp3_final %>%
   anti_join(current_rows, by = c("StudyID", "ChildID")) %>%
   arrange(ChildID)
+
 
 # Add to database
 append_rows_to_table(l2t, "ChildStudy", new_rows)
