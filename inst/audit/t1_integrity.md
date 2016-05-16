@@ -1,7 +1,7 @@
 TP1 Data Integrity Check
 ================
 Tristan Mahr
-2016-04-25
+2016-05-16
 
 In Spring 2015, we had our data-entry team re-enter test scores gathered in the longitudinal study, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
@@ -116,15 +116,10 @@ We now compare the scores in each score-set. This check is only being performed 
     #> 
     #> $FruitStroop_Score
     #>   ParticipantID          Variable DIRT ParticipantInfo
-    #> 1          006L FruitStroop_Score 1.20            1.22
-    #> 2          046L FruitStroop_Score 2.10            2.11
-    #> 3          057L FruitStroop_Score 2.78            2.11
-    #> 4          058L FruitStroop_Score 2.11            2.78
-    #> 5          601L FruitStroop_Score   NA            3.00
-    #> 6          612L FruitStroop_Score 1.11            1.10
-    #> 7          616L FruitStroop_Score 1.78            1.77
-    #> 8          635L FruitStroop_Score   NA            2.00
-    #> 9          657L FruitStroop_Score 1.88            1.89
+    #> 1          057L FruitStroop_Score 2.78            2.11
+    #> 2          058L FruitStroop_Score 2.11            2.78
+    #> 3          601L FruitStroop_Score   NA            3.00
+    #> 4          635L FruitStroop_Score   NA            2.00
     #> 
     #> $PPVT_Date
     #>   ParticipantID  Variable       DIRT ParticipantInfo
@@ -176,10 +171,8 @@ We now compare the scores in each score-set. This check is only being performed 
     #> 
     #> $VerbalFluency_Score
     #>   ParticipantID            Variable DIRT ParticipantInfo
-    #> 1          057L VerbalFluency_Score    0               2
-    #> 2          058L VerbalFluency_Score    2               0
-    #> 3          619L VerbalFluency_Score    5               6
-    #> 4          627L VerbalFluency_Score   NA               0
-    #> 5          632L VerbalFluency_Score    0               7
-    #> 6          635L VerbalFluency_Score   NA               0
-    #> 7          657L VerbalFluency_Score    0               1
+    #> 1          619L VerbalFluency_Score    5               6
+    #> 2          627L VerbalFluency_Score   NA               0
+    #> 3          632L VerbalFluency_Score    0               7
+    #> 4          635L VerbalFluency_Score   NA               0
+    #> 5          657L VerbalFluency_Score    0               1
