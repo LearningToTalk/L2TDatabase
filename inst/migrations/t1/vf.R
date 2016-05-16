@@ -125,7 +125,7 @@ cds <- tbl(l2t, "ChildStudy") %>%
   left_join(tbl(l2t, "Child")) %>%
   left_join(tbl(l2t, "Study")) %>%
   collect %>%
-  select(ShortResearchID, Study, ChildStudyID)
+  select(ShortResearchID, Study, ChildStudyID, Birthdate)
 
 # Make sure every verbal fluency corresponds to a database ChildStudy key
 anti_join(df_with_dates, cds)
@@ -134,8 +134,11 @@ df_can_be_added <- df_with_dates %>%
   left_join(cds) %>%
   rename(VerbalFluency_Completion = VerbalFluency_Date,
          VerbalFluency_Raw = VerbalFluency_Score,
-         VerbalFluency_AgeEq = VerbalFluency_AgeEquivalent) %>%
-  select(-Study, ShortResearchID)
+         VerbalFluency_AgeEq = VerbalFluency_AgeEquivalent)
+
+df_can_be_added <- df_can_be_added %>%
+  mutate(VerbalFluency_Age = chrono_age(Birthdate, VerbalFluency_Completion)) %>%
+  select(-Study, -ShortResearchID, -Birthdate)
 
 df_can_be_added
 
@@ -161,6 +164,39 @@ append_rows_to_table(l2t, "VerbalFluency", new_rows)
 
 
 
-## Compare remote to local
+## Find records that need to be updated
 
-# todo add boilerplate for updating changed records
+# Redownload the table
+remote_data <- collect("VerbalFluency" %from% l2t)
+
+# Attach the database keys to latest data
+current_indices <- remote_data %>%
+  select(ChildStudyID, VerbalFluencyID)
+
+latest_data <- df_can_be_added %>%
+  inner_join(current_indices) %>%
+  mutate()
+
+# Keep just the columns in the latest data
+remote_data <- match_columns(remote_data, latest_data) %>%
+  filter(ChildStudyID %in% latest_data$ChildStudyID)
+
+latest_data$VerbalFluency_Completion <- latest_data$VerbalFluency_Completion %>% format
+latest_data
+
+# Preview changes with daff
+library("daff")
+daff <- diff_data(remote_data, latest_data, context = 0)
+render_diff(daff)
+
+# Or see them itemized in a long data-frame
+create_diff_table(latest_data, remote_data, "VerbalFluencyID")
+
+overwrite_rows_in_table(l2t, "VerbalFluency", rows = latest_data, preview = TRUE)
+overwrite_rows_in_table(l2t, "VerbalFluency", rows = latest_data, preview = FALSE)
+
+# Check one last time
+remote_data <- collect("VerbalFluency" %from% l2t)
+anti_join(remote_data, latest_data, by = "VerbalFluencyID")
+anti_join(remote_data, latest_data)
+anti_join(latest_data, remote_data)
