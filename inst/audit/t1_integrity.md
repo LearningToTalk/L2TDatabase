@@ -1,7 +1,7 @@
 TP1 Data Integrity Check
 ================
 Tristan Mahr
-2016-05-16
+2016-05-18
 
 In Spring 2015, we had our data-entry team re-enter test scores gathered in the longitudinal study, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
@@ -164,15 +164,13 @@ We now compare the scores in each score-set. This check is only being performed 
     #> 
     #> $VerbalFluency_AgeEquivalent
     #>   ParticipantID                    Variable DIRT ParticipantInfo
-    #> 1          619L VerbalFluency_AgeEquivalent  2;3             2;5
-    #> 2          627L VerbalFluency_AgeEquivalent <NA>            <2;0
-    #> 3          632L VerbalFluency_AgeEquivalent <2;0             2;7
-    #> 4          635L VerbalFluency_AgeEquivalent <NA>            <2;0
+    #> 1          627L VerbalFluency_AgeEquivalent <NA>            <2;0
+    #> 2          632L VerbalFluency_AgeEquivalent <2;0             2;7
+    #> 3          635L VerbalFluency_AgeEquivalent <NA>            <2;0
     #> 
     #> $VerbalFluency_Score
     #>   ParticipantID            Variable DIRT ParticipantInfo
-    #> 1          619L VerbalFluency_Score    5               6
-    #> 2          627L VerbalFluency_Score   NA               0
-    #> 3          632L VerbalFluency_Score    0               7
-    #> 4          635L VerbalFluency_Score   NA               0
-    #> 5          657L VerbalFluency_Score    0               1
+    #> 1          627L VerbalFluency_Score   NA               0
+    #> 2          632L VerbalFluency_Score    0               7
+    #> 3          635L VerbalFluency_Score   NA               0
+    #> 4          657L VerbalFluency_Score    0               1

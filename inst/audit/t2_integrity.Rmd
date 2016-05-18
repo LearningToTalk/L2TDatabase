@@ -1,0 +1,201 @@
+---
+title: "TP2 Data Integrity Check"
+author: "Tristan Mahr"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("knitr")
+opts_chunk$set(echo = FALSE)
+opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
+opts_knit$set(root.dir = "../../")
+```
+
+```{r gather data, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("L2TDatabase")
+library("dplyr")
+library("tidyr")
+library("stringr")
+
+# Load external dependencies
+source("inst/paths.R")
+source(paths$GetSiteInfo)
+source("inst/migrations/dates.R")
+
+#' A stronger equality operator. Returns TRUE only if x matches y
+`%===%` <- function(x, y) {
+  stopifnot(length(x) == length(y))
+  Map(`%in%`, x, y) %>% unlist(use.names = FALSE)
+}
+
+`%!==%` <- Negate(`%===%`)
+
+# Collect dates/scores
+df_dates <- collect_dates(paths$score_dates, recursive = TRUE)
+
+df_tp2 <- df_dates %>%
+  filter(Study == "TimePoint2")
+
+# Columns used the 2 sites x 3 timepoints spreadsheets
+unique(df_tp2$Variable)
+
+# Get T1 scores for both sites. Function sourced via paths$GetSiteInfo
+t2 <- GetSiteInfo("TimePoint2", separately = TRUE)
+
+get_t2_scores_from_info <- function(df) {
+  # Select and rename columns we want to compare
+  df %>% 
+    select(ParticipantID = Participant_ID, Study,
+           EVT_Form,
+           EVT_Date = starts_with("EVT_COMPLETION"),
+           EVT_Raw = starts_with("EVT_raw"),
+           EVT_Standard = starts_with("EVT_standard"),
+           EVT_GSV,
+           PPVT_Form,
+           PPVT_Date = starts_with("PPVT_COMPLETION"),
+           PPVT_Raw = starts_with("PPVT_raw"),
+           PPVT_Standard = starts_with("PPVT_standard"),
+           PPVT_GSV,
+           VerbalFluency_Score = starts_with("verbalfluency_raw"),
+           VerbalFluency_AgeEquivalent = starts_with("verbalfluency_AE"),
+           FruitStroop_Score = starts_with("fruitstroop_time"),
+           CTOPPElision_Raw = starts_with("CTOPP_Elision_raw"),
+           CTOPPElision_Scaled = starts_with("CTOPP_Elision_scaled"),
+           CTOPPBlending_Raw = starts_with("CTOPP_Blending_raw"),
+           CTOPPBlending_Scaled = starts_with("CTOPP_Blending_scaled"),
+           KBIT_Raw = starts_with("Kbit_nonverbalraw"),
+           KBIT_Standard = starts_with("Kbit_nonverbalstandard")) %>%
+    # Add additional info
+    mutate(
+      Source = "ParticipantInfo") %>%
+    # Set dates to strings
+    mutate_each(funs(format), matches("Date"))
+}
+
+# Get the original TP2 scores
+df_t2_info_wide <- t2 %>%
+  lapply(get_t2_scores_from_info) %>%
+  bind_rows
+
+# Store VF to show difference in formatting
+original_verbal_fluency <- df_t2_info_wide %>%
+  select(ParticipantID, Source, VerbalFluency_AgeEquivalent)
+
+df_t2_info_wide <- df_t2_info_wide %>%
+  mutate(VerbalFluency_AgeEquivalent =
+           str_replace_all(VerbalFluency_AgeEquivalent, "-", ";"))
+
+# Convert to long format
+df_t2_info_long <- df_t2_info_wide %>%
+  gather(Variable, Value, -ParticipantID, -Study, -Source)
+
+# Get the re-entered scores into the same format
+df_tp2_redo <- df_tp2 %>%
+  select(-Site) %>%
+  filter(Variable %in% unique(df_t2_info_long$Variable)) %>%
+  mutate(Source = "DIRT")
+
+```
+
+In Spring 2015, we had our data-entry team re-enter test scores gathered in the
+longitudinal study, so that we could find data-entry discrepancies. This script
+compares the original to the re-entered scores.
+
+## Participant pool comparison
+
+Do the same participants contribute scores in each set?
+
+```{r}
+reentry_participants <- df_tp2_redo %>%
+  select(Source, ParticipantID) %>%
+  distinct
+
+original_participants <- df_t2_info_long %>%
+  select(Source, ParticipantID) %>%
+  distinct
+```
+
+Participants in original score-set ("ParticipantInfo") *not in* the re-entered
+score-set ("DIRT"):
+
+```{r}
+anti_join(original_participants, reentry_participants, by = "ParticipantID")
+```
+
+Participants in re-entered score-set ("DIRT") *not in* the original score-set
+("ParticipantInfo"):
+
+```{r}
+anti_join(reentry_participants, original_participants, by = "ParticipantID")
+```
+
+## Verbal Fluency Value Formatting Comparison
+
+The most fiddly field seems to be the Verbal Fluency age-equivalents score.
+
+These are the unique values found in the original score-set.
+
+```{r}
+# Compare formatting of verbal fluency scores
+original_verbal_fluency$VerbalFluency_AgeEquivalent %>%
+  unique %>%
+  sort
+```
+
+Some of those values used to have leading spaces. These are the rows with spaces
+located in the score. (Empty is good.)
+
+```{r}
+original_verbal_fluency %>%
+  filter(str_detect(VerbalFluency_AgeEquivalent, " "))
+```
+
+These are the unique values found in the re-entry score-set.
+
+```{r}
+# Compare formatting of verbal fluency scores
+df_tp2 %>%
+  filter(Variable == "VerbalFluency_AgeEquivalent") %>%
+  getElement("Value") %>%
+  unique %>%
+  sort
+```
+
+We used to write chronological ages as "Year-Month" but have since switched to
+"Year;Month", so we still check for these hyphens. (Empty is good.)
+
+```{r}
+df_tp2 %>%
+  filter(Variable == "VerbalFluency_AgeEquivalent", str_detect(Value, "-"))
+```
+
+## Value Comparison
+
+We now compare the scores in each score-set. This check is only being performed
+on participants in both score-sets.
+
+```{r}
+in_both_sets <- reentry_participants %>%
+  semi_join(original_participants, by = "ParticipantID") %>%
+  select(ParticipantID)
+
+# Combine the two sources. Make columns with the values from
+both <- bind_rows(df_t2_info_long, df_tp2_redo) %>%
+  semi_join(in_both_sets) %>%
+  spread(Source, Value)
+
+discrepancies <-
+  both %>%
+  select(-Study) %>%
+  split(.$Variable) %>%
+  lapply(readr::type_convert) %>%
+  lapply(function(df) filter(df, DIRT %!==% ParticipantInfo)) %>%
+  lapply(as.data.frame)
+```
+
+```{r}
+discrepancies
+```
+
+
