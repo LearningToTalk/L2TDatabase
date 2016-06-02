@@ -94,6 +94,7 @@ both_wide <- both_sources %>%
 # Convert to long format, reshape so cells from both sites can be compared
 discrepancies <- both_wide %>%
   filter(DIRT != ParticipantInfo | is.na(DIRT) != is.na(ParticipantInfo))
+discrepancies
 
 # Missing values
 both_wide %>% filter(is.na(ParticipantInfo))
@@ -136,6 +137,7 @@ df_can_be_added <- df_with_dates %>%
          VerbalFluency_Raw = VerbalFluency_Score,
          VerbalFluency_AgeEq = VerbalFluency_AgeEquivalent)
 
+# Calculate age at administration
 df_can_be_added <- df_can_be_added %>%
   mutate(VerbalFluency_Age = chrono_age(Birthdate, VerbalFluency_Completion)) %>%
   select(-Study, -ShortResearchID, -Birthdate)
@@ -155,7 +157,7 @@ df_can_be_added <- df_can_be_added %>%
 new_rows <- df_can_be_added %>%
   anti_join(current_rows, by = c("ChildStudyID")) %>%
   arrange(ChildStudyID)
-
+new_rows
 
 # Add to database
 append_rows_to_table(l2t, "VerbalFluency", new_rows)
@@ -169,18 +171,20 @@ append_rows_to_table(l2t, "VerbalFluency", new_rows)
 # Redownload the table
 remote_data <- collect("VerbalFluency" %from% l2t)
 
-# Attach the database keys to latest data
+# Attach the database keys to latest local data
 current_indices <- remote_data %>%
   select(ChildStudyID, VerbalFluencyID)
 
 latest_data <- df_can_be_added %>%
   inner_join(current_indices) %>%
-  mutate()
+  arrange(VerbalFluencyID)
 
-# Keep just the columns in the latest data
+# Keep just the columns in the latest data (i.e., drop database-oriented
+# VerbalFluency_Timestamp)
 remote_data <- match_columns(remote_data, latest_data) %>%
   filter(ChildStudyID %in% latest_data$ChildStudyID)
 
+# Make date into YYYY-MM-DD string
 latest_data$VerbalFluency_Completion <- latest_data$VerbalFluency_Completion %>% format
 latest_data
 
