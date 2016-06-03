@@ -162,6 +162,29 @@ discrepancies <- df_comparing_scores %>%
   lapply(as.data.frame)
 ```
 
+### Summary
+
+This table lists all the fields that were checked and whether any discrepancies
+were found in that field.
+
+```{r}
+columns_with_discrepancies <- discrepancies %>% names
+  
+columns_in_info_sheets %>% 
+  select(Variable) %>% 
+  distinct %>% 
+  mutate(Passing = !(Variable %in% columns_with_discrepancies)) %>% 
+  arrange(Variable) %>% 
+  mutate(Status = ifelse(Passing, ":white_check_mark:", ":x:")) %>% 
+  as.data.frame %>% 
+  rename(` ` = Status) %>% 
+  kable
+```
+
+### Details
+
+These are all the mismatching values.
+
 ```{r}
 discrepancies
 ```

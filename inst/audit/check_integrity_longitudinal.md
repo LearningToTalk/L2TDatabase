@@ -59,6 +59,43 @@ Value Comparison
 
 We now compare the scores in each score-set. This check is only being performed on participants in both score-sets.
 
+### Summary
+
+This table lists all the fields that were checked and whether any discrepancies were found in that field.
+
+| Variable                                 | Passing |                      |
+|:-----------------------------------------|:--------|----------------------|
+| CTOPPBlending\_Raw                       | TRUE    | :white\_check\_mark: |
+| CTOPPBlending\_Scaled                    | FALSE   | :x:                  |
+| CTOPPElision\_Raw                        | TRUE    | :white\_check\_mark: |
+| CTOPPElision\_Scaled                     | TRUE    | :white\_check\_mark: |
+| DELV\_Date                               | FALSE   | :x:                  |
+| DELV\_LanguageRisk                       | FALSE   | :x:                  |
+| DELV\_LanguageRisk\_DiagnosticErrorScore | FALSE   | :x:                  |
+| DELV\_LanguageVar                        | FALSE   | :x:                  |
+| DELV\_LanguageVar\_ColumnAScore          | TRUE    | :white\_check\_mark: |
+| DELV\_LanguageVar\_ColumnBScore          | TRUE    | :white\_check\_mark: |
+| EVT\_Date                                | FALSE   | :x:                  |
+| EVT\_Form                                | FALSE   | :x:                  |
+| EVT\_GSV                                 | FALSE   | :x:                  |
+| EVT\_Raw                                 | FALSE   | :x:                  |
+| EVT\_Standard                            | FALSE   | :x:                  |
+| FruitStroop\_Score                       | FALSE   | :x:                  |
+| GFTA\_Date                               | FALSE   | :x:                  |
+| KBIT\_Raw                                | TRUE    | :white\_check\_mark: |
+| KBIT\_Standard                           | TRUE    | :white\_check\_mark: |
+| PPVT\_Date                               | FALSE   | :x:                  |
+| PPVT\_Form                               | FALSE   | :x:                  |
+| PPVT\_GSV                                | FALSE   | :x:                  |
+| PPVT\_Raw                                | FALSE   | :x:                  |
+| PPVT\_Standard                           | FALSE   | :x:                  |
+| VerbalFluency\_AgeEquivalent             | FALSE   | :x:                  |
+| VerbalFluency\_Score                     | FALSE   | :x:                  |
+
+### Details
+
+These are all the mismatching values.
+
     #> $CTOPPBlending_Scaled
     #>        Study ParticipantID             Variable DIRT ParticipantInfo
     #> 1 TimePoint3          671L CTOPPBlending_Scaled    1              10
