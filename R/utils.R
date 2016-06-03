@@ -1,8 +1,45 @@
 
+#' A stronger element-wise equality operators
+#'
+#' These operators work like \code{==} or \code{!=} but they handle comparison
+#' with NA values. \code{1 \%===\% NA} is false and \code{NA \%===\% NA}.
+#'
+#' @param x,y vectors to be compared. They must have the same length.
+#' @return \code{\%===\%} returns TRUE wherever is x[i] the same as y[i] and
+#'   \code{\%!==\%} returns FALSE wherever is x[i] the same as y[i].
+#' @export
+#' @rdname equality
+#' @examples
+#' 1:3  %===% 1:3
+#' #> [1] TRUE TRUE TRUE
+#'
+#' 1:3 %===% 4:6
+#' #> [1] FALSE FALSE FALSE
+#'
+#' c(NA, NaN) %===% c(NA, NaN)
+#' #> [1] TRUE TRUE
+#'
+#' c(NA, 1) %===% c(1, NA)
+#' #> [1] FALSE FALSE
+`%===%` <- function(x, y) {
+  stopifnot(length(x) == length(y))
+  Map(`%in%`, x, y) %>% unlist(use.names = FALSE)
+}
+
+#' @export
+#' @rdname equality
+#' @usage x \%!==\% y
+`%!==%` <- Negate(`%===%`)
+
+
+
+
+
+c(1, 2, 3, 4, NA, 7) %===% c(1, 2, 3, NA, NA, 6)
+c(1, 2, 3, 4, NA, 7) %===% c(1, 2, 3, NA, NA, 6)
+
 
 `%nin%` <- Negate(`%in%`)
-
-
 
 # Merge list y into list x
 merge_lists <- function(x, y) {
