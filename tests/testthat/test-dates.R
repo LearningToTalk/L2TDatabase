@@ -37,24 +37,24 @@ test_that("Chronological age in months", {
 })
 
 test_that("Excel date recovery", {
-  # xls file
-  dates <- readxl::read_excel("data/dates.xls")
+  # An xls file
+  dates <- readxl::read_excel(test_path("data/dates.xls"))
 
-  # parse expected date (string -> date)
+  # Parse expected date (string -> date)
   dates$exp_date <- as.Date(dates$Expected)
 
-  # convert excel date (string -> time -> date)
+  # Convert excel date (string -> time -> date)
   dates$new_date <- suppressWarnings(as.Date(undo_excel_date(dates$Date)))
 
   expect_equal(dates$new_date, dates$exp_date)
 
-  # xlsx file
-  x_dates <- readxl::read_excel("data/dates.xlsx")
+  # An xlsx file
+  x_dates <- readxl::read_excel(test_path("data/dates.xlsx"))
 
-  # parse expected date (string -> date)
+  # Parse expected date (string -> date)
   x_dates$exp_date <- as.Date(x_dates$Expected)
 
-  # convert excel date (string -> time -> date)
+  # Convert excel date (string -> time -> date)
   x_dates$new_date <- suppressWarnings(as.Date(undo_excel_date(x_dates$Date)))
 
   expect_equal(x_dates$new_date, x_dates$exp_date)
