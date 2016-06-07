@@ -45,9 +45,6 @@ The following columns in DIRT are not being checked because there is not a match
 | CDI\_Extension\_Date | :grey\_question: |
 | CTOPPBlending\_Date  | :grey\_question: |
 | CTOPPElision\_Date   | :grey\_question: |
-| CTOPPMemory\_Date    | :grey\_question: |
-| CTOPPMemory\_Raw     | :grey\_question: |
-| CTOPPMemory\_Scaled  | :grey\_question: |
 | FruitStroop\_Date    | :grey\_question: |
 | KBIT\_Date           | :grey\_question: |
 | MBCDI\_Date          | :grey\_question: |
@@ -63,6 +60,9 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CTOPPBlending\_Scaled                    | FALSE   | :x:                  |
 | CTOPPElision\_Raw                        | TRUE    | :white\_check\_mark: |
 | CTOPPElision\_Scaled                     | TRUE    | :white\_check\_mark: |
+| CTOPPMemory\_Date                        | FALSE   | :x:                  |
+| CTOPPMemory\_Raw                         | TRUE    | :white\_check\_mark: |
+| CTOPPMemory\_Scaled                      | FALSE   | :x:                  |
 | DELV\_Date                               | FALSE   | :x:                  |
 | DELV\_LanguageRisk                       | FALSE   | :x:                  |
 | DELV\_LanguageRisk\_DiagnosticErrorScore | FALSE   | :x:                  |
@@ -93,6 +93,74 @@ These are all the mismatching values.
     #> $CTOPPBlending_Scaled
     #>        Study ParticipantID             Variable DIRT ParticipantInfo
     #> 1 TimePoint3          671L CTOPPBlending_Scaled    1              10
+    #> 
+    #> $CTOPPMemory_Date
+    #>         Study ParticipantID         Variable       DIRT ParticipantInfo
+    #> 1  TimePoint3          024L CTOPPMemory_Date 2015-03-13      2015-03-19
+    #> 2  TimePoint3          600L CTOPPMemory_Date 2014-12-12            <NA>
+    #> 3  TimePoint3          602L CTOPPMemory_Date 2014-12-18            <NA>
+    #> 4  TimePoint3          604L CTOPPMemory_Date 2014-12-01            <NA>
+    #> 5  TimePoint3          605L CTOPPMemory_Date 2014-11-15            <NA>
+    #> 6  TimePoint3          607L CTOPPMemory_Date 2014-12-16            <NA>
+    #> 7  TimePoint3          608L CTOPPMemory_Date 2014-12-22            <NA>
+    #> 8  TimePoint3          609L CTOPPMemory_Date 2014-12-12            <NA>
+    #> 9  TimePoint3          610L CTOPPMemory_Date 2014-11-21            <NA>
+    #> 10 TimePoint3          611L CTOPPMemory_Date 2015-03-13            <NA>
+    #> 11 TimePoint3          612L CTOPPMemory_Date 2015-01-26            <NA>
+    #> 12 TimePoint3          614L CTOPPMemory_Date 2015-01-05            <NA>
+    #> 13 TimePoint3          615L CTOPPMemory_Date 2015-05-04            <NA>
+    #> 14 TimePoint3          616L CTOPPMemory_Date 2015-01-15            <NA>
+    #> 15 TimePoint3          619L CTOPPMemory_Date 2015-04-04            <NA>
+    #> 16 TimePoint3          620L CTOPPMemory_Date 2015-01-16            <NA>
+    #> 17 TimePoint3          622L CTOPPMemory_Date 2015-02-28            <NA>
+    #> 18 TimePoint3          623L CTOPPMemory_Date 2015-02-13            <NA>
+    #> 19 TimePoint3          624L CTOPPMemory_Date 2015-02-27            <NA>
+    #> 20 TimePoint3          625L CTOPPMemory_Date 2015-02-03            <NA>
+    #> 21 TimePoint3          627L CTOPPMemory_Date 2015-02-03            <NA>
+    #> 22 TimePoint3          628L CTOPPMemory_Date 2015-04-09            <NA>
+    #> 23 TimePoint3          629L CTOPPMemory_Date 2015-05-01            <NA>
+    #> 24 TimePoint3          630L CTOPPMemory_Date 2016-01-12            <NA>
+    #> 25 TimePoint3          631L CTOPPMemory_Date 2015-06-06            <NA>
+    #> 26 TimePoint3          632L CTOPPMemory_Date 2015-04-21            <NA>
+    #> 27 TimePoint3          636L CTOPPMemory_Date 2015-05-04            <NA>
+    #> 28 TimePoint3          638L CTOPPMemory_Date 2015-06-08            <NA>
+    #> 29 TimePoint3          639L CTOPPMemory_Date 2015-05-29            <NA>
+    #> 30 TimePoint3          640L CTOPPMemory_Date 2015-05-30            <NA>
+    #> 31 TimePoint3          644L CTOPPMemory_Date 2015-08-19            <NA>
+    #> 32 TimePoint3          651L CTOPPMemory_Date 2015-10-24            <NA>
+    #> 33 TimePoint3          652L CTOPPMemory_Date 2015-07-16            <NA>
+    #> 34 TimePoint3          655L CTOPPMemory_Date 2015-12-01            <NA>
+    #> 35 TimePoint3          656L CTOPPMemory_Date 2015-07-20            <NA>
+    #> 36 TimePoint3          657L CTOPPMemory_Date 2015-09-18            <NA>
+    #> 37 TimePoint3          658L CTOPPMemory_Date 2015-08-31            <NA>
+    #> 38 TimePoint3          659L CTOPPMemory_Date 2015-09-03            <NA>
+    #> 39 TimePoint3          660L CTOPPMemory_Date 2015-10-17            <NA>
+    #> 40 TimePoint3          661L CTOPPMemory_Date 2015-10-02            <NA>
+    #> 41 TimePoint3          664L CTOPPMemory_Date 2015-10-16            <NA>
+    #> 42 TimePoint3          665L CTOPPMemory_Date 2015-10-15            <NA>
+    #> 43 TimePoint3          666L CTOPPMemory_Date 2015-09-24            <NA>
+    #> 44 TimePoint3          667L CTOPPMemory_Date 2015-10-03            <NA>
+    #> 45 TimePoint3          668L CTOPPMemory_Date 2015-09-26            <NA>
+    #> 46 TimePoint3          669L CTOPPMemory_Date 2015-10-02            <NA>
+    #> 47 TimePoint3          670L CTOPPMemory_Date 2015-09-18            <NA>
+    #> 48 TimePoint3          671L CTOPPMemory_Date 2015-11-24            <NA>
+    #> 49 TimePoint3          673L CTOPPMemory_Date 2015-11-21            <NA>
+    #> 50 TimePoint3          674L CTOPPMemory_Date 2015-11-20            <NA>
+    #> 51 TimePoint3          677L CTOPPMemory_Date 2015-12-11            <NA>
+    #> 52 TimePoint3          678L CTOPPMemory_Date 2015-01-15            <NA>
+    #> 53 TimePoint3          679L CTOPPMemory_Date 2016-03-04            <NA>
+    #> 54 TimePoint3          680L CTOPPMemory_Date 2015-12-10            <NA>
+    #> 55 TimePoint3          681L CTOPPMemory_Date 2016-02-02            <NA>
+    #> 56 TimePoint3          683L CTOPPMemory_Date 2016-02-01            <NA>
+    #> 57 TimePoint3          684L CTOPPMemory_Date 2016-01-16            <NA>
+    #> 58 TimePoint3          685L CTOPPMemory_Date 2016-02-13            <NA>
+    #> 59 TimePoint3          686L CTOPPMemory_Date 2016-02-13            <NA>
+    #> 60 TimePoint3          689L CTOPPMemory_Date 2016-02-23            <NA>
+    #> 
+    #> $CTOPPMemory_Scaled
+    #>        Study ParticipantID           Variable DIRT ParticipantInfo
+    #> 1 TimePoint3          008L CTOPPMemory_Scaled   50              10
+    #> 2 TimePoint3          609L CTOPPMemory_Scaled    9               6
     #> 
     #> $DELV_Date
     #>         Study ParticipantID  Variable       DIRT ParticipantInfo
