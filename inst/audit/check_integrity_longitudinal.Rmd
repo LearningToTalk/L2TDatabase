@@ -26,6 +26,16 @@ source("inst/migrations/dates.R")
 # Collect dates/scores
 df_dates <- collect_dates(paths$score_dates, recursive = TRUE)
 
+df_no_visits <- df_dates %>% 
+  filter(Variable == "Visited") %>% 
+  select(-Variable) %>% 
+  rename(Visited = Value) %>% 
+  filter(Visited == FALSE)
+
+columns_in_dirt <- df_dates %>% 
+  select(Variable) %>% 
+  distinct
+
 # Columns used the 2 sites x 3 timepoints spreadsheets
 unique(df_dates$Variable)
 
@@ -124,14 +134,18 @@ Participants in original score-set ("ParticipantInfo") *not in* the re-entered
 score-set ("DIRT"):
 
 ```{r}
-df_sources_per_id %>% filter(is.na(DIRT))
+df_sources_per_id %>% 
+  filter(is.na(DIRT)) %>% 
+  anti_join(df_no_visits)
 ```
 
-Participants in re-entered score-set ("DIRT") *not in* the original score-set
-("ParticipantInfo"):
+Participants in re-entered score-set ("DIRT") who visited the lab but are *not
+in* the original score-set ("ParticipantInfo"). 
 
 ```{r}
-df_sources_per_id %>% filter(is.na(ParticipantInfo))
+df_sources_per_id %>% 
+  filter(is.na(ParticipantInfo)) %>% 
+  anti_join(df_no_visits)
 ```
 
 
@@ -162,6 +176,22 @@ discrepancies <- df_comparing_scores %>%
   lapply(as.data.frame)
 ```
 
+### Unchecked fields
+
+The following columns in DIRT are not being checked because there is not a
+matching column in the participant info spreadsheets
+
+```{r}
+columns_in_dirt %>% 
+  anti_join(columns_in_info_sheets) %>% 
+  filter(Variable != "DOB", Variable != "Visited") %>% 
+  as.data.frame %>% 
+  mutate(Status = ":grey_question:") %>% 
+  rename(` ` = Status) %>% 
+  kable
+```
+
+
 ### Summary
 
 This table lists all the fields that were checked and whether any discrepancies
@@ -169,7 +199,7 @@ were found in that field.
 
 ```{r}
 columns_with_discrepancies <- discrepancies %>% names
-  
+
 columns_in_info_sheets %>% 
   select(Variable) %>% 
   distinct %>% 
