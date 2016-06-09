@@ -66,8 +66,8 @@ This table lists all the fields that were checked and whether any discrepancies 
 | DELV\_Date                               | FALSE   | :x:                  |
 | DELV\_LanguageRisk                       | FALSE   | :x:                  |
 | DELV\_LanguageRisk\_DiagnosticErrorScore | FALSE   | :x:                  |
-| DELV\_LanguageVar\_ColumnAScore          | FALSE   | :x:                  |
-| DELV\_LanguageVar\_ColumnBScore          | FALSE   | :x:                  |
+| DELV\_LanguageVar\_ColumnAScore          | TRUE    | :white\_check\_mark: |
+| DELV\_LanguageVar\_ColumnBScore          | TRUE    | :white\_check\_mark: |
 | EVT\_Date                                | TRUE    | :white\_check\_mark: |
 | EVT\_Form                                | FALSE   | :x:                  |
 | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
@@ -173,123 +173,45 @@ These are all the mismatching values.
     #> 
     #> $DELV_LanguageRisk
     #>         Study ParticipantID          Variable DIRT ParticipantInfo
-    #> 1  TimePoint3          001L DELV_LanguageRisk   NA               3
-    #> 2  TimePoint3          023L DELV_LanguageRisk   NA               3
-    #> 3  TimePoint3          025L DELV_LanguageRisk   NA               2
-    #> 4  TimePoint3          027L DELV_LanguageRisk   NA               3
-    #> 5  TimePoint3          035L DELV_LanguageRisk   NA               2
-    #> 6  TimePoint3          036L DELV_LanguageRisk   NA               1
-    #> 7  TimePoint3          049L DELV_LanguageRisk   NA               3
-    #> 8  TimePoint3          065L DELV_LanguageRisk   NA               3
-    #> 9  TimePoint3          066L DELV_LanguageRisk   NA               3
-    #> 10 TimePoint3          089L DELV_LanguageRisk   NA               3
-    #> 11 TimePoint3          093L DELV_LanguageRisk   NA               0
-    #> 12 TimePoint3          094L DELV_LanguageRisk   NA               3
-    #> 13 TimePoint3          108L DELV_LanguageRisk   NA               0
-    #> 14 TimePoint3          128L DELV_LanguageRisk   NA               0
-    #> 15 TimePoint3          605L DELV_LanguageRisk    4               3
-    #> 16 TimePoint3          608L DELV_LanguageRisk    1               0
-    #> 17 TimePoint3          609L DELV_LanguageRisk    4               3
-    #> 18 TimePoint3          633L DELV_LanguageRisk   NA               0
-    #> 19 TimePoint3          660L DELV_LanguageRisk   NA               1
-    #> 20 TimePoint3          665L DELV_LanguageRisk   NA               3
-    #> 21 TimePoint3          671L DELV_LanguageRisk   NA               2
-    #> 22 TimePoint3          677L DELV_LanguageRisk   NA               3
-    #> 23 TimePoint3          679L DELV_LanguageRisk   NA               3
-    #> 24 TimePoint3          680L DELV_LanguageRisk   NA               3
-    #> 25 TimePoint3          681L DELV_LanguageRisk   NA               0
-    #> 26 TimePoint3          684L DELV_LanguageRisk   NA               0
-    #> 27 TimePoint3          686L DELV_LanguageRisk   NA               3
+    #> 1  TimePoint3          605L DELV_LanguageRisk    4               3
+    #> 2  TimePoint3          608L DELV_LanguageRisk    1               0
+    #> 3  TimePoint3          609L DELV_LanguageRisk    4               3
+    #> 4  TimePoint3          633L DELV_LanguageRisk   NA               0
+    #> 5  TimePoint3          660L DELV_LanguageRisk   NA               1
+    #> 6  TimePoint3          665L DELV_LanguageRisk   NA               3
+    #> 7  TimePoint3          671L DELV_LanguageRisk   NA               2
+    #> 8  TimePoint3          677L DELV_LanguageRisk   NA               3
+    #> 9  TimePoint3          679L DELV_LanguageRisk   NA               3
+    #> 10 TimePoint3          680L DELV_LanguageRisk   NA               3
+    #> 11 TimePoint3          681L DELV_LanguageRisk   NA               0
+    #> 12 TimePoint3          684L DELV_LanguageRisk   NA               0
+    #> 13 TimePoint3          686L DELV_LanguageRisk   NA               3
     #> 
     #> $DELV_LanguageRisk_DiagnosticErrorScore
     #>         Study ParticipantID                               Variable DIRT
-    #> 1  TimePoint3          001L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 2  TimePoint3          023L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 3  TimePoint3          025L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 4  TimePoint3          027L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 5  TimePoint3          035L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 6  TimePoint3          036L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 7  TimePoint3          049L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 8  TimePoint3          065L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 9  TimePoint3          066L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 10 TimePoint3          089L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 11 TimePoint3          093L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 12 TimePoint3          094L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 13 TimePoint3          108L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 14 TimePoint3          128L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 15 TimePoint3          605L DELV_LanguageRisk_DiagnosticErrorScore   18
-    #> 16 TimePoint3          633L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 17 TimePoint3          660L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 18 TimePoint3          665L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 19 TimePoint3          671L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 20 TimePoint3          677L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 21 TimePoint3          679L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 22 TimePoint3          680L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 23 TimePoint3          681L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 24 TimePoint3          684L DELV_LanguageRisk_DiagnosticErrorScore   NA
-    #> 25 TimePoint3          686L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 1  TimePoint3          605L DELV_LanguageRisk_DiagnosticErrorScore   18
+    #> 2  TimePoint3          633L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 3  TimePoint3          660L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 4  TimePoint3          665L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 5  TimePoint3          671L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 6  TimePoint3          677L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 7  TimePoint3          679L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 8  TimePoint3          680L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 9  TimePoint3          681L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 10 TimePoint3          684L DELV_LanguageRisk_DiagnosticErrorScore   NA
+    #> 11 TimePoint3          686L DELV_LanguageRisk_DiagnosticErrorScore   NA
     #>    ParticipantInfo
-    #> 1               23
-    #> 2               15
-    #> 3                7
-    #> 4               14
-    #> 5               10
-    #> 6                7
-    #> 7               12
-    #> 8               16
-    #> 9                9
-    #> 10              19
-    #> 11               2
-    #> 12              14
-    #> 13               0
-    #> 14               5
-    #> 15              17
-    #> 16               6
-    #> 17               8
-    #> 18              13
-    #> 19              11
-    #> 20              18
-    #> 21              15
-    #> 22              20
-    #> 23               6
-    #> 24               6
-    #> 25              17
-    #> 
-    #> $DELV_LanguageVar_ColumnAScore
-    #>        Study ParticipantID                      Variable DIRT
-    #> 1 TimePoint3          023L DELV_LanguageVar_ColumnAScore   NA
-    #> 2 TimePoint3          024L DELV_LanguageVar_ColumnAScore   NA
-    #> 3 TimePoint3          025L DELV_LanguageVar_ColumnAScore   NA
-    #> 4 TimePoint3          035L DELV_LanguageVar_ColumnAScore   NA
-    #> 5 TimePoint3          036L DELV_LanguageVar_ColumnAScore   NA
-    #> 6 TimePoint3          046L DELV_LanguageVar_ColumnAScore   NA
-    #> 7 TimePoint3          066L DELV_LanguageVar_ColumnAScore   NA
-    #>   ParticipantInfo
-    #> 1               8
-    #> 2              10
-    #> 3              14
-    #> 4              13
-    #> 5              14
-    #> 6              13
-    #> 7              13
-    #> 
-    #> $DELV_LanguageVar_ColumnBScore
-    #>        Study ParticipantID                      Variable DIRT
-    #> 1 TimePoint3          023L DELV_LanguageVar_ColumnBScore   NA
-    #> 2 TimePoint3          024L DELV_LanguageVar_ColumnBScore   NA
-    #> 3 TimePoint3          025L DELV_LanguageVar_ColumnBScore   NA
-    #> 4 TimePoint3          035L DELV_LanguageVar_ColumnBScore   NA
-    #> 5 TimePoint3          036L DELV_LanguageVar_ColumnBScore   NA
-    #> 6 TimePoint3          046L DELV_LanguageVar_ColumnBScore   NA
-    #> 7 TimePoint3          066L DELV_LanguageVar_ColumnBScore   NA
-    #>   ParticipantInfo
-    #> 1               5
-    #> 2               3
-    #> 3               1
-    #> 4               0
-    #> 5               0
-    #> 6               2
-    #> 7               0
+    #> 1               17
+    #> 2                6
+    #> 3                8
+    #> 4               13
+    #> 5               11
+    #> 6               18
+    #> 7               15
+    #> 8               20
+    #> 9                6
+    #> 10               6
+    #> 11              17
     #> 
     #> $EVT_Form
     #>        Study ParticipantID Variable DIRT ParticipantInfo
