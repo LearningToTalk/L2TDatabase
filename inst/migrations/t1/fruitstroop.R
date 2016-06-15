@@ -56,7 +56,7 @@ both_scores <- bind_rows(df_stroop, stroops)
 discrepancies <- both_scores %>%
   select(-FruitStroop_Date) %>%
   spread(Source, FruitStroop_Score) %>%
-  filter(DIRT != ParticipantInfo)
+  filter(DIRT != ParticipantInfo | is.na(DIRT) != is.na(ParticipantInfo))
 
 both_scores %>%
   mutate(Full = FruitStroop_Score * 9)
@@ -122,12 +122,12 @@ df_can_be_added <- scores_to_add %>%
   rename(ShortResearchID = ParticipantID) %>%
   left_join(cds)
 
-
 df_can_be_added <- df_can_be_added %>%
   mutate(FruitStroop_Age = chrono_age(Birthdate, FruitStroop_Completion)) %>%
   select(-Study, -ShortResearchID, -Birthdate)
 
 df_can_be_added
+df_can_be_added %>% filter(is.na(ChildStudyID))
 
 
 
@@ -142,7 +142,7 @@ df_can_be_added <- df_can_be_added %>%
 new_rows <- df_can_be_added %>%
   anti_join(current_rows, by = c("ChildStudyID")) %>%
   arrange(ChildStudyID)
-
+new_rows
 
 # Add to database
 append_rows_to_table(l2t, "FruitStroop", new_rows)
@@ -161,11 +161,13 @@ current_indices <- remote_data %>%
   select(ChildStudyID, FruitStroopID)
 
 latest_data <- df_can_be_added %>%
-  inner_join(current_indices)
+  inner_join(current_indices) %>%
+  arrange(FruitStroopID)
 
 # Keep just the columns in the latest data
 remote_data <- match_columns(remote_data, latest_data) %>%
-  filter(ChildStudyID %in% latest_data$ChildStudyID)
+  filter(ChildStudyID %in% latest_data$ChildStudyID) %>%
+  arrange(FruitStroopID)
 
 latest_data$FruitStroop_Completion <- latest_data$FruitStroop_Completion %>% format
 latest_data
