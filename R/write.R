@@ -211,11 +211,21 @@ find_updates_in_daff <- function(ref_data, new_data) {
     read_csv(skip = 0) %>%
     ncol
 
+  # Locate header line. Sometimes it's the second line if there have been
+  # columns inserted/removed
+  at_at_line <- this_daff$to_csv() %>%
+    read_lines %>%
+    stringr::str_detect("@@")
+
+  header_row <- seq_along(at_at_line)[at_at_line]
+  stopifnot(length(header_row) == 1)
+  skip_to_find_header <- header_row - 1
+
   # Read the diff csv, ignoring the scheme row and interpreting all columns as
   # strings
   col_types <- rep_len("c", num_cols) %>% paste0(collapse = "")
   updated_rows <- this_daff$to_csv() %>%
-    read_csv(skip = 1, col_types = col_types) %>%
+    read_csv(skip = skip_to_find_header, col_types = col_types) %>%
     filter(`@@` == "->") %>%
     type_convert
 
