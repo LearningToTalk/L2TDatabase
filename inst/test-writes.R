@@ -1,9 +1,24 @@
 # Testing update queries to database
 
+library("DBI")
 library("L2TDatabase")
 library("dplyr", warn.conflicts = FALSE)
 
-cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
+
+scores <- data_frame(
+  Variable = c("Score1", "Score2", "Score3"),
+  Value = 1:3
+)
+
+db <- dbConnect(RMySQL::MySQL(), dbname = "test", user = "testuser")
+db
+
+dbWriteTable(db, "scores", as.data.frame(scores), overwrite = TRUE)
+
+db_src <- src_mysql("test", user = "testuser")
+db_src
+
+
 
 l2t_test <- l2t_connect(cnf_file, db_name = "l2ttest")
 
