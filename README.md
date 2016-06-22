@@ -51,28 +51,33 @@ l2t <- l2t_connect(cnf_file = cnf_file, db_name = "l2t")
 src_tbls(l2t)
 #>  [1] "BRIEF"               "Caregivers"          "Caregivers_Entry"   
 #>  [4] "Child"               "ChildStudy"          "EVT"                
-#>  [7] "FruitStroop"         "LENA_Admin"          "LENA_Hours"         
-#> [10] "Literacy"            "MinPair_Admin"       "MinPair_Responses"  
-#> [13] "PPVT"                "SES"                 "SES_Entry"          
-#> [16] "Siblings"            "Study"               "StudyTask"          
-#> [19] "VerbalFluency"       "q_MinPair_Aggregate" "q_Scores_TimePoint1"
-#> [22] "q_Scores_TimePoint2" "q_Scores_TimePoint3"
+#>  [7] "FruitStroop"         "GFTA"                "LENA_Admin"         
+#> [10] "LENA_Hours"          "Literacy"            "MinPair_Admin"      
+#> [13] "MinPair_Responses"   "PPVT"                "SAILS_Admin"        
+#> [16] "SAILS_Responses"     "SES"                 "SES_Entry"          
+#> [19] "Siblings"            "Study"               "VerbalFluency"      
+#> [22] "q_LENA_Averages"     "q_MinPair_Aggregate" "q_Scores_TimePoint1"
+#> [25] "q_Scores_TimePoint2" "q_Scores_TimePoint3"
 
 # use tbl to create a link to a tbl in the database
 studies <- tbl(src = l2t, "Study") 
 head(studies)
-#>   StudyID      Study Code     Study_Timestamp
-#> 1       1 TimePoint1    L 2015-06-26 14:44:06
-#> 2       2 TimePoint2    L 2015-06-26 14:44:06
-#> 3       3 TimePoint3    L 2015-06-26 14:44:06
+#>   StudyID      Study Study_Code     Study_Timestamp
+#> 1       1 TimePoint1          L 2015-06-26 14:44:06
+#> 2       2 TimePoint2          L 2015-06-26 14:44:06
+#> 3       3 TimePoint3          L 2015-06-26 14:44:06
+#> 4       4 CochlearV1          E 2016-05-16 00:00:00
+#> 5       5 CochlearV2          E 0000-00-00 00:00:00
 
 # or use %from% as an infix form of the above
 studies <- "Study" %from% l2t
 head(studies)
-#>   StudyID      Study Code     Study_Timestamp
-#> 1       1 TimePoint1    L 2015-06-26 14:44:06
-#> 2       2 TimePoint2    L 2015-06-26 14:44:06
-#> 3       3 TimePoint3    L 2015-06-26 14:44:06
+#>   StudyID      Study Study_Code     Study_Timestamp
+#> 1       1 TimePoint1          L 2015-06-26 14:44:06
+#> 2       2 TimePoint2          L 2015-06-26 14:44:06
+#> 3       3 TimePoint3          L 2015-06-26 14:44:06
+#> 4       4 CochlearV1          E 2016-05-16 00:00:00
+#> 5       5 CochlearV2          E 0000-00-00 00:00:00
 ```
 
 Back up
@@ -84,53 +89,56 @@ We can download and backup each table in the database with `l2t_backup`.
 # backup each tbl
 backup_dir <- "inst/backup"
 all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
-#> Writing inst/backup/2016-03-11_14-59/BRIEF.csv
-#> Writing inst/backup/2016-03-11_14-59/Caregivers.csv
-#> Writing inst/backup/2016-03-11_14-59/Caregivers_Entry.csv
-#> Writing inst/backup/2016-03-11_14-59/Child.csv
-#> Writing inst/backup/2016-03-11_14-59/ChildStudy.csv
-#> Writing inst/backup/2016-03-11_14-59/EVT.csv
-#> Writing inst/backup/2016-03-11_14-59/FruitStroop.csv
-#> Writing inst/backup/2016-03-11_14-59/LENA_Admin.csv
-#> Writing inst/backup/2016-03-11_14-59/LENA_Hours.csv
-#> Writing inst/backup/2016-03-11_14-59/Literacy.csv
-#> Writing inst/backup/2016-03-11_14-59/MinPair_Admin.csv
-#> Writing inst/backup/2016-03-11_14-59/MinPair_Responses.csv
-#> Writing inst/backup/2016-03-11_14-59/PPVT.csv
-#> Writing inst/backup/2016-03-11_14-59/SES.csv
-#> Writing inst/backup/2016-03-11_14-59/SES_Entry.csv
-#> Writing inst/backup/2016-03-11_14-59/Siblings.csv
-#> Writing inst/backup/2016-03-11_14-59/Study.csv
-#> Writing inst/backup/2016-03-11_14-59/StudyTask.csv
-#> Writing inst/backup/2016-03-11_14-59/VerbalFluency.csv
-#> Writing inst/backup/2016-03-11_14-59/q_MinPair_Aggregate.csv
-#> Writing inst/backup/2016-03-11_14-59/q_Scores_TimePoint1.csv
-#> Writing inst/backup/2016-03-11_14-59/q_Scores_TimePoint2.csv
-#> Writing inst/backup/2016-03-11_14-59/q_Scores_TimePoint3.csv
-#> Writing inst/backup/2016-03-11_14-59/metadata/field_descriptions.csv
-#> Writing inst/backup/2016-03-11_14-59/metadata/table_descriptions.csv
+#> Writing inst/backup/2016-06-22_12-02/BRIEF.csv
+#> Writing inst/backup/2016-06-22_12-02/Caregivers.csv
+#> Writing inst/backup/2016-06-22_12-02/Caregivers_Entry.csv
+#> Writing inst/backup/2016-06-22_12-02/Child.csv
+#> Writing inst/backup/2016-06-22_12-02/ChildStudy.csv
+#> Writing inst/backup/2016-06-22_12-02/EVT.csv
+#> Writing inst/backup/2016-06-22_12-02/FruitStroop.csv
+#> Writing inst/backup/2016-06-22_12-02/GFTA.csv
+#> Writing inst/backup/2016-06-22_12-02/LENA_Admin.csv
+#> Writing inst/backup/2016-06-22_12-02/LENA_Hours.csv
+#> Writing inst/backup/2016-06-22_12-02/Literacy.csv
+#> Writing inst/backup/2016-06-22_12-02/MinPair_Admin.csv
+#> Writing inst/backup/2016-06-22_12-02/MinPair_Responses.csv
+#> Writing inst/backup/2016-06-22_12-02/PPVT.csv
+#> Writing inst/backup/2016-06-22_12-02/SAILS_Admin.csv
+#> Writing inst/backup/2016-06-22_12-02/SAILS_Responses.csv
+#> Writing inst/backup/2016-06-22_12-02/SES.csv
+#> Writing inst/backup/2016-06-22_12-02/SES_Entry.csv
+#> Writing inst/backup/2016-06-22_12-02/Siblings.csv
+#> Writing inst/backup/2016-06-22_12-02/Study.csv
+#> Writing inst/backup/2016-06-22_12-02/VerbalFluency.csv
+#> Writing inst/backup/2016-06-22_12-02/q_LENA_Averages.csv
+#> Writing inst/backup/2016-06-22_12-02/q_MinPair_Aggregate.csv
+#> Writing inst/backup/2016-06-22_12-02/q_Scores_TimePoint1.csv
+#> Writing inst/backup/2016-06-22_12-02/q_Scores_TimePoint2.csv
+#> Writing inst/backup/2016-06-22_12-02/q_Scores_TimePoint3.csv
+#> Writing inst/backup/2016-06-22_12-02/metadata/field_descriptions.csv
+#> Writing inst/backup/2016-06-22_12-02/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 rows <- lapply(all_tbls, nrow)
 data_frame(tbl = names(rows), rows = unlist(rows))
-#> Source: local data frame [23 x 2]
+#> Source: local data frame [26 x 2]
 #> 
 #>                 tbl  rows
 #>               (chr) (int)
 #> 1             BRIEF   224
 #> 2        Caregivers     0
-#> 3  Caregivers_Entry   477
-#> 4             Child   224
-#> 5        ChildStudy   559
+#> 3  Caregivers_Entry   552
+#> 4             Child   247
+#> 5        ChildStudy   604
 #> 6               EVT   559
-#> 7       FruitStroop     0
-#> 8        LENA_Admin   182
-#> 9        LENA_Hours  2968
-#> 10         Literacy   207
+#> 7       FruitStroop   386
+#> 8              GFTA   174
+#> 9        LENA_Admin   182
+#> 10       LENA_Hours  2968
 #> ..              ...   ...
 
 all_tbls$ChildStudy
-#> Source: local data frame [559 x 8]
+#> Source: local data frame [604 x 8]
 #> 
 #>    ChildStudyID ChildID StudyID ShortResearchID FullResearchID
 #>           (int)   (int)   (int)           (chr)          (chr)
@@ -145,8 +153,8 @@ all_tbls$ChildStudy
 #> 9             9      31       1            608L      608L39FS2
 #> 10           10      32       1            609L      609L28MS1
 #> ..          ...     ...     ...             ...            ...
-#> Variables not shown: ChildStudy_Timestamp (chr), Exclude (int),
-#>   ExcludeNotes (chr)
+#> Variables not shown: ChildStudy_Timestamp (chr), ChildStudy_Exclude (int),
+#>   ChildStudy_ExcludeNote (chr)
 ```
 
 Metadata
@@ -184,54 +192,60 @@ We can also download the table-level comments from a database with `describe_db`
 
 ``` r
 describe_db(src = l2t)
-#>    Database               Table Rows
-#> 1       l2t               BRIEF  224
-#> 2       l2t          Caregivers    0
-#> 3       l2t    Caregivers_Entry  444
-#> 4       l2t               Child  224
-#> 5       l2t          ChildStudy  559
-#> 6       l2t                 EVT  559
-#> 7       l2t         FruitStroop    0
-#> 8       l2t          LENA_Admin  182
-#> 9       l2t          LENA_Hours 2968
-#> 10      l2t            Literacy  207
-#> 11      l2t       MinPair_Admin  190
-#> 12      l2t   MinPair_Responses 7674
-#> 13      l2t                PPVT  406
-#> 14      l2t                 SES  224
-#> 15      l2t           SES_Entry  215
-#> 16      l2t            Siblings    0
-#> 17      l2t               Study    3
-#> 18      l2t           StudyTask   12
-#> 19      l2t       VerbalFluency    0
-#> 20      l2t q_MinPair_Aggregate   NA
-#> 21      l2t q_Scores_TimePoint1   NA
-#> 22      l2t q_Scores_TimePoint2   NA
-#> 23      l2t q_Scores_TimePoint3   NA
+#>    Database               Table  Rows
+#> 1       l2t               BRIEF   224
+#> 2       l2t          Caregivers     0
+#> 3       l2t    Caregivers_Entry   526
+#> 4       l2t               Child   224
+#> 5       l2t          ChildStudy   559
+#> 6       l2t                 EVT   559
+#> 7       l2t         FruitStroop   386
+#> 8       l2t                GFTA   174
+#> 9       l2t          LENA_Admin   182
+#> 10      l2t          LENA_Hours  2968
+#> 11      l2t            Literacy   207
+#> 12      l2t       MinPair_Admin   320
+#> 13      l2t   MinPair_Responses 12060
+#> 14      l2t                PPVT   406
+#> 15      l2t         SAILS_Admin   335
+#> 16      l2t     SAILS_Responses 25591
+#> 17      l2t                 SES   224
+#> 18      l2t           SES_Entry   242
+#> 19      l2t            Siblings     0
+#> 20      l2t               Study     5
+#> 21      l2t       VerbalFluency   531
+#> 22      l2t     q_LENA_Averages    NA
+#> 23      l2t q_MinPair_Aggregate    NA
+#> 24      l2t q_Scores_TimePoint1    NA
+#> 25      l2t q_Scores_TimePoint2    NA
+#> 26      l2t q_Scores_TimePoint3    NA
 #>                                                    Description
 #> 1  Scores from Behvr Rating Inventory of Exec Func (Preschool)
-#> 2                        Demographics of children's caregivers
-#> 3      Demographics of children's caregivers (temp data-entry)
+#> 2                 [Todo] Demographics of children's caregivers
+#> 3      [Temp Data Entry] Demographics of children's caregivers
 #> 4          Unique IDs and demographics of children in database
 #> 5                                                             
 #> 6                       Scores on Expressive Vocabulary Test 2
-#> 7                                                             
-#> 8                                              LENA recordings
-#> 9                    Stats from LENA recordings by hour-of-day
-#> 10                                                            
-#> 11             Administrations of the Minimal Pairs experiment
-#> 12      Trials and responses from the Minimal Pairs experiment
-#> 13                 Scores on Peabody Picture Vocabulary Test 4
-#> 14                            Child and household demographics
-#> 15          Child and household demographics (temp data-entry)
-#> 16                              Sibling and Twin Relationships
-#> 17                                                            
-#> 18                                                            
-#> 19                                                            
-#> 20                                                        VIEW
-#> 21                                                        VIEW
+#> 7                              Scores on the Fruit Stroop task
+#> 8             Scores on Goldman Fristoe Test of Articulation 2
+#> 9                                              LENA recordings
+#> 10                   Stats from LENA recordings by hour-of-day
+#> 11                                                            
+#> 12             Administrations of the Minimal Pairs experiment
+#> 13      Trials and responses from the Minimal Pairs experiment
+#> 14                 Scores on Peabody Picture Vocabulary Test 4
+#> 15                     Administrations of the SAILS experiment
+#> 16              Trials and responses from the SAILS experiment
+#> 17                     [Todo] Child and household demographics
+#> 18          [Temp Data Entry] Child and household demographics
+#> 19                       [Todo] Sibling and Twin Relationships
+#> 20                                                            
+#> 21  Scores for Verbal Fluency (WJ-3 Retrieval Fluency Subtest)
 #> 22                                                        VIEW
 #> 23                                                        VIEW
+#> 24                                                        VIEW
+#> 25                                                        VIEW
+#> 26                                                        VIEW
 ```
 
 These two forms of metadata are backed up by `l2t_backup` as well. They are stored in a `metadata` folder.
@@ -246,11 +260,6 @@ dump_database(
   cnf_file = cnf_file, 
   backup_dir = "inst/backup",
   db_name = "l2t")
-#> Checking inst/backup/l2t_2016-03-11_14-59.sql
-#> ..file size: 1200.819 kB
-#> ..line count: 834
-#> ..first line: -- MySQL dump 10.13  Distrib 5.6.26, for Win64 (x86_64)
-#> ..final line: -- Dump completed on 2016-03-11 15:00:02
 ```
 
 Writing
@@ -275,7 +284,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          (int)   (chr)                (chr)
-#> 1            5  Hello!  2016-03-11 15:00:03
+#> 1           15  Hello!  2016-06-22 12:02:59
 ```
 
 Helpers
@@ -290,8 +299,8 @@ dates$t1 <- undo_excel_date(41659)
 dates$t2 <- undo_excel_date(41659 + 365 + 181)
 str(dates)
 #> List of 2
-#>  $ t1: POSIXct[1:1], format: "2014-01-20"
-#>  $ t2: POSIXct[1:1], format: "2015-07-20"
+#>  $ t1: Date[1:1], format: "2014-01-20"
+#>  $ t2: Date[1:1], format: "2015-07-20"
 
 # Chrono age in months, assuming t1 is a birthdate
 chrono_age(dates$t2, dates$t1)

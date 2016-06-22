@@ -57,6 +57,7 @@ discrepancies <- both_scores %>%
   select(-FruitStroop_Date) %>%
   spread(Source, FruitStroop_Score) %>%
   filter(DIRT != ParticipantInfo | is.na(DIRT) != is.na(ParticipantInfo))
+discrepancies
 
 both_scores %>%
   mutate(Full = FruitStroop_Score * 9)

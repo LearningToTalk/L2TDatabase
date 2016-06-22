@@ -108,7 +108,7 @@ A final option for backing up the database is `dump_database`. This function
 calls on the `mysqldump` utility which exports a database into a series of SQL
 statements that can be used to reconstruct the database.
 
-```{r}
+```{r, eval = FALSE}
 dump_database(
   cnf_file = cnf_file, 
   backup_dir = "inst/backup",
