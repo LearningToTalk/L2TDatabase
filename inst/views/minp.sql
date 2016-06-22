@@ -3,7 +3,7 @@
 -- each administration of the Minimal Pairs experiment.
 --
 
-CREATE ALGORITHM = UNDEFINED VIEW  `q_MinPair_Aggregate` AS SELECT c.Study, d.ShortResearchID AS  `ResearchID` , b.MinPair_EprimeFile, b.MinPair_Completion, b.MinPair_Dialect, ROUND( AVG( a.Correct ) , 4.0 ) AS  `MinPair_ProportionCorrect`
+CREATE ALGORITHM = UNDEFINED VIEW  `q_MinPair_Aggregate` AS SELECT c.Study, d.ChildStudyID, d.ShortResearchID AS  `ResearchID`, b.MinPair_EprimeFile, b.MinPair_Completion, b.MinPair_Dialect, ROUND( AVG( a.Correct ) , 4.0 ) AS  `MinPair_ProportionCorrect`
 FROM ChildStudy d
 LEFT JOIN Study c
 USING ( StudyID )
