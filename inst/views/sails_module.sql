@@ -5,7 +5,7 @@
 
 CREATE ALGORITHM = UNDEFINED VIEW `q_SAILS_ModulesPropCorrect` AS
   SELECT d.ChildStudyID, c.Study, d.ShortResearchID AS `ResearchID`, b.SAILS_EprimeFile,
-    b.SAILS_Completion, b.SAILS_Dialect, b.SAILS_Age, a.Module,
+    b.SAILSID, b.SAILS_Completion, b.SAILS_Dialect, b.SAILS_Age, a.Module,
     ROUND( AVG( a.Correct ) , 4.0 ) AS  `ProportionCorrect`
   FROM ChildStudy d
   LEFT JOIN Study c
