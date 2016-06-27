@@ -44,46 +44,57 @@ t1 <- GetSiteInfo("ParticipantData_TimePoint1", separately = TRUE)
 t2 <- GetSiteInfo("TimePoint2", separately = TRUE)
 t3 <- GetSiteInfo("TimePoint3", separately = TRUE)
 
+maybe_starts_with <- function(...) {
+  vars <- starts_with(...)
+  if (all(vars < 0)) numeric() else vars
+}
+
+maybe_matches <- function(...) {
+  vars <- matches(...)
+  if (all(vars < 0)) numeric() else vars
+}
+
+
 # Select necessary columns
 get_scores_from_info <- function(df) {
   # Select and rename columns we want to compare
   df %>%
     select(ParticipantID = Participant_ID, Study,
-           # use starts_with so that we don't get an error when the column is not found
-           EVT_Form = starts_with("EVT_Form"),
-           EVT_Date = starts_with("EVT_COMPLETION"),
-           EVT_Raw = starts_with("EVT_raw"),
-           EVT_Standard = starts_with("EVT_standard"),
-           EVT_GSV = starts_with("EVT_GSV"),
-           PPVT_Form = starts_with("PPVT_Form"),
-           PPVT_Date = starts_with("PPVT_COMPLETION"),
-           PPVT_Raw = starts_with("PPVT_raw"),
-           PPVT_Standard = starts_with("PPVT_standard"),
-           PPVT_GSV = starts_with("PPVT_GSV"),
-           FruitStroop_Score = starts_with("fruitstroop_time"),
-           VerbalFluency_Score = starts_with("verbalfluency_raw"),
-           VerbalFluency_AgeEquivalent = starts_with("verbalfluency_AE"),
-           CTOPPElision_Raw = starts_with("CTOPP_Elision_raw"),
-           CTOPPElision_Scaled = starts_with("CTOPP_Elision_scaled"),
-           CTOPPBlending_Raw = starts_with("CTOPP_Blending_raw"),
-           CTOPPBlending_Scaled = starts_with("CTOPP_Blending_scaled"),
-           CTOPPMemory_Date = starts_with("CTOPP_MemoryforDigits_COMPLETION"),
-           CTOPPMemory_Raw = starts_with("CTOPP_MemoryforDigits_raw"),
-           CTOPPMemory_Scaled = starts_with("CTOPP_MemoryforDigits_scaled"),
-           KBIT_Raw = starts_with("Kbit_nonverbalraw"),
-           KBIT_Standard = starts_with("Kbit_nonverbalstandard"),
-           GFTA_Date = starts_with("GFTA_COMPLETION_DATE"),
-           DELV_Date = starts_with("DELV_Date"),
-           DELV_LanguageVar_ColumnAScore = starts_with("DELV_LanguageVar_ColumnAScore"),
-           DELV_LanguageVar_ColumnBScore = starts_with("DELV_LanguageVar_ColumnBScore"),
-           DELV_LanguageVar = matches("DELV_LanguageVar$"),
-           DELV_LanguageRisk_DiagnosticErrorScore = starts_with("DELV_LanguageRisk_DiagnosticErrorScore"),
-           DELV_LanguageRisk = matches("DELV_LanguageRisk$")) %>%
+           # use maybe_starts_with so that we don't get an error when the column is not found
+           EVT_Form = maybe_starts_with("EVT_Form"),
+           EVT_Date = maybe_starts_with("EVT_COMPLETION"),
+           EVT_Raw = maybe_starts_with("EVT_raw"),
+           EVT_Standard = maybe_starts_with("EVT_standard"),
+           EVT_GSV = maybe_starts_with("EVT_GSV"),
+           PPVT_Form = maybe_starts_with("PPVT_Form"),
+           PPVT_Date = maybe_starts_with("PPVT_COMPLETION"),
+           PPVT_Raw = maybe_starts_with("PPVT_raw"),
+           PPVT_Standard = maybe_starts_with("PPVT_standard"),
+           PPVT_GSV = maybe_starts_with("PPVT_GSV"),
+           FruitStroop_Score = maybe_starts_with("fruitstroop_time"),
+           VerbalFluency_Score = maybe_starts_with("verbalfluency_raw"),
+           VerbalFluency_AgeEquivalent = maybe_starts_with("verbalfluency_AE"),
+           CTOPPElision_Raw = maybe_starts_with("CTOPP_Elision_raw"),
+           CTOPPElision_Scaled = maybe_starts_with("CTOPP_Elision_scaled"),
+           CTOPPBlending_Raw = maybe_starts_with("CTOPP_Blending_raw"),
+           CTOPPBlending_Scaled = maybe_starts_with("CTOPP_Blending_scaled"),
+           CTOPPMemory_Date = maybe_starts_with("CTOPP_MemoryforDigits_COMPLETION"),
+           CTOPPMemory_Raw = maybe_starts_with("CTOPP_MemoryforDigits_raw"),
+           CTOPPMemory_Scaled = maybe_starts_with("CTOPP_MemoryforDigits_scaled"),
+           KBIT_Raw = maybe_starts_with("Kbit_nonverbalraw"),
+           KBIT_Standard = maybe_starts_with("Kbit_nonverbalstandard"),
+           GFTA_Date = maybe_starts_with("GFTA_COMPLETION_DATE"),
+           DELV_Date = maybe_starts_with("DELV_Date"),
+           DELV_LanguageVar_ColumnAScore = maybe_starts_with("DELV_LanguageVar_ColumnAScore"),
+           DELV_LanguageVar_ColumnBScore = maybe_starts_with("DELV_LanguageVar_ColumnBScore"),
+           DELV_LanguageVar = maybe_matches("DELV_LanguageVar$"),
+           DELV_LanguageRisk_DiagnosticErrorScore = maybe_starts_with("DELV_LanguageRisk_DiagnosticErrorScore"),
+           DELV_LanguageRisk = maybe_matches("DELV_LanguageRisk$")) %>%
     # Add additional info
     mutate(
       Source = "ParticipantInfo") %>%
     # Set dates to strings
-    mutate_each(funs(format), matches("Date"))
+    mutate_each(funs(format), maybe_matches("Date"))
 }
 
 # Combine scores in the UMN/UW spreadsheets, convert to long format
