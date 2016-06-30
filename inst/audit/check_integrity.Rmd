@@ -1,5 +1,5 @@
 ---
-title: "Longitudinal Data Integrity Check"
+title: "Data Integrity Check"
 author: "Tristan Mahr"
 date: "`r Sys.Date()`"
 output: github_document
@@ -20,11 +20,12 @@ library("stringr")
 
 # Load external dependencies
 source("inst/paths.R")
-source(paths$GetSiteInfo)
+source(paths$GetSiteInfo, chdir = TRUE)
 source("inst/migrations/dates.R")
 
 # Collect dates/scores
-df_dates <- collect_dates(paths$score_dates, recursive = TRUE)
+df_dates <- collect_dates(paths$score_dates, recursive = TRUE) %>% 
+  filter(Study != "Dialect")
 
 df_no_visits <- df_dates %>% 
   filter(Variable == "Visited") %>% 
@@ -40,9 +41,16 @@ columns_in_dirt <- df_dates %>%
 unique(df_dates$Variable)
 
 # Get T1 scores for both sites. Function sourced via paths$GetSiteInfo
-t1 <- GetSiteInfo("ParticipantData_TimePoint1", separately = TRUE)
-t2 <- GetSiteInfo("TimePoint2", separately = TRUE)
-t3 <- GetSiteInfo("TimePoint3", separately = TRUE)
+t1 <- get_study_info("TimePoint1")
+t2 <- get_study_info("TimePoint2")
+t3 <- get_study_info("TimePoint3")
+
+ci1 <- get_study_info("CochlearV1")
+ci2 <- get_study_info("CochlearV2")
+ci_age <- get_study_info("CochlearMatching")
+
+lt <- get_study_info("LateTalker")
+medu <- get_study_info("Medu")
 
 maybe_starts_with <- function(...) {
   vars <- starts_with(...)
@@ -54,12 +62,11 @@ maybe_matches <- function(...) {
   if (all(vars < 0)) numeric() else vars
 }
 
-
 # Select necessary columns
 get_scores_from_info <- function(df) {
   # Select and rename columns we want to compare
   df %>%
-    select(ParticipantID = Participant_ID, Study,
+    select(ParticipantID = Participant_ID, Study, Source,
            # use maybe_starts_with so that we don't get an error when the column is not found
            EVT_Form = maybe_starts_with("EVT_Form"),
            EVT_Date = maybe_starts_with("EVT_COMPLETION"),
@@ -90,9 +97,6 @@ get_scores_from_info <- function(df) {
            DELV_LanguageVar = maybe_matches("DELV_LanguageVar$"),
            DELV_LanguageRisk_DiagnosticErrorScore = maybe_starts_with("DELV_LanguageRisk_DiagnosticErrorScore"),
            DELV_LanguageRisk = maybe_matches("DELV_LanguageRisk$")) %>%
-    # Add additional info
-    mutate(
-      Source = "ParticipantInfo") %>%
     # Set dates to strings
     mutate_each(funs(format), maybe_matches("Date"))
 }
@@ -100,11 +104,12 @@ get_scores_from_info <- function(df) {
 # Combine scores in the UMN/UW spreadsheets, convert to long format
 normalize_sheets <- . %>% 
   lapply(get_scores_from_info) %>% 
+  Filter(function(x) nrow(x) != 0, .) %>% 
   bind_rows %>% 
   gather(Variable, Value, -ParticipantID, -Study, -Source)
 
 # Normalize data from all three studies, combine to single study
-df_info_long <- list(t1, t2, t3) %>% 
+df_info_long <- list(t1, t2, t3, ci1, ci2, ci_age, lt, medu) %>% 
   lapply(normalize_sheets) %>% 
   bind_rows
 
@@ -118,13 +123,20 @@ df_dirt <- df_dates %>%
   select(-Site) %>%
   semi_join(columns_in_info_sheets) %>% 
   mutate(Source = "DIRT")
-
 ```
 
-In Spring 2015, we had our data-entry team re-enter test scores gathered in the
-longitudinal study, so that we could find data-entry discrepancies. This script
+In Spring 2015, we had our data-entry team re-enter test scores gathered in our 
+studies, so that we could find data-entry discrepancies. This script
 compares the original to the re-entered scores.
 
+
+## Studies under consideration
+
+Data from the following studies are checked:
+
+```{r}
+unique(df_info_long$Study)
+```
 
 
 ## Participant pool comparison
@@ -187,22 +199,6 @@ discrepancies <- df_comparing_scores %>%
   lapply(as.data.frame)
 ```
 
-### Unchecked fields
-
-The following columns in DIRT are not being checked because there is not a
-matching column in the participant info spreadsheets
-
-```{r}
-columns_in_dirt %>% 
-  anti_join(columns_in_info_sheets) %>% 
-  filter(Variable != "DOB", Variable != "Visited") %>% 
-  as.data.frame %>% 
-  mutate(Status = ":grey_question:") %>% 
-  rename(` ` = Status) %>% 
-  kable
-```
-
-
 ### Summary
 
 This table lists all the fields that were checked and whether any discrepancies
@@ -211,12 +207,20 @@ were found in that field.
 ```{r}
 columns_with_discrepancies <- discrepancies %>% names
 
-columns_in_info_sheets %>% 
-  select(Variable) %>% 
+columns_with_errors <- discrepancies %>% 
+  lapply(. %>% select(Study, Variable)) %>% 
+  bind_rows %>% 
   distinct %>% 
-  mutate(Passing = !(Variable %in% columns_with_discrepancies)) %>% 
-  arrange(Variable) %>% 
-  mutate(Status = ifelse(Passing, ":white_check_mark:", ":x:")) %>% 
+  arrange(Study, Variable) %>% 
+  mutate(Passing = FALSE)
+
+columns_in_info_sheets %>% 
+  select(Study, Variable) %>% 
+  distinct %>% 
+  left_join(columns_with_errors) %>% 
+  mutate(Passing = if_else(is.na(Passing), TRUE, Passing)) %>% 
+  arrange(Study, Variable) %>% 
+  mutate(Status = if_else(Passing, ":white_check_mark:", ":x:")) %>% 
   as.data.frame %>% 
   rename(` ` = Status) %>% 
   kable
@@ -228,4 +232,24 @@ These are all the mismatching values.
 
 ```{r}
 discrepancies
+```
+
+
+### Unchecked fields
+
+The following columns in DIRT were not checked because there is not a
+matching column in the participant info spreadsheets
+
+```{r}
+columns_in_dirt_by_study <- df_dates %>% 
+  select(Study, Variable) %>% 
+  distinct
+
+columns_in_dirt_by_study %>% 
+  anti_join(columns_in_info_sheets) %>% 
+  filter(Variable != "DOB", Variable != "Visited") %>% 
+  as.data.frame %>% 
+  mutate(Status = ":grey_question:") %>% 
+  rename(` ` = Status) %>% 
+  kable
 ```
