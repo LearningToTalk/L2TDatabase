@@ -6,7 +6,7 @@ library("stringr")
 
 # Load external dependencies
 source("inst/paths.R")
-source(paths$GetSiteInfo)
+source(paths$GetSiteInfo, chdir = TRUE)
 
 # Download/backup db beforehand
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")

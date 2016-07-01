@@ -5,7 +5,7 @@ library("dplyr")
 
 # Load external dependencies
 source("inst/paths.R")
-source(paths$GetSiteInfo)
+source(paths$GetSiteInfo, chdir = TRUE)
 
 # # Peek at the excel spreadsheet
 # open_file <- function(file_name) shell(sprintf("open %s", file_name))

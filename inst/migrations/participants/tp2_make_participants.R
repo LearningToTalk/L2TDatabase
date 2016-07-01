@@ -22,7 +22,7 @@ library("stringr")
 source("inst/paths.R")
 
 # Helpers for working with the Excel participant-info spreadsheets
-source(paths$GetSiteInfo)
+source(paths$GetSiteInfo, chdir = TRUE)
 
 # # Peek at the excel spreadsheet
 # open_file <- function(file_name) shell(sprintf("open %s", file_name))

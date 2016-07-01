@@ -7,7 +7,7 @@ library("stringr")
 
 # Load external dependencies
 source("inst/paths.R")
-source(paths$GetSiteInfo)
+source(paths$GetSiteInfo, chdir = TRUE)
 source("inst/migrations/dates.R")
 
 # Download/backup db beforehand
