@@ -1,4 +1,5 @@
-# Add timepoint1 evt scores to the database
+# Add evt scores to the database
+# Supports T1, T2, T3
 
 library("L2TDatabase")
 library("dplyr")
@@ -12,29 +13,29 @@ cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 l2t <- l2t_connect(cnf_file)
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
-# Treat "NA" and NA identically
-convert_na_strings <- function(xs) ifelse(is_na_string(xs), NA, xs)
-is_na_string <- function(xs) is.element(xs, c(NA, "NA"))
+# Get T1/T2/T3 scores for both sites. Function sourced via paths$GetSiteInfo
+t1 <- get_study_info("TimePoint1")
+t2 <- get_study_info("TimePoint2")
+t3 <- get_study_info("TimePoint3")
 
-# Get T1 scores for both sites. Function sourced via paths$GetSiteInfo
-t1 <- GetSiteInfo()
-names(t1)
-t1_evt <- t1 %>%
-  select(ShortResearchID = Participant_ID,
+maybe_starts_with <- function(...) {
+  vars <- starts_with(...)
+  if (all(vars < 0)) numeric() else vars
+}
+
+process_scores <- . %>%
+  select(Study,
+         ShortResearchID = Participant_ID,
          EVT_Form,
-         EVT_Completion = starts_with("EVT_COMPLETION"),
-         EVT_Raw = starts_with("EVT_raw"),
-         EVT_Standard = starts_with("EVT_standard"),
+         EVT_Completion = maybe_starts_with("EVT_COMPLETION"),
+         EVT_Raw = maybe_starts_with("EVT_raw"),
+         EVT_Standard = maybe_starts_with("EVT_standard"),
          EVT_GSV) %>%
-  # Make sure scores are integers
-  mutate_each(funs(as.integer(.)), EVT_Raw:EVT_GSV) %>%
-  mutate(Study = "TimePoint1")
+  mutate(EVT_Completion = format(EVT_Completion))
 
-# Convert dates
-t1_evt$EVT_Completion <- t1_evt$EVT_Completion %>%
-  convert_na_strings %>%
-  undo_excel_date %>%
-  format
+scores <- c(t1, t2, t3) %>%
+  lapply(process_scores) %>%
+  bind_rows
 
 # Combine child-study-childstudy tbls
 cds <- l2t_dl$ChildStudy %>%
@@ -43,12 +44,16 @@ cds <- l2t_dl$ChildStudy %>%
 cds
 
 # Attach the database identifiers to the EVT scores
-with_evt <- left_join(t1_evt, cds)
+with_evt <- left_join(scores, cds)
+
+# Kids in spreadsheets not in database. Should be empty rows (attrition)
+scores %>% anti_join(cds) %>% as.data.frame
 
 # Calculate chronological ages, default to NA if error encountered
 chr_age <- failwith(NA, chrono_age)
 
 with_evt <-  with_evt %>%
+  filter(!is.na(EVT_Completion)) %>%
   mutate(EVT_Age = unlist(Map(chr_age, EVT_Completion, Birthdate)))
 
 # Find completely new records that need to be added
@@ -57,6 +62,7 @@ latest_data <- match_columns(with_evt, l2t_dl$EVT) %>%
 
 to_add <- latest_data %>%
   anti_join(l2t_dl$EVT, by = c("ChildStudyID"))
+to_add
 
 # Update the remote table. An error here is a good thing if there are no new
 # rows to add
@@ -83,10 +89,15 @@ remote_data <- match_columns(remote_data, latest_data) %>%
 # Preview changes with daff
 library("daff")
 daff <- diff_data(remote_data, latest_data, context = 0)
+stamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
 render_diff(daff)
 
+# save them
+render_diff(daff, file = sprintf("inst/diffs/%s_evt_diffs.html", stamp))
+daff::write_diff(daff, file = sprintf("inst/diffs/%s_evt_.csv", stamp))
+
 # Or see them itemized in a long data-frame
-create_diff_table(latest_data, current_data, "EVTID")
+create_diff_table(latest_data, remote_data, "EVTID")
 
 overwrite_rows_in_table(l2t, "EVT", rows = latest_data, preview = TRUE)
 overwrite_rows_in_table(l2t, "EVT", rows = latest_data, preview = FALSE)
