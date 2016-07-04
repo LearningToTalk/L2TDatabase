@@ -18,19 +18,20 @@ l2t <- l2t_connect(cnf_file)
 df_dates <- collect_dates(paths$score_dates, recursive = TRUE)
 
 
+cds <- tbl(l2t, "Child") %>%
+  left_join(tbl(l2t, "ChildStudy")) %>%
+  left_join(tbl(l2t, "Study")) %>%
+  select(ChildID, Study, ParticipantID = ShortResearchID, Birthdate) %>%
+  collect
 
 df_dobs <- df_dates %>%
   filter(Variable == "DOB") %>%
   select(Study, ParticipantID, Birthdate = Value) %>%
   mutate(Source = "DIRT",
-         Birthdate = format(Birthdate))
+         Birthdate = format(Birthdate)) %>%
+  left_join(select(cds, -Birthdate))
 
-df_db_dobs <- tbl(l2t, "Child") %>%
-  left_join(tbl(l2t, "ChildStudy")) %>%
-  left_join(tbl(l2t, "Study")) %>%
-  select(Study, ParticipantID = ShortResearchID, Birthdate) %>%
-  collect %>%
-  mutate(Source = "Database")
+df_db_dobs <- cds %>% mutate(Source = "Database")
 
 df_both <- bind_rows(df_dobs, df_db_dobs) %>%
   spread(Source, Birthdate)
@@ -38,3 +39,8 @@ df_both <- bind_rows(df_dobs, df_db_dobs) %>%
 df_both %>%
   filter(!is.na(Database), Database != DIRT) %>%
   arrange(Study, ParticipantID)
+
+df_both %>%
+  filter(!is.na(Database), Database != DIRT) %>%
+  arrange(ParticipantID, Study)
+
