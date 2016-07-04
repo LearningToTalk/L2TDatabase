@@ -13,7 +13,8 @@ l2t_dl <- l2t_backup(l2t, "inst/backup")
 
 # Map from study to study number, from study/short research id to child-study
 # id, from child-study id to research id
-cds <- left_join(l2t_dl$ChildStudy, l2t_dl$Study)
+cds <- left_join(l2t_dl$ChildStudy, l2t_dl$Study) %>%
+  left_join(l2t_dl$Child)
 
 # Studies in the database
 cds %>% select(Study) %>% distinct
@@ -45,8 +46,10 @@ mp_admins %>%
 with_ids <- mp_admins %>%
   inner_join(cds, by = c("Study", "ShortResearchID")) %>%
   select(Study, ShortResearchID, ChildStudyID, MinPair_Dialect, MinPair_EprimeFile,
-         FullResearchID, MinPair_Completion) %>%
-  mutate(IDFromFile = str_replace(MinPair_EprimeFile, "MINP_", ""))
+         FullResearchID, MinPair_Completion, Birthdate) %>%
+  mutate(
+    MinPair_Age = chrono_age(Birthdate, MinPair_Completion),
+    IDFromFile = str_replace(MinPair_EprimeFile, "MINP_", ""))
 
 # Check for weird cases where id in filename doesn't match the FullResearchID
 id_mismatch <- with_ids %>% filter(IDFromFile != FullResearchID)
@@ -59,7 +62,7 @@ local_admins <- match_columns(with_ids, curr_admins)
 
 # Remove adminstrations already in database
 rows_to_add <- local_admins %>%
-  anti_join(curr_admins) %>%
+  anti_join(curr_admins, by = c("ChildStudyID", "MinPair_Dialect", "MinPair_EprimeFile")) %>%
   arrange(ChildStudyID, MinPair_Completion)
 rows_to_add
 
@@ -94,13 +97,30 @@ admins_latest_data <- local_admins %>%
 # Keep just the columns in the latest data
 admins_remote_data <- match_columns(admins_remote_data, admins_latest_data) %>%
   # filter(ChildStudyID %in% admins_latest_data$ChildStudyID) %>%
-  arrange(MinPairID)
+  arrange(MinPairID) %>%
+  mutate(MinPair_Completion = format(MinPair_Completion))
+
 
 # Preview changes with daff
 library("daff")
 daff <- diff_data(admins_remote_data, admins_latest_data, context = 0)
 render_diff(daff)
 
+# # One-off to add ages to the database
+# with_updated_ages <- admins_remote_data %>%
+#   left_join(cds) %>%
+#   mutate(MinPair_Age = chrono_age(Birthdate, MinPair_Completion)) %>%
+#   match_columns(admins_remote_data)
+#
+# # Preview changes with daff
+# library("daff")
+# daff <- diff_data(admins_remote_data, with_updated_ages, context = 0)
+# render_diff(daff)
+#
+# create_diff_table(with_updated_ages, admins_remote_data, "MinPairID")
+# overwrite_rows_in_table(l2t, "MinPair_Admin", rows = with_updated_ages, preview = TRUE)
+# overwrite_rows_in_table(l2t, "MinPair_Admin", rows = with_updated_ages, preview = FALSE)
+#
 
 
 
