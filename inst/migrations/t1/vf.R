@@ -25,6 +25,7 @@ df_dates <- collect_dates(paths$score_dates, recursive = TRUE)
 
 # Keep just verbal fluency data from DIRT
 df_vf <- df_dates %>%
+  filter(Study %in% c("TimePoint1", "TimePoint2", "TimePoint3")) %>%
   filter(str_detect(Variable, "VerbalFluency")) %>%
   spread(Variable, Value) %>%
   filter(!is.na(VerbalFluency_Score)) %>%
@@ -100,7 +101,9 @@ discrepancies
 both_wide %>% filter(is.na(ParticipantInfo))
 
 # Drop discrepant values
-obs_to_drop <- discrepancies %>% select(Study, ParticipantID) %>% distinct
+obs_to_drop <- discrepancies %>%
+  select(Study, ParticipantID) %>%
+  distinct
 
 shared_scores <- both_sources %>%
   anti_join(obs_to_drop) %>%
