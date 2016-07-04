@@ -11,7 +11,7 @@ CREATE ALGORITHM = UNDEFINED VIEW  `q_Scores_TimePoint1` AS
     f.VerbalFluency_Completion, f.VerbalFluency_Age, f.VerbalFluency_Raw, f.VerbalFluency_AgeEq,
     g.GFTA_Completion, g.GFTA_RawCorrect, g.GFTA_NumTranscribed, g.GFTA_AdjCorrect, g.GFTA_Standard,
     h.FruitStroop_Completion, h.FruitStroop_Age, h.FruitStroop_Score,
-    i.MinPair_ProportionCorrect
+    i.MinPair_Age, i.MinPair_ProportionCorrect
   FROM Study a
   LEFT JOIN ChildStudy b
   USING ( StudyID )

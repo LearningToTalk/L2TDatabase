@@ -10,7 +10,7 @@ CREATE ALGORITHM = UNDEFINED VIEW  `q_Scores_TimePoint2` AS
     e.PPVT_Completion, e.PPVT_Form, e.PPVT_Raw, e.PPVT_GSV, e.PPVT_Age, e.PPVT_Standard,
     f.VerbalFluency_Completion, f.VerbalFluency_Age, f.VerbalFluency_Raw, f.VerbalFluency_AgeEq,
     h.FruitStroop_Completion, h.FruitStroop_Age, h.FruitStroop_Score,
-    i.MinPair_ProportionCorrect,
+    i.MinPair_Age, i.MinPair_ProportionCorrect,
     j.SAILS_Age, j.SAILS_NumPracticeTrials, j.SAILS_NumTestTrials, j.SAILS_ProportionTestCorrect
   FROM Study a
   LEFT JOIN ChildStudy b

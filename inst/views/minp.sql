@@ -5,7 +5,7 @@
 
 CREATE ALGORITHM = UNDEFINED VIEW  `q_MinPair_Aggregate` AS
   SELECT d.ChildStudyID, c.Study, d.ShortResearchID AS `ResearchID`,
-    b.MinPairID, b.MinPair_EprimeFile, b.MinPair_Completion, b.MinPair_Dialect,
+    b.MinPairID, b.MinPair_EprimeFile, b.MinPair_Completion, b.MinPair_Dialect, b.MinPair_Age,
     ROUND( AVG( a.Correct ) , 4.0 ) AS `MinPair_ProportionCorrect`
   FROM ChildStudy d
   LEFT JOIN Study c
