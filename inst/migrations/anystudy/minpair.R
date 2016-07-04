@@ -92,7 +92,8 @@ admins_current_indices <- admins_remote_data %>%
 
 admins_latest_data <- local_admins %>%
   inner_join(admins_current_indices)  %>%
-  arrange(MinPairID)
+  arrange(MinPairID) %>%
+  mutate(MinPair_Completion = format(MinPair_Completion))
 
 # Keep just the columns in the latest data
 admins_remote_data <- match_columns(admins_remote_data, admins_latest_data) %>%
@@ -100,11 +101,19 @@ admins_remote_data <- match_columns(admins_remote_data, admins_latest_data) %>%
   arrange(MinPairID) %>%
   mutate(MinPair_Completion = format(MinPair_Completion))
 
-
 # Preview changes with daff
 library("daff")
 daff <- diff_data(admins_remote_data, admins_latest_data, context = 0)
 render_diff(daff)
+
+# Or see them itemized in a long data-frame
+create_diff_table(admins_latest_data, admins_remote_data, "MinPairID")
+
+overwrite_rows_in_table(l2t, "MinPair_Admin", rows = admins_latest_data, preview = TRUE)
+overwrite_rows_in_table(l2t, "MinPair_Admin", rows = admins_latest_data, preview = FALSE)
+
+
+
 
 # # One-off to add ages to the database
 # with_updated_ages <- admins_remote_data %>%

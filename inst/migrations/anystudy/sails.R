@@ -82,7 +82,7 @@ local_admins <- match_columns(local_sails_admins, curr_admins)
 
 # Remove adminstrations already in database
 rows_to_add <- local_admins %>%
-  anti_join(curr_admins) %>%
+  anti_join(curr_admins, by = c("ChildStudyID", "SAILS_Dialect", "SAILS_EprimeFile")) %>%
   arrange(ChildStudyID, SAILS_EprimeFile)
 rows_to_add
 
@@ -111,7 +111,8 @@ admins_current_indices <- remote_sails_admins %>%
 
 admins_latest_data <- local_admins %>%
   inner_join(admins_current_indices)  %>%
-  arrange(SAILSID)
+  arrange(SAILSID) %>%
+  mutate(SAILS_Completion = format(SAILS_Completion))
 
 # Keep just the columns in the latest data
 remote_sails_admins <- match_columns(remote_sails_admins, admins_latest_data) %>%
@@ -122,6 +123,9 @@ library("daff")
 daff <- diff_data(remote_sails_admins, admins_latest_data, context = 0)
 render_diff(daff)
 
+create_diff_table(admins_latest_data, remote_sails_admins, "SAILSID")
+overwrite_rows_in_table(l2t, "SAILS_Admin", rows = admins_latest_data, preview = TRUE)
+overwrite_rows_in_table(l2t, "SAILS_Admin", rows = admins_latest_data, preview = FALSE)
 
 
 
