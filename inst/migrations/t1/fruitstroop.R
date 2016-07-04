@@ -33,14 +33,13 @@ df_stroop
 
 
 # Get T1/T2 scores for both sites
-t1 <- GetSiteInfo(separately = TRUE)
-t2 <- GetSiteInfo(separately = TRUE, sheet = "TimePoint2")
+t1 <- get_study_info("TimePoint1")
+t2 <- get_study_info("TimePoint2")
 
 # one-off function to select/rename the stroop columns from a spreadsheet
 extract_stroop <- . %>%
-  select(Site, Study, ParticipantID = Participant_ID,
-         FruitStroop_Score = starts_with("fruitstroop_time")) %>%
-  mutate(Source = "ParticipantInfo")
+  select(Source, Site, Study, ParticipantID = Participant_ID,
+         FruitStroop_Score = starts_with("fruitstroop_time"))
 
 t1_stroops <- t1 %>% lapply(extract_stroop) %>% bind_rows
 t2_stroops <- t2 %>% lapply(extract_stroop) %>% bind_rows
@@ -51,7 +50,8 @@ stroops
 df_stroop
 
 # Compare DIRT versus participant info
-both_scores <- bind_rows(df_stroop, stroops)
+both_scores <- bind_rows(df_stroop, stroops) %>%
+  filter(Study %in% c("TimePoint1", "TimePoint2"))
 
 discrepancies <- both_scores %>%
   select(-FruitStroop_Date) %>%
