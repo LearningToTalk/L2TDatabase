@@ -42,14 +42,19 @@ unique(df_dates$Variable)
 
 # Get T1 scores for both sites. Function sourced via paths$GetSiteInfo
 t1 <- get_study_info("TimePoint1")
+
 t2 <- get_study_info("TimePoint2")
+
 t3 <- get_study_info("TimePoint3")
 
 ci1 <- get_study_info("CochlearV1")
+
 ci2 <- get_study_info("CochlearV2")
+
 ci_age <- get_study_info("CochlearMatching")
 
 lt <- get_study_info("LateTalker")
+
 medu <- get_study_info("Medu")
 
 maybe_starts_with <- function(...) {

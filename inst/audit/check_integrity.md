@@ -1,7 +1,7 @@
 Data Integrity Check
 ================
 Tristan Mahr
-2016-06-30
+2016-07-25
 
 In Spring 2015, we had our data-entry team re-enter test scores gathered in our studies, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
@@ -21,23 +21,13 @@ Do the same participants contribute scores in each set?
 
 Participants in original score-set ("ParticipantInfo") *not in* the re-entered score-set ("DIRT"):
 
-    #> # A tibble: 14 x 4
-    #>         Study ParticipantID  DIRT ParticipantInfo
-    #>         <chr>         <chr> <lgl>           <lgl>
-    #> 1  CochlearV1          079L    NA            TRUE
-    #> 2  CochlearV2          312E    NA            TRUE
-    #> 3  CochlearV2          804E    NA            TRUE
-    #> 4  CochlearV2          805E    NA            TRUE
-    #> 5  CochlearV2          802E    NA            TRUE
-    #> 6  CochlearV2          803E    NA            TRUE
-    #> 7  CochlearV2          808E    NA            TRUE
-    #> 8  CochlearV2          809E    NA            TRUE
-    #> 9  CochlearV2          806E    NA            TRUE
-    #> 10 CochlearV2          807E    NA            TRUE
-    #> 11 LateTalker          209T    NA            TRUE
-    #> 12 LateTalker          206T    NA            TRUE
-    #> 13 LateTalker          203T    NA            TRUE
-    #> 14 LateTalker          201T    NA            TRUE
+    #> # A tibble: 4 x 4
+    #>        Study ParticipantID  DIRT ParticipantInfo
+    #>        <chr>         <chr> <lgl>           <lgl>
+    #> 1 CochlearV1          079L    NA            TRUE
+    #> 2 CochlearV2          312E    NA            TRUE
+    #> 3 LateTalker          206T    NA            TRUE
+    #> 4 LateTalker          203T    NA            TRUE
 
 Participants in re-entered score-set ("DIRT") who visited the lab but are *not in* the original score-set ("ParticipantInfo").
 
@@ -79,14 +69,14 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearV1       | PPVT\_GSV                                | FALSE   | :x:                  |
 | CochlearV1       | PPVT\_Raw                                | FALSE   | :x:                  |
 | CochlearV1       | PPVT\_Standard                           | FALSE   | :x:                  |
-| CochlearV1       | VerbalFluency\_AgeEquivalent             | FALSE   | :x:                  |
+| CochlearV1       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | CochlearV1       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_Date                                | FALSE   | :x:                  |
 | CochlearV2       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | CochlearV2       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
-| CochlearV2       | PPVT\_Date                               | FALSE   | :x:                  |
+| CochlearV2       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
@@ -97,13 +87,13 @@ This table lists all the fields that were checked and whether any discrepancies 
 | LateTalker       | CTOPPMemory\_Date                        | TRUE    | :white\_check\_mark: |
 | LateTalker       | CTOPPMemory\_Raw                         | TRUE    | :white\_check\_mark: |
 | LateTalker       | CTOPPMemory\_Scaled                      | TRUE    | :white\_check\_mark: |
-| LateTalker       | EVT\_Date                                | FALSE   | :x:                  |
+| LateTalker       | EVT\_Date                                | TRUE    | :white\_check\_mark: |
 | LateTalker       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | LateTalker       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
-| LateTalker       | EVT\_Standard                            | FALSE   | :x:                  |
+| LateTalker       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | LateTalker       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
-| LateTalker       | PPVT\_GSV                                | FALSE   | :x:                  |
+| LateTalker       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
 | LateTalker       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
@@ -111,18 +101,23 @@ This table lists all the fields that were checked and whether any discrepancies 
 | Medu             | CTOPPBlending\_Raw                       | TRUE    | :white\_check\_mark: |
 | Medu             | CTOPPElision\_Raw                        | TRUE    | :white\_check\_mark: |
 | Medu             | CTOPPMemory\_Date                        | FALSE   | :x:                  |
-| Medu             | CTOPPMemory\_Raw                         | FALSE   | :x:                  |
+| Medu             | CTOPPMemory\_Raw                         | TRUE    | :white\_check\_mark: |
 | Medu             | CTOPPMemory\_Scaled                      | TRUE    | :white\_check\_mark: |
+| Medu             | DELV\_Date                               | FALSE   | :x:                  |
+| Medu             | DELV\_LanguageRisk                       | TRUE    | :white\_check\_mark: |
+| Medu             | DELV\_LanguageRisk\_DiagnosticErrorScore | TRUE    | :white\_check\_mark: |
+| Medu             | DELV\_LanguageVar\_ColumnAScore          | TRUE    | :white\_check\_mark: |
+| Medu             | DELV\_LanguageVar\_ColumnBScore          | TRUE    | :white\_check\_mark: |
 | Medu             | EVT\_Date                                | FALSE   | :x:                  |
 | Medu             | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | Medu             | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | Medu             | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
-| Medu             | FruitStroop\_Score                       | FALSE   | :x:                  |
-| Medu             | PPVT\_Date                               | FALSE   | :x:                  |
-| Medu             | PPVT\_GSV                                | FALSE   | :x:                  |
-| Medu             | PPVT\_Raw                                | FALSE   | :x:                  |
-| Medu             | PPVT\_Standard                           | FALSE   | :x:                  |
-| Medu             | VerbalFluency\_AgeEquivalent             | FALSE   | :x:                  |
+| Medu             | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
+| Medu             | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
+| Medu             | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
+| Medu             | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
+| Medu             | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| Medu             | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | Medu             | VerbalFluency\_Score                     | FALSE   | :x:                  |
 | TimePoint1       | EVT\_Date                                | TRUE    | :white\_check\_mark: |
 | TimePoint1       | EVT\_Form                                | TRUE    | :white\_check\_mark: |
@@ -193,24 +188,15 @@ These are all the mismatching values.
     #>   Study ParticipantID         Variable       DIRT ParticipantInfo
     #> 1  Medu          509M CTOPPMemory_Date 2015-07-08      2015-06-29
     #> 
-    #> $CTOPPMemory_Raw
-    #>   Study ParticipantID        Variable DIRT ParticipantInfo
-    #> 1  Medu          553M CTOPPMemory_Raw   13              10
+    #> $DELV_Date
+    #>   Study ParticipantID  Variable       DIRT ParticipantInfo
+    #> 1  Medu          508M DELV_Date 2015-05-27      2015-05-22
     #> 
     #> $EVT_Date
     #>        Study ParticipantID Variable       DIRT ParticipantInfo
     #> 1 CochlearV1          311E EVT_Date 2014-11-09      2013-11-09
     #> 2 CochlearV2          314E EVT_Date 2016-02-28      2016-02-08
-    #> 3 LateTalker          250T EVT_Date 2015-10-10      2015-08-29
-    #> 4       Medu          506M EVT_Date 2015-05-18      2015-05-08
-    #> 
-    #> $EVT_Standard
-    #>        Study ParticipantID     Variable DIRT ParticipantInfo
-    #> 1 LateTalker          250T EVT_Standard  111             115
-    #> 
-    #> $FruitStroop_Score
-    #>   Study ParticipantID          Variable DIRT ParticipantInfo
-    #> 1  Medu          552M FruitStroop_Score 2.55             2.5
+    #> 3       Medu          506M EVT_Date 2015-05-18      2015-05-08
     #> 
     #> $GFTA_Date
     #>         Study ParticipantID  Variable       DIRT ParticipantInfo
@@ -286,36 +272,20 @@ These are all the mismatching values.
     #> 70 TimePoint3          689L GFTA_Date 2016-03-01            <NA>
     #> 
     #> $PPVT_Date
-    #>        Study ParticipantID  Variable       DIRT ParticipantInfo
-    #> 1 CochlearV1          306E PPVT_Date       <NA>      2014-08-09
-    #> 2 CochlearV1          800E PPVT_Date 2014-04-07      2015-04-07
-    #> 3 CochlearV1          806E PPVT_Date 2015-04-03      2015-04-02
-    #> 4 CochlearV2          801E PPVT_Date 2015-05-16      2015-05-02
-    #> 5       Medu          552M PPVT_Date 2015-07-13            <NA>
+    #>        Study ParticipantID  Variable DIRT ParticipantInfo
+    #> 1 CochlearV1          306E PPVT_Date <NA>      2014-08-09
     #> 
     #> $PPVT_GSV
     #>        Study ParticipantID Variable DIRT ParticipantInfo
     #> 1 CochlearV1          306E PPVT_GSV   NA              88
-    #> 2 LateTalker          250T PPVT_GSV  114              14
-    #> 3       Medu          552M PPVT_GSV   74              NA
     #> 
     #> $PPVT_Raw
     #>        Study ParticipantID Variable DIRT ParticipantInfo
     #> 1 CochlearV1          306E PPVT_Raw   NA              32
-    #> 2       Medu          552M PPVT_Raw   19              NA
     #> 
     #> $PPVT_Standard
     #>        Study ParticipantID      Variable DIRT ParticipantInfo
     #> 1 CochlearV1          306E PPVT_Standard   NA              74
-    #> 2       Medu          552M PPVT_Standard   59              NA
-    #> 
-    #> $VerbalFluency_AgeEquivalent
-    #>        Study ParticipantID                    Variable DIRT
-    #> 1 CochlearV1          806E VerbalFluency_AgeEquivalent <2;0
-    #> 2       Medu          553M VerbalFluency_AgeEquivalent 4;10
-    #>   ParticipantInfo
-    #> 1            <NA>
-    #> 2             4;1
     #> 
     #> $VerbalFluency_Score
     #>   Study ParticipantID            Variable DIRT ParticipantInfo
@@ -331,8 +301,6 @@ The following columns in DIRT were not checked because there is not a matching c
 | Medu             | CTOPPElision\_Scaled                     | :grey\_question: |
 | Medu             | CTOPPBlending\_Date                      | :grey\_question: |
 | Medu             | CTOPPBlending\_Scaled                    | :grey\_question: |
-| Medu             | DELV\_LanguageRisk\_DiagnosticErrorScore | :grey\_question: |
-| Medu             | DELV\_LanguageRisk                       | :grey\_question: |
 | Medu             | DELV\_DegreeLanguageVar                  | :grey\_question: |
 | TimePoint1       | VerbalFluency\_Date                      | :grey\_question: |
 | TimePoint1       | FruitStroop\_Date                        | :grey\_question: |
@@ -407,6 +375,3 @@ The following columns in DIRT were not checked because there is not a matching c
 | Medu             | BRIEFP\_Date                             | :grey\_question: |
 | Medu             | PPVT\_Form                               | :grey\_question: |
 | Medu             | GFTA\_Date                               | :grey\_question: |
-| Medu             | DELV\_Date                               | :grey\_question: |
-| Medu             | DELV\_LanguageVar\_ColumnAScore          | :grey\_question: |
-| Medu             | DELV\_LanguageVar\_ColumnBScore          | :grey\_question: |
