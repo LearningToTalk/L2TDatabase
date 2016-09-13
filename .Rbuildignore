@@ -8,6 +8,6 @@
 ^inst/export$
 ^inst/migrations$
 ^inst/paths\.R$
-^ParticipantExplorer$
+^inst/ParticipantExplorer$
 ^inst/temp$
 ^inst/backup$

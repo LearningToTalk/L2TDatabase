@@ -4,7 +4,7 @@
 \alias{make_cnf_file}
 \title{Create a MySQL config file}
 \usage{
-make_cnf_file(dest = "db.cnf", user = "", password = "", host = "",
+make_cnf_file(dest = "./db.cnf", user = "", password = "", host = "",
   port = 3306, db = "")
 }
 \arguments{
