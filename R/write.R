@@ -207,9 +207,11 @@ find_updates_in_daff <- function(ref_data, new_data) {
   this_daff <- daff::diff_data(ref_data, new_data, context = 0)
 
   # Determine the number of columns in the diff csv
-  num_cols <- this_daff$to_csv() %>%
-    read_csv(skip = 0) %>%
-    ncol
+  num_cols <- suppressWarnings({
+    this_daff$to_csv() %>%
+      read_csv(skip = 0) %>%
+      ncol
+  })
 
   # Locate header line. Sometimes it's the second line if there have been
   # columns inserted/removed
