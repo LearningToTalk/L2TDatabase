@@ -4,12 +4,12 @@
 \alias{create_diff_table}
 \title{Summarize the changes between two data-frames}
 \usage{
-create_diff_table(new_rows, ref_rows, primary_key)
+create_diff_table(data, ref_data, primary_key)
 }
 \arguments{
-\item{new_rows}{a data-frame}
+\item{data}{a data-frame}
 
-\item{ref_rows}{a reference version of the data-frame}
+\item{ref_data}{a reference version of the data-frame}
 
 \item{primary_key}{the name of a column which is used to unique identify rows
 in the data}

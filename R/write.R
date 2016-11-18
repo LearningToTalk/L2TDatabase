@@ -34,6 +34,54 @@ append_rows_to_table <- function(src, tbl_name, rows) {
 }
 
 
+#' Compare two tables to find new records
+#' @param data data-frame to check for changes
+#' @param ref_data a reference data-frame
+#' @param required_cols the names of columns that both tables to need to have
+#'   and should only have non-NA values for.
+#' @param extra_cols the names of additional columns which should have the same
+#'   values in each table
+#' @return a data-frame of rows of rows that are in `data` but not in `ref_data`
+#' @export
+find_new_rows_in_table <- function(data, ref_data, required_cols, extra_cols = character(0)) {
+  # Make the two tables have the same columns
+  data_conformed <- match_columns(data, ref_data)
+
+  # Check that the required columns have values
+  find_na_rows <- function(col_name, df) which(is.na(df[[col_name]]))
+  na_rows <- required_cols %>%
+    lapply(find_na_rows, df = data_conformed) %>%
+    unlist
+
+  if (length(na_rows) != 0) {
+    col_list <- deparse(required_cols)
+    row_list <- deparse(sort(unique(na_rows)))
+    stop("Missing values in required columns: ", col_list,
+         "\n  Affected rows: ", row_list, call. = FALSE)
+  }
+
+  # Columns that need to match in both tables
+  by <- c(required_cols, extra_cols)
+
+  # Create a list of formulas from col names. Needed to get arrange_ to sort
+  # with these columns.
+  by_list <- lapply(paste0("~ ", by), as.formula)
+
+  data_conformed %>%
+    anti_join(ref_data, by = by) %>%
+    arrange_(.dots = by_list)
+}
+
+
+
+
+
+
+
+
+
+
+
 #' Update records in a table
 #' @param src a dplyr-managed database connection or a MySQLConnection
 #' @param tbl_name name of the table to update
@@ -155,17 +203,17 @@ convert_diff_to_update_statement <- function(src, tbl_name, primary_key, tbl_dif
 
 
 #' Summarize the changes between two data-frames
-#' @param new_rows a data-frame
-#' @param ref_rows a reference version of the data-frame
+#' @param data a data-frame
+#' @param ref_data a reference version of the data-frame
 #' @param primary_key the name of a column which is used to unique identify rows
 #'   in the data
 #' @return a data-frame with the primary key column(s), and the columns Field,
 #'   OldVersion and NewVersion showing the differences between the two
 #'   data-frames
 #' @export
-create_diff_table <- function(new_rows, ref_rows, primary_key) {
+create_diff_table <- function(data, ref_data, primary_key) {
   # Identify rows that had values change
-  changes <- find_updates_in_daff(ref_rows, new_rows) %>%
+  changes <- find_updates_in_daff(ref_data, data) %>%
     select(one_of(primary_key))
 
   # Return an empty data-frame with the expected columns if nothing changed
@@ -177,9 +225,9 @@ create_diff_table <- function(new_rows, ref_rows, primary_key) {
   }
 
   # Combine the old and new data together
-  ref_rows$TblVersion <- "Reference"
-  new_rows$TblVersion <- "New"
-  combined <- bind_rows(ref_rows, new_rows) %>%
+  ref_data$TblVersion <- "Reference"
+  data$TblVersion <- "New"
+  combined <- bind_rows(ref_data, data) %>%
     semi_join(changes, by = primary_key)
 
   # Exclude the primary key column from the comparison
