@@ -86,3 +86,26 @@ FROM (`eyetracking`.`q_TrialsByStudy` `a`
 ORDER BY `a`.`Basename`,
          `a`.`TrialNo`,
          `b`.`Time` ;
+
+
+-- COUNT(A) returns number of non-NULL values in A.
+-- COUNT(*) returns number of records (rows).
+-- 1 - (COUNT(A) / COUNT(*)) therefore is proportion of NULLs in A.
+ALTER ALGORITHM = UNDEFINED VIEW `q_MissingDataByBlock` AS
+SELECT `a`.`Study` AS `Study`,
+       `a`.`ResearchID` AS `ResearchID`,
+       `a`.`Task` AS `Task`,
+       `a`.`Version` AS `Version`,
+       `a`.`Basename` AS `Basename`,
+       `a`.`DateTime` AS `DateTime`,
+       `a`.`BlockID` AS `BlockID`,
+       0 AS `MissingDataWindow_Start`,
+       2000 AS `MissingDataWindow_End`,
+       (1 - COUNT(`a`.`GazeByImageAOI`) / count(*)) AS `ProportionMissing`
+FROM q_LooksByStudy a
+WHERE `a`.`Time` between 0 and 2000
+GROUP BY `a`.`BlockID`
+ORDER BY `a`.`Study`,
+         `a`.`ResearchID`,
+         `a`.`Task`,
+         `a`.`Basename`
