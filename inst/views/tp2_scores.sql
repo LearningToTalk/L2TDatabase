@@ -11,7 +11,8 @@ CREATE ALGORITHM = UNDEFINED VIEW  `q_Scores_TimePoint2` AS
     f.VerbalFluency_Completion, f.VerbalFluency_Age, f.VerbalFluency_Raw, f.VerbalFluency_AgeEq,
     h.FruitStroop_Completion, h.FruitStroop_Age, h.FruitStroop_Score,
     i.MinPair_Age, i.MinPair_ProportionCorrect,
-    j.SAILS_Age, j.SAILS_NumPracticeTrials, j.SAILS_NumTestTrials, j.SAILS_ProportionTestCorrect
+    j.SAILS_Age, j.SAILS_NumPracticeTrials, j.SAILS_NumTestTrials, j.SAILS_ProportionTestCorrect,
+    k.RealWordRep_Completion, k.RealWordRep_Experiment, k.RealWordRep_Age
   FROM Study a
   LEFT JOIN ChildStudy b
   USING ( StudyID )
@@ -28,6 +29,8 @@ CREATE ALGORITHM = UNDEFINED VIEW  `q_Scores_TimePoint2` AS
   LEFT JOIN q_MinPair_Aggregate i
   USING ( ChildStudyID )
   LEFT JOIN q_SAILS_Aggregate j
+  USING ( ChildStudyID )
+  LEFT JOIN RealWordRep_Admin k
   USING ( ChildStudyID )
   WHERE a.Study = "TimePoint2"
   ORDER BY b.ShortResearchID
