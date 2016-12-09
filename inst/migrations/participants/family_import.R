@@ -27,6 +27,7 @@ cross_study <- "
   076L / 411D
   095L / 096L / 441D
   083L / 446D
+  091L / 420D
   110L / 111L / 422D
   112L / 418D
   114L / 442D
@@ -35,14 +36,15 @@ cross_study <- "
   132L / 424D
   305E / 456D
   443D / 500M
-  553M / 554M
   509M / 510M
-  625L / 683L"
+  553M / 554M
+  625L / 683L
+  046L / 401D
+  067L / 408D
+  413D / 414D
+  416D / 417D
+  202T / 203T"
 
-# Used to have
-#   302E / 452D
-#   091L / 420D
-# the dialect children did not contribute any data...
 
 # Make a vector of sibling sets
 sib_set <- c(long_twins, cross_study) %>%
@@ -81,11 +83,13 @@ tbl_cds <- tbl_child %>%
 
 # Children not in database yet
 not_in_db_yet <- df_siblings %>% anti_join(tbl_cds)
+not_in_db_yet
 
 # Sibsets that contain a child not in the database
 sib_sets_to_set_aside <- not_in_db_yet %>%
   select(SibSet) %>%
   distinct()
+sib_sets_to_set_aside
 
 # Set aside children in database who have a sibling not yet in database
 kids_to_set_aside <- sib_sets_to_set_aside %>%
