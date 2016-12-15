@@ -3,7 +3,7 @@
 -- Replace CREATE with ALTER to update an existing view
 --
 
-create algorithm = undefined view  `q_Scores_TimePoint2` as
+alter algorithm = undefined view  `q_Scores_TimePoint2` as
   select
     childstudy.ChildStudyID,
     study.Study,
@@ -34,15 +34,17 @@ create algorithm = undefined view  `q_Scores_TimePoint2` as
     fruit.FruitStroop_Completion,
     fruit.FruitStroop_Age,
     fruit.FruitStroop_Score,
+    minpair.MinPair_Completion,
     minpair.MinPair_Age,
     minpair.MinPair_ProportionCorrect,
+    sails.SAILS_Completion,
     sails.SAILS_Age,
     sails.SAILS_NumPracticeTrials,
     sails.SAILS_NumTestTrials,
     sails.SAILS_ProportionTestCorrect,
     rwr.RealWordRep_Completion,
-    rwr.RealWordRep_Experiment,
-    rwr.RealWordRep_Age
+    rwr.RealWordRep_Age,
+    rwr.RealWordRep_Experiment
   from
     Study study
     left join ChildStudy childstudy
