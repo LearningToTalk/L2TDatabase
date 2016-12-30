@@ -57,15 +57,7 @@ lt <- get_study_info("LateTalker")
 
 medu <- get_study_info("Medu")
 
-maybe_starts_with <- function(...) {
-  vars <- starts_with(...)
-  if (all(vars < 0)) numeric() else vars
-}
 
-maybe_matches <- function(...) {
-  vars <- matches(...)
-  if (all(vars < 0)) numeric() else vars
-}
 
 # Select necessary columns
 get_scores_from_info <- function(df) {
@@ -84,27 +76,32 @@ get_scores_from_info <- function(df) {
            PPVT_Standard = maybe_starts_with("PPVT_standard"),
            PPVT_GSV = maybe_starts_with("PPVT_GSV"),
            FruitStroop_Score = maybe_starts_with("fruitstroop_time"),
+           VerbalFluency_Date = maybe_starts_with("VerbalFluency_Date"),
            VerbalFluency_Score = maybe_starts_with("verbalfluency_raw"),
            VerbalFluency_AgeEquivalent = maybe_starts_with("verbalfluency_AE"),
-           CTOPPElision_Raw = maybe_starts_with("CTOPP_Elision_raw"),
-           CTOPPElision_Scaled = maybe_starts_with("CTOPP_Elision_scaled"),
-           CTOPPBlending_Raw = maybe_starts_with("CTOPP_Blending_raw"),
-           CTOPPBlending_Scaled = maybe_starts_with("CTOPP_Blending_scaled"),
-           CTOPPMemory_Date = maybe_starts_with("CTOPP_MemoryforDigits_COMPLETION"),
-           CTOPPMemory_Raw = maybe_starts_with("CTOPP_MemoryforDigits_raw"),
-           CTOPPMemory_Scaled = maybe_starts_with("CTOPP_MemoryforDigits_scaled"),
+           CTOPPElision_Date = maybe_starts_with("CTOPPElision_Date"),
+           CTOPPElision_Raw = maybe_matches("CTOPP_Elision_raw|CTOPPElision_Raw"),
+           CTOPPElision_Scaled = maybe_matches("CTOPP_Elision_scaled|CTOPPElision_Scaled"),
+           CTOPPBlending_Date = maybe_starts_with("CTOPPBlending_Date"),
+           CTOPPBlending_Raw = maybe_matches("CTOPP_Blending_raw|CTOPPBlending_Raw"),
+           CTOPPBlending_Scaled = maybe_matches("CTOPP_Blending_scaled|CTOPPBlending_Scaled"),
+           CTOPPMemory_Date = maybe_matches("CTOPP_MemoryforDigits_COMPLETION|CTOPPMemory_Date"),
+           CTOPPMemory_Raw = maybe_matches("CTOPP_MemoryforDigits_raw|CTOPPMemory_Raw"),
+           CTOPPMemory_Scaled = maybe_matches("CTOPP_MemoryforDigits_scaled|CTOPPMemory_Scaled"),
            KBIT_Raw = maybe_starts_with("Kbit_nonverbalraw"),
            KBIT_Standard = maybe_starts_with("Kbit_nonverbalstandard"),
-           GFTA_Date = maybe_starts_with("GFTA_COMPLETION_DATE"),
+           GFTA_Date = maybe_matches("GFTA_COMPLETION_DATE|GFTA_Date"),
            DELV_Date = maybe_starts_with("DELV_Date"),
            DELV_LanguageVar_ColumnAScore = maybe_starts_with("DELV_LanguageVar_ColumnAScore"),
            DELV_LanguageVar_ColumnBScore = maybe_starts_with("DELV_LanguageVar_ColumnBScore"),
-           DELV_LanguageVar = maybe_matches("DELV_LanguageVar$"),
+           DELV_LanguageVar = maybe_matches("(DELV_LanguageVar$)|DELV_DegreeLanguageVar"),
            DELV_LanguageRisk_DiagnosticErrorScore = maybe_starts_with("DELV_LanguageRisk_DiagnosticErrorScore"),
-           DELV_LanguageRisk = maybe_matches("DELV_LanguageRisk$")) %>%
+           DELV_LanguageRisk = maybe_matches("DELV_LanguageRisk$"),
+           BRIEFP_Date = maybe_matches("BRIEFP_Date")) %>%
     # Set dates to strings
     mutate_each(funs(format), maybe_matches("Date"))
 }
+
 
 # Combine scores in the UMN/UW spreadsheets, convert to long format
 normalize_sheets <- . %>% 
@@ -130,7 +127,7 @@ df_dirt <- df_dates %>%
   mutate(Source = "DIRT")
 ```
 
-In Spring 2015, we had our data-entry team re-enter test scores gathered in our 
+In Spring 2016, we had our data-entry team re-enter test scores gathered in our 
 studies, so that we could find data-entry discrepancies. This script
 compares the original to the re-entered scores.
 
