@@ -3,7 +3,7 @@
 -- Replace "create" with "alter" to update an existing view
 --
 
-create algorithm = undefined view  `q_Scores_TimePoint3` as
+alter algorithm = undefined view  `q_Scores_TimePoint3` as
   select
     childstudy.ChildStudyID,
     study.Study,
@@ -31,15 +31,23 @@ create algorithm = undefined view  `q_Scores_TimePoint3` as
     vf.VerbalFluency_Age,
     vf.VerbalFluency_Raw,
     vf.VerbalFluency_AgeEq,
+    gfta.GFTA_Completion,
+    gfta.GFTA_Age,
+    gfta.GFTA_RawCorrect,
+    gfta.GFTA_NumTranscribed,
+    gfta.GFTA_AdjCorrect,
+    gfta.GFTA_Standard,
+    minpair.MinPair_Completion,
     minpair.MinPair_Age,
     minpair.MinPair_ProportionCorrect,
+    sails.SAILS_Completion,
     sails.SAILS_Age,
     sails.SAILS_NumPracticeTrials,
     sails.SAILS_NumTestTrials,
     sails.SAILS_ProportionTestCorrect,
     rwr.RealWordRep_Completion,
-    rwr.RealWordRep_Experiment,
-    rwr.RealWordRep_Age
+    rwr.RealWordRep_Age,
+    rwr.RealWordRep_Experiment
   from
     Study study
     left join ChildStudy childstudy
@@ -53,6 +61,8 @@ create algorithm = undefined view  `q_Scores_TimePoint3` as
     left join PPVT ppvt
       using (ChildStudyID)
     left join VerbalFluency vf
+      using (ChildStudyID)
+    left join GFTA gfta
       using (ChildStudyID)
     left join q_MinPair_Aggregate minpair
       using (ChildStudyID)
