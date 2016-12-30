@@ -1,3 +1,28 @@
+#' Versions of dplyr's select helpers that fail safely
+#'
+#' When dplyr's column-selection functions `starts_with` or `matches` fail to
+#' find a column, no columns are returned. These alternative versions return all
+#' available columns when no match is found. The result is that `select(df, V1,
+#' maybe_starts_with("V2")` still returns V1 even if there is no V2.
+#'
+#' @param ... arguments passed on to the dplyr select helpers
+#' @return the column indices for matching columns if any are found; otherwise,
+#'   an empty numeric vector.
+#' @name select-helpers
+#' @export
+maybe_starts_with <- function(...) {
+  vars <- dplyr::starts_with(...)
+  if (all(vars < 0)) numeric() else vars
+}
+
+#' @rdname select-helpers
+#' @export
+maybe_matches <- function(...) {
+  vars <- dplyr::matches(...)
+  if (all(vars < 0)) numeric() else vars
+}
+
+
 
 #' A stronger element-wise equality operators
 #'
