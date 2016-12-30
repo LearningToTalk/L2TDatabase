@@ -45,19 +45,19 @@ This table lists all the fields that were checked and whether any discrepancies 
 
 | Study            | Variable                                 | Passing |                      |
 |:-----------------|:-----------------------------------------|:--------|----------------------|
-| CochlearMatching | BRIEFP\_Date                             | FALSE   | :x:                  |
+| CochlearMatching | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
 | CochlearMatching | CTOPPMemory\_Date                        | TRUE    | :white\_check\_mark: |
 | CochlearMatching | CTOPPMemory\_Raw                         | TRUE    | :white\_check\_mark: |
 | CochlearMatching | CTOPPMemory\_Scaled                      | TRUE    | :white\_check\_mark: |
 | CochlearMatching | EVT\_Date                                | TRUE    | :white\_check\_mark: |
-| CochlearMatching | EVT\_Form                                | FALSE   | :x:                  |
+| CochlearMatching | EVT\_Form                                | TRUE    | :white\_check\_mark: |
 | CochlearMatching | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | CochlearMatching | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | CochlearMatching | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | CochlearMatching | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | CochlearMatching | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
-| CochlearMatching | PPVT\_Form                               | FALSE   | :x:                  |
+| CochlearMatching | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
@@ -68,7 +68,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearV1       | CTOPPMemory\_Date                        | TRUE    | :white\_check\_mark: |
 | CochlearV1       | CTOPPMemory\_Raw                         | TRUE    | :white\_check\_mark: |
 | CochlearV1       | CTOPPMemory\_Scaled                      | TRUE    | :white\_check\_mark: |
-| CochlearV1       | EVT\_Date                                | FALSE   | :x:                  |
+| CochlearV1       | EVT\_Date                                | TRUE    | :white\_check\_mark: |
 | CochlearV1       | EVT\_Form                                | TRUE    | :white\_check\_mark: |
 | CochlearV1       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | CochlearV1       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
@@ -83,11 +83,11 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearV1       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | CochlearV1       | VerbalFluency\_Date                      | FALSE   | :x:                  |
 | CochlearV1       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
-| CochlearV2       | BRIEFP\_Date                             | FALSE   | :x:                  |
+| CochlearV2       | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
 | CochlearV2       | CTOPPMemory\_Date                        | TRUE    | :white\_check\_mark: |
 | CochlearV2       | CTOPPMemory\_Raw                         | TRUE    | :white\_check\_mark: |
 | CochlearV2       | CTOPPMemory\_Scaled                      | TRUE    | :white\_check\_mark: |
-| CochlearV2       | EVT\_Date                                | FALSE   | :x:                  |
+| CochlearV2       | EVT\_Date                                | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_Form                                | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
@@ -102,7 +102,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearV2       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | CochlearV2       | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
 | CochlearV2       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
-| LateTalker       | BRIEFP\_Date                             | FALSE   | :x:                  |
+| LateTalker       | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
 | LateTalker       | CTOPPBlending\_Date                      | TRUE    | :white\_check\_mark: |
 | LateTalker       | CTOPPBlending\_Raw                       | TRUE    | :white\_check\_mark: |
 | LateTalker       | CTOPPBlending\_Scaled                    | TRUE    | :white\_check\_mark: |
@@ -239,91 +239,75 @@ This table lists all the fields that were checked and whether any discrepancies 
 These are all the mismatching values.
 
     #> $BRIEFP_Date
-    #>               Study ParticipantID    Variable       DIRT ParticipantInfo
-    #> 1  CochlearMatching          392A BRIEFP_Date 2016-03-18      2016-03-16
-    #> 2        CochlearV1          300E BRIEFP_Date 2014-02-22            <NA>
-    #> 3        CochlearV1          301E BRIEFP_Date 2014-03-29            <NA>
-    #> 4        CochlearV1          310E BRIEFP_Date 2014-03-10      2016-03-17
-    #> 5        CochlearV1          800E BRIEFP_Date 2014-03-24      2014-04-07
-    #> 6        CochlearV1          801E BRIEFP_Date 2014-04-26      2014-04-28
-    #> 7        CochlearV1          808E BRIEFP_Date 2015-07-10      2015-07-09
-    #> 8        CochlearV2          314E BRIEFP_Date 2016-02-19      2016-02-08
-    #> 9        LateTalker          204T BRIEFP_Date 2015-04-10      2015-04-24
-    #> 10             Medu          500M BRIEFP_Date 2015-03-16            <NA>
-    #> 11             Medu          554M BRIEFP_Date 2015-08-03      2015-10-14
-    #> 12       TimePoint1          005L BRIEFP_Date 2012-07-12      2012-12-07
-    #> 13       TimePoint1          007L BRIEFP_Date 2012-10-28      2012-11-12
-    #> 14       TimePoint1          008L BRIEFP_Date 2012-10-30      2012-11-01
-    #> 15       TimePoint1          011L BRIEFP_Date 2013-01-10      2013-01-11
-    #> 16       TimePoint1          013L BRIEFP_Date 2013-05-08      2013-05-18
-    #> 17       TimePoint1          019L BRIEFP_Date 2013-01-10      2013-02-16
-    #> 18       TimePoint1          039L BRIEFP_Date 2013-06-21      2013-06-28
-    #> 19       TimePoint1          044L BRIEFP_Date 2014-01-22      2014-02-04
-    #> 20       TimePoint1          051L BRIEFP_Date 2013-12-06      2013-12-12
-    #> 21       TimePoint1          055L BRIEFP_Date 2013-10-30      2013-11-07
-    #> 22       TimePoint1          063L BRIEFP_Date 2013-08-02      2013-07-24
-    #> 23       TimePoint1          073L BRIEFP_Date 2013-09-13      2013-09-06
-    #> 24       TimePoint1          091L BRIEFP_Date       <NA>      2013-10-19
-    #> 25       TimePoint1          101L BRIEFP_Date 2013-10-11      2013-10-03
-    #> 26       TimePoint1          110L BRIEFP_Date 2014-01-17      2014-01-07
-    #> 27       TimePoint1          115L BRIEFP_Date 2013-12-03      2015-12-03
-    #> 28       TimePoint1          125L BRIEFP_Date 2013-12-10      2013-12-18
-    #> 29       TimePoint1          128L BRIEFP_Date 2014-01-31      2014-02-07
-    #> 30       TimePoint1          619L BRIEFP_Date 2013-05-24      2013-05-12
-    #> 31       TimePoint1          627L BRIEFP_Date 2013-03-01      2013-04-12
-    #> 32       TimePoint1          635L BRIEFP_Date 2013-06-20      2013-06-17
-    #> 33       TimePoint1          642L BRIEFP_Date 2013-08-26      2013-08-20
-    #> 34       TimePoint1          650L BRIEFP_Date 2013-08-03      2013-08-10
-    #> 35       TimePoint1          655L BRIEFP_Date 2013-12-17      2013-12-18
-    #> 36       TimePoint1          656L BRIEFP_Date 2013-08-27      2013-09-02
-    #> 37       TimePoint1          659L BRIEFP_Date 2013-09-18      2013-09-13
-    #> 38       TimePoint1          670L BRIEFP_Date 2013-10-31      2013-11-01
-    #> 39       TimePoint1          671L BRIEFP_Date 2014-01-04      2014-01-18
-    #> 40       TimePoint1          678L BRIEFP_Date 2014-01-29      2014-03-01
-    #> 41       TimePoint1          679L BRIEFP_Date 2014-02-10      2015-02-13
-    #> 42       TimePoint1          681L BRIEFP_Date 3014-03-24      2014-03-24
-    #> 43       TimePoint1          685L BRIEFP_Date 2014-02-07      2015-02-14
-    #> 44       TimePoint1          686L BRIEFP_Date 2014-03-07      2013-03-07
-    #> 45       TimePoint1          688L BRIEFP_Date 2014-03-08      2014-03-14
+    #>         Study ParticipantID    Variable       DIRT ParticipantInfo
+    #> 1  CochlearV1          800E BRIEFP_Date 2014-03-24      2014-04-07
+    #> 2  CochlearV1          801E BRIEFP_Date 2014-04-26      2014-04-28
+    #> 3  CochlearV1          808E BRIEFP_Date 2015-07-10      2015-07-09
+    #> 4        Medu          500M BRIEFP_Date 2015-03-16            <NA>
+    #> 5        Medu          554M BRIEFP_Date 2015-08-03      2015-10-14
+    #> 6  TimePoint1          005L BRIEFP_Date 2012-07-12      2012-12-07
+    #> 7  TimePoint1          007L BRIEFP_Date 2012-10-28      2012-11-12
+    #> 8  TimePoint1          008L BRIEFP_Date 2012-10-30      2012-11-01
+    #> 9  TimePoint1          011L BRIEFP_Date 2013-01-10      2013-01-11
+    #> 10 TimePoint1          013L BRIEFP_Date 2013-05-08      2013-05-18
+    #> 11 TimePoint1          019L BRIEFP_Date 2013-01-10      2013-02-16
+    #> 12 TimePoint1          039L BRIEFP_Date 2013-06-21      2013-06-28
+    #> 13 TimePoint1          044L BRIEFP_Date 2014-01-22      2014-02-04
+    #> 14 TimePoint1          051L BRIEFP_Date 2013-12-06      2013-12-12
+    #> 15 TimePoint1          055L BRIEFP_Date 2013-10-30      2013-11-07
+    #> 16 TimePoint1          063L BRIEFP_Date 2013-08-02      2013-07-24
+    #> 17 TimePoint1          073L BRIEFP_Date 2013-09-13      2013-09-06
+    #> 18 TimePoint1          091L BRIEFP_Date       <NA>      2013-10-19
+    #> 19 TimePoint1          101L BRIEFP_Date 2013-10-11      2013-10-03
+    #> 20 TimePoint1          110L BRIEFP_Date 2014-01-17      2014-01-07
+    #> 21 TimePoint1          115L BRIEFP_Date 2013-12-03      2015-12-03
+    #> 22 TimePoint1          125L BRIEFP_Date 2013-12-10      2013-12-18
+    #> 23 TimePoint1          128L BRIEFP_Date 2014-01-31      2014-02-07
+    #> 24 TimePoint1          619L BRIEFP_Date 2013-05-24      2013-05-12
+    #> 25 TimePoint1          627L BRIEFP_Date 2013-03-01      2013-04-12
+    #> 26 TimePoint1          635L BRIEFP_Date 2013-06-20      2013-06-17
+    #> 27 TimePoint1          642L BRIEFP_Date 2013-08-26      2013-08-20
+    #> 28 TimePoint1          650L BRIEFP_Date 2013-08-03      2013-08-10
+    #> 29 TimePoint1          655L BRIEFP_Date 2013-12-17      2013-12-18
+    #> 30 TimePoint1          656L BRIEFP_Date 2013-08-27      2013-09-02
+    #> 31 TimePoint1          659L BRIEFP_Date 2013-09-18      2013-09-13
+    #> 32 TimePoint1          670L BRIEFP_Date 2013-10-31      2013-11-01
+    #> 33 TimePoint1          671L BRIEFP_Date 2014-01-04      2014-01-18
+    #> 34 TimePoint1          678L BRIEFP_Date 2014-01-29      2014-03-01
+    #> 35 TimePoint1          679L BRIEFP_Date 2014-02-10      2015-02-13
+    #> 36 TimePoint1          681L BRIEFP_Date 3014-03-24      2014-03-24
+    #> 37 TimePoint1          685L BRIEFP_Date 2014-02-07      2015-02-14
+    #> 38 TimePoint1          686L BRIEFP_Date 2014-03-07      2013-03-07
+    #> 39 TimePoint1          688L BRIEFP_Date 2014-03-08      2014-03-14
     #> 
     #> $CTOPPBlending_Date
     #>         Study ParticipantID           Variable       DIRT ParticipantInfo
     #> 1  TimePoint2          078L CTOPPBlending_Date 2015-02-13      2015-02-14
     #> 2  TimePoint2          109L CTOPPBlending_Date 2011-11-18      2014-11-18
-    #> 3  TimePoint2          607L CTOPPBlending_Date 2013-12-11       2016-12-9
+    #> 3  TimePoint2          607L CTOPPBlending_Date 2013-12-11           41617
     #> 4  TimePoint3          044L CTOPPBlending_Date 2015-01-15      2016-01-15
     #> 5  TimePoint3          088L CTOPPBlending_Date 2015-09-15      2015-09-25
     #> 6  TimePoint3          089L CTOPPBlending_Date       <NA>      2015-10-03
     #> 7  TimePoint3          623L CTOPPBlending_Date 2015-02-27      2015-02-13
     #> 8  TimePoint3          640L CTOPPBlending_Date 2015-05-30      2015-05-03
-    #> 9  TimePoint3          669L CTOPPBlending_Date 2015-10-02      2016-10-02
-    #> 10 TimePoint3          670L CTOPPBlending_Date 2015-09-25      2016-09-25
-    #> 11 TimePoint3          673L CTOPPBlending_Date 2015-11-21      2015-11-02
-    #> 12 TimePoint3          674L CTOPPBlending_Date 2015-11-20      2016-11-20
-    #> 13 TimePoint3          677L CTOPPBlending_Date 2015-12-11      2016-12-11
-    #> 14 TimePoint3          678L CTOPPBlending_Date 2015-01-15      2016-01-15
-    #> 15 TimePoint3          680L CTOPPBlending_Date 2015-12-10      2016-12-10
-    #> 16 TimePoint3          685L CTOPPBlending_Date 2016-02-13      2016-02-11
-    #> 17 TimePoint3          686L CTOPPBlending_Date 2016-02-13      2016-02-11
+    #> 9  TimePoint3          673L CTOPPBlending_Date 2015-11-21      2015-11-02
+    #> 10 TimePoint3          678L CTOPPBlending_Date 2015-01-15      2016-01-15
+    #> 11 TimePoint3          685L CTOPPBlending_Date 2016-02-13      2016-02-11
+    #> 12 TimePoint3          686L CTOPPBlending_Date 2016-02-13      2016-02-11
     #> 
     #> $CTOPPElision_Date
     #>         Study ParticipantID          Variable       DIRT ParticipantInfo
     #> 1        Medu          509M CTOPPElision_Date 2015-06-29      2015-07-08
     #> 2  TimePoint2          078L CTOPPElision_Date 2015-02-13      2015-02-14
     #> 3  TimePoint2          109L CTOPPElision_Date 2011-11-18      2014-11-18
-    #> 4  TimePoint2          607L CTOPPElision_Date 2013-12-11       2016-12-9
+    #> 4  TimePoint2          607L CTOPPElision_Date 2013-12-11           41617
     #> 5  TimePoint3          021L CTOPPElision_Date 2015-03-15      2015-03-14
     #> 6  TimePoint3          089L CTOPPElision_Date       <NA>      2015-10-03
     #> 7  TimePoint3          623L CTOPPElision_Date 2015-02-27      2015-02-13
     #> 8  TimePoint3          640L CTOPPElision_Date 2015-05-30      2015-05-03
-    #> 9  TimePoint3          669L CTOPPElision_Date 2015-10-02      2016-10-02
-    #> 10 TimePoint3          670L CTOPPElision_Date 2015-09-25      2016-09-25
-    #> 11 TimePoint3          673L CTOPPElision_Date 2015-11-21      2015-11-02
-    #> 12 TimePoint3          674L CTOPPElision_Date 2015-11-20      2016-11-20
-    #> 13 TimePoint3          677L CTOPPElision_Date 2015-12-11      2016-12-11
-    #> 14 TimePoint3          680L CTOPPElision_Date 2015-12-10      2016-12-10
-    #> 15 TimePoint3          685L CTOPPElision_Date 2016-02-13      2016-02-11
-    #> 16 TimePoint3          686L CTOPPElision_Date 2016-02-13      2016-02-11
+    #> 9  TimePoint3          673L CTOPPElision_Date 2015-11-21      2015-11-02
+    #> 10 TimePoint3          685L CTOPPElision_Date 2016-02-13      2016-02-11
+    #> 11 TimePoint3          686L CTOPPElision_Date 2016-02-13      2016-02-11
     #> 
     #> $DELV_Date
     #>   Study ParticipantID  Variable DIRT ParticipantInfo
@@ -346,16 +330,10 @@ These are all the mismatching values.
     #> 12 TimePoint3          046L DELV_LanguageVar   NA               2
     #> 13 TimePoint3          066L DELV_LanguageVar   NA               2
     #> 
-    #> $EVT_Date
-    #>        Study ParticipantID Variable       DIRT ParticipantInfo
-    #> 1 CochlearV1          310E EVT_Date       <NA>      2016-03-17
-    #> 2 CochlearV2          314E EVT_Date 2016-02-28      2016-02-08
-    #> 
     #> $EVT_Form
-    #>              Study ParticipantID Variable DIRT ParticipantInfo
-    #> 1 CochlearMatching          392A EVT_Form    A            <NA>
-    #> 2             Medu          550M EVT_Form    A            <NA>
-    #> 3             Medu          552M EVT_Form    A            <NA>
+    #>   Study ParticipantID Variable DIRT ParticipantInfo
+    #> 1  Medu          550M EVT_Form    A            <NA>
+    #> 2  Medu          552M EVT_Form    A            <NA>
     #> 
     #> $GFTA_Date
     #>        Study ParticipantID  Variable       DIRT ParticipantInfo
@@ -367,10 +345,6 @@ These are all the mismatching values.
     #> 6 TimePoint1          075L GFTA_Date 2013-08-28      2013-09-14
     #> 7 TimePoint1          085L GFTA_Date 2013-10-02            <NA>
     #> 8 TimePoint1          110L GFTA_Date 2014-01-24      2014-02-14
-    #> 
-    #> $PPVT_Form
-    #>              Study ParticipantID  Variable DIRT ParticipantInfo
-    #> 1 CochlearMatching          391A PPVT_Form    A            <NA>
     #> 
     #> $VerbalFluency_Date
     #>         Study ParticipantID           Variable       DIRT ParticipantInfo
@@ -433,22 +407,22 @@ These are all the mismatching values.
     #> 57 TimePoint2          076L VerbalFluency_Date 2014-01-26      2015-01-26
     #> 58 TimePoint2          078L VerbalFluency_Date 2015-02-13      2015-02-14
     #> 59 TimePoint2          106L VerbalFluency_Date 2014-12-01      2014-12-02
-    #> 60 TimePoint2          600L VerbalFluency_Date 2013-11-20      2006-05-26
-    #> 61 TimePoint2          602L VerbalFluency_Date 2013-11-26      2006-06-01
-    #> 62 TimePoint2          603L VerbalFluency_Date 2013-12-13      2006-06-18
-    #> 63 TimePoint2          604L VerbalFluency_Date 2014-01-15      2006-07-21
-    #> 64 TimePoint2          605L VerbalFluency_Date 2013-12-02      2006-06-07
-    #> 65 TimePoint2          607L VerbalFluency_Date 2013-12-16      2006-06-21
-    #> 66 TimePoint2          609L VerbalFluency_Date 2013-12-10      2006-06-15
-    #> 67 TimePoint2          610L VerbalFluency_Date 2013-12-06      2006-06-11
-    #> 68 TimePoint2          612L VerbalFluency_Date 2014-01-13      2006-07-19
-    #> 69 TimePoint2          613L VerbalFluency_Date 2014-01-13      2006-07-19
-    #> 70 TimePoint2          615L VerbalFluency_Date 2014-01-30      2006-08-05
-    #> 71 TimePoint2          616L VerbalFluency_Date 2014-02-04      2006-08-10
-    #> 72 TimePoint2          619L VerbalFluency_Date 2014-02-01      2006-08-07
-    #> 73 TimePoint2          620L VerbalFluency_Date 2014-01-22      2006-07-28
-    #> 74 TimePoint2          622L VerbalFluency_Date 2014-02-08      2006-08-14
-    #> 75 TimePoint2          624L VerbalFluency_Date 2014-02-07      2006-08-13
+    #> 60 TimePoint2          600L VerbalFluency_Date 2013-11-20            <NA>
+    #> 61 TimePoint2          602L VerbalFluency_Date 2013-11-26            <NA>
+    #> 62 TimePoint2          603L VerbalFluency_Date 2013-12-13            <NA>
+    #> 63 TimePoint2          604L VerbalFluency_Date 2014-01-15            <NA>
+    #> 64 TimePoint2          605L VerbalFluency_Date 2013-12-02            <NA>
+    #> 65 TimePoint2          607L VerbalFluency_Date 2013-12-16            <NA>
+    #> 66 TimePoint2          609L VerbalFluency_Date 2013-12-10            <NA>
+    #> 67 TimePoint2          610L VerbalFluency_Date 2013-12-06            <NA>
+    #> 68 TimePoint2          612L VerbalFluency_Date 2014-01-13            <NA>
+    #> 69 TimePoint2          613L VerbalFluency_Date 2014-01-13            <NA>
+    #> 70 TimePoint2          615L VerbalFluency_Date 2014-01-30            <NA>
+    #> 71 TimePoint2          616L VerbalFluency_Date 2014-02-04            <NA>
+    #> 72 TimePoint2          619L VerbalFluency_Date 2014-02-01            <NA>
+    #> 73 TimePoint2          620L VerbalFluency_Date 2014-01-22            <NA>
+    #> 74 TimePoint2          622L VerbalFluency_Date 2014-02-08            <NA>
+    #> 75 TimePoint2          624L VerbalFluency_Date 2014-02-07            <NA>
     #> 76 TimePoint2          638L VerbalFluency_Date 2014-06-20      2015-07-21
     #> 77 TimePoint2          665L VerbalFluency_Date 2014-10-10      2015-08-18
     #> 78 TimePoint2          666L VerbalFluency_Date 2014-10-10      2015-08-18
