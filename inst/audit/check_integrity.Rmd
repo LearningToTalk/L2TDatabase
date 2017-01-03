@@ -38,7 +38,7 @@ columns_in_dirt <- df_dates %>%
   distinct
 
 # Columns used the 2 sites x 3 timepoints spreadsheets
-unique(df_dates$Variable)
+df_dates$Variable %>% unique() %>% sort()
 
 # Get T1 scores for both sites. Function sourced via paths$GetSiteInfo
 t1 <- get_study_info("TimePoint1")
@@ -56,8 +56,6 @@ ci_age <- get_study_info("CochlearMatching")
 lt <- get_study_info("LateTalker")
 
 medu <- get_study_info("Medu")
-
-
 
 # Select necessary columns
 get_scores_from_info <- function(df) {
@@ -94,7 +92,7 @@ get_scores_from_info <- function(df) {
            DELV_Date = maybe_starts_with("DELV_Date"),
            DELV_LanguageVar_ColumnAScore = maybe_starts_with("DELV_LanguageVar_ColumnAScore"),
            DELV_LanguageVar_ColumnBScore = maybe_starts_with("DELV_LanguageVar_ColumnBScore"),
-           DELV_LanguageVar = maybe_matches("(DELV_LanguageVar$)|DELV_DegreeLanguageVar"),
+           DELV_DegreeLanguageVar = maybe_matches("DELV_DegreeLanguageVar"),
            DELV_LanguageRisk_DiagnosticErrorScore = maybe_starts_with("DELV_LanguageRisk_DiagnosticErrorScore"),
            DELV_LanguageRisk = maybe_matches("DELV_LanguageRisk$"),
            BRIEFP_Date = maybe_matches("BRIEFP_Date")) %>%
@@ -207,7 +205,7 @@ This table lists all the fields that were checked and whether any discrepancies
 were found in that field.
 
 ```{r}
-columns_with_discrepancies <- discrepancies %>% names
+columns_with_discrepancies <- discrepancies %>% names()
 
 columns_with_errors <- discrepancies %>% 
   lapply(. %>% select(Study, Variable)) %>% 
@@ -215,6 +213,13 @@ columns_with_errors <- discrepancies %>%
   distinct %>% 
   arrange(Study, Variable) %>% 
   mutate(Passing = FALSE)
+
+# Make a mock-error table if there are no errors
+if (nrow(columns_with_errors) == 0) {
+  columns_with_errors <- data_frame(
+    Study = NA_character_, Variable = NA_character_, Passing = FALSE
+  )
+}
 
 columns_in_info_sheets %>% 
   select(Study, Variable) %>% 
