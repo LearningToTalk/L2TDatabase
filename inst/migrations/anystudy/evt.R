@@ -1,5 +1,4 @@
-# Add evt scores to the database
-# Supports T1, T2, T3
+# Add EVT scores to the database
 
 library("L2TDatabase")
 library("dplyr")
@@ -17,11 +16,11 @@ l2t_dl <- l2t_backup(l2t, "inst/backup")
 t1 <- get_study_info("TimePoint1")
 t2 <- get_study_info("TimePoint2")
 t3 <- get_study_info("TimePoint3")
-
-maybe_starts_with <- function(...) {
-  vars <- starts_with(...)
-  if (all(vars < 0)) numeric() else vars
-}
+ci1 <- get_study_info("CochlearV1")
+ci2 <- get_study_info("CochlearV2")
+cim <- get_study_info("CochlearMatching")
+lt <- get_study_info("LateTalker")
+medu <- get_study_info("Medu")
 
 process_scores <- . %>%
   select(Study,
@@ -33,9 +32,10 @@ process_scores <- . %>%
          EVT_GSV) %>%
   mutate(EVT_Completion = format(EVT_Completion))
 
-scores <- c(t1, t2, t3) %>%
+scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
   lapply(process_scores) %>%
-  bind_rows
+  bind_rows() %>%
+  mutate(Study = ifelse(Study == "Medu", "MaternalEd", Study))
 
 # Combine child-study-childstudy tbls
 cds <- l2t_dl$ChildStudy %>%
@@ -47,22 +47,27 @@ cds
 with_evt <- left_join(scores, cds)
 
 # Kids in spreadsheets not in database. Should be empty rows (attrition)
-scores %>% anti_join(cds) %>% as.data.frame
+scores %>%
+  anti_join(cds) %>%
+  as.data.frame() %>%
+  arrange(Study, ShortResearchID)
 
 # Calculate chronological ages, default to NA if error encountered
 chr_age <- failwith(NA, chrono_age)
+
+# with_evt %>% filter(is.na(Birthdate))
 
 with_evt <-  with_evt %>%
   filter(!is.na(EVT_Completion)) %>%
   mutate(EVT_Age = unlist(Map(chr_age, EVT_Completion, Birthdate)))
 
 # Find completely new records that need to be added
-latest_data <- match_columns(with_evt, l2t_dl$EVT) %>%
-  arrange(ChildStudyID)
+to_add <- find_new_rows_in_table(
+  data = with_evt,
+  ref_data = l2t_dl$EVT,
+  required_cols = "ChildStudyID")
 
-to_add <- latest_data %>%
-  anti_join(l2t_dl$EVT, by = c("ChildStudyID"))
-to_add
+to_add %>% print(n = Inf)
 
 # Update the remote table. An error here is a good thing if there are no new
 # rows to add
@@ -78,6 +83,9 @@ remote_data <- collect("EVT" %from% l2t)
 # Attach the database keys to latest data
 current_indices <- remote_data %>%
   select(ChildStudyID, EVTID)
+
+latest_data <- match_columns(with_evt, l2t_dl$EVT) %>%
+  arrange(ChildStudyID)
 
 latest_data <- latest_data %>%
   inner_join(current_indices)
