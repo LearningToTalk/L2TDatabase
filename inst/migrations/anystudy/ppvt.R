@@ -1,5 +1,4 @@
 # Add PPVT scores to the database
-# Supports T1, T2, T3
 
 library("L2TDatabase")
 library("dplyr")
@@ -13,15 +12,16 @@ cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 l2t <- l2t_connect(cnf_file)
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
-# Get T1/T2/T3 scores for both sites. Function sourced via paths$GetSiteInfo
+# Get info for both sites. Function sourced via paths$GetSiteInfo
 t1 <- get_study_info("TimePoint1")
 t2 <- get_study_info("TimePoint2")
 t3 <- get_study_info("TimePoint3")
-
-maybe_starts_with <- function(...) {
-  vars <- starts_with(...)
-  if (all(vars < 0)) numeric() else vars
-}
+ci1 <- get_study_info("CochlearV1")
+ci2 <- get_study_info("CochlearV2")
+cim <- get_study_info("CochlearMatching")
+lt <- get_study_info("LateTalker")
+medu <- get_study_info("Medu") %>%
+  lapply(. %>% mutate(Study = "MaternalEd"))
 
 process_scores <- . %>%
   select(Study,
@@ -33,9 +33,9 @@ process_scores <- . %>%
          PPVT_GSV) %>%
   mutate(PPVT_Completion = format(PPVT_Completion))
 
-scores <- c(t1, t2, t3) %>%
+scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
   lapply(process_scores) %>%
-  bind_rows
+  bind_rows()
 
 # Combine child-study-childstudy tbls
 cds <- l2t_dl$ChildStudy %>%
@@ -57,12 +57,17 @@ with_ppvt <-  with_ppvt %>%
   mutate(PPVT_Age = unlist(Map(chr_age, PPVT_Completion, Birthdate)))
 
 # Find completely new records that need to be added
-latest_data <- match_columns(with_ppvt, l2t_dl$PPVT) %>%
-  arrange(ChildStudyID)
+to_add <- find_new_rows_in_table(
+  data = with_ppvt,
+  ref_data = l2t_dl$PPVT,
+  required_cols = "ChildStudyID")
 
-to_add <- latest_data %>%
-  anti_join(l2t_dl$PPVT, by = c("ChildStudyID"))
-to_add
+to_add %>% print(n = Inf)
+
+with_ppvt %>%
+  inner_join(to_add) %>%
+  select(Study:PPVT_Completion) %>%
+  print(n = Inf)
 
 # Update the remote table. An error here is a good thing if there are no new
 # rows to add
@@ -79,8 +84,9 @@ remote_data <- collect("PPVT" %from% l2t)
 current_indices <- remote_data %>%
   select(ChildStudyID, PPVTID)
 
-latest_data <- latest_data %>%
-  inner_join(current_indices)
+latest_data <- match_columns(with_ppvt, l2t_dl$PPVT) %>%
+  inner_join(current_indices) %>%
+  arrange(ChildStudyID)
 
 # Keep just the columns in the latest data
 remote_data <- match_columns(remote_data, latest_data) %>%
@@ -93,8 +99,8 @@ stamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
 render_diff(daff)
 
 # save them
-render_diff(daff, file = sprintf("inst/diffs/%s_ppvt_diffs.html", stamp))
-daff::write_diff(daff, file = sprintf("inst/diffs/%s_ppvt_.csv", stamp))
+# render_diff(daff, file = sprintf("inst/diffs/%s_ppvt_diffs.html", stamp))
+# daff::write_diff(daff, file = sprintf("inst/diffs/%s_ppvt_.csv", stamp))
 
 # Or see them itemized in a long data-frame
 create_diff_table(latest_data, remote_data, "PPVTID")

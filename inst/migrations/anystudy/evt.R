@@ -12,7 +12,7 @@ cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 l2t <- l2t_connect(cnf_file)
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
-# Get T1/T2/T3 scores for both sites. Function sourced via paths$GetSiteInfo
+# Get info for both sites. Function sourced via paths$GetSiteInfo
 t1 <- get_study_info("TimePoint1")
 t2 <- get_study_info("TimePoint2")
 t3 <- get_study_info("TimePoint3")
@@ -20,7 +20,8 @@ ci1 <- get_study_info("CochlearV1")
 ci2 <- get_study_info("CochlearV2")
 cim <- get_study_info("CochlearMatching")
 lt <- get_study_info("LateTalker")
-medu <- get_study_info("Medu")
+medu <- get_study_info("Medu") %>%
+  lapply(. %>% mutate(Study = "MaternalEd"))
 
 process_scores <- . %>%
   select(Study,
@@ -34,8 +35,7 @@ process_scores <- . %>%
 
 scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
   lapply(process_scores) %>%
-  bind_rows() %>%
-  mutate(Study = ifelse(Study == "Medu", "MaternalEd", Study))
+  bind_rows()
 
 # Combine child-study-childstudy tbls
 cds <- l2t_dl$ChildStudy %>%
