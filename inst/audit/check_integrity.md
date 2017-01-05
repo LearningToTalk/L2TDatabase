@@ -1,7 +1,7 @@
 Data Integrity Check
 ================
 Tristan Mahr
-2017-01-03
+2017-01-05
 
 In Spring 2016, we had our data-entry team re-enter test scores gathered in our studies, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
@@ -54,6 +54,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearMatching | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | CochlearMatching | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | CochlearMatching | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
+| CochlearMatching | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
 | CochlearMatching | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | CochlearMatching | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
@@ -73,6 +74,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearV1       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | CochlearV1       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | CochlearV1       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
+| CochlearV1       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
 | CochlearV1       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | CochlearV1       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearV1       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
@@ -92,6 +94,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearV2       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
+| CochlearV2       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
 | CochlearV2       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | CochlearV2       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
@@ -123,6 +126,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | LateTalker       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | LateTalker       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | LateTalker       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
+| LateTalker       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
 | LateTalker       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | LateTalker       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
@@ -154,6 +158,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | Medu             | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | Medu             | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | Medu             | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
+| Medu             | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
 | Medu             | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | Medu             | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | Medu             | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
@@ -170,6 +175,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | TimePoint1       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | TimePoint1       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | TimePoint1       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
+| TimePoint1       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
 | TimePoint1       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | TimePoint1       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | TimePoint1       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
@@ -191,6 +197,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | TimePoint2       | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | TimePoint2       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | TimePoint2       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
+| TimePoint2       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
 | TimePoint2       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | TimePoint2       | KBIT\_Raw                                | TRUE    | :white\_check\_mark: |
 | TimePoint2       | KBIT\_Standard                           | TRUE    | :white\_check\_mark: |
@@ -246,25 +253,18 @@ The following columns in DIRT were not checked because there is not a matching c
 
 | Study            | Variable             |                  |
 |:-----------------|:---------------------|------------------|
-| TimePoint1       | FruitStroop\_Date    | :grey\_question: |
 | TimePoint1       | MBCDI\_Date          | :grey\_question: |
 | TimePoint1       | CDI\_Extension\_Date | :grey\_question: |
-| TimePoint2       | FruitStroop\_Date    | :grey\_question: |
 | TimePoint2       | KBIT\_Date           | :grey\_question: |
 | TimePoint3       | KBIT\_Date           | :grey\_question: |
 | LateTalker       | MBCDI\_Date          | :grey\_question: |
 | LateTalker       | CDI\_Extension\_Date | :grey\_question: |
-| LateTalker       | FruitStroop\_Date    | :grey\_question: |
 | CochlearV1       | CDI\_Extension\_Date | :grey\_question: |
 | CochlearV1       | MBCDI\_Date          | :grey\_question: |
-| CochlearV1       | FruitStroop\_Date    | :grey\_question: |
 | CochlearV1       | CDI W&G              | :grey\_question: |
 | CochlearV2       | MBCDI\_Date          | :grey\_question: |
 | CochlearV2       | CDI\_Extension\_Date | :grey\_question: |
-| CochlearV2       | FruitStroop\_Date    | :grey\_question: |
 | CochlearMatching | CDI\_Extension\_Date | :grey\_question: |
 | CochlearMatching | MBCDI\_Date          | :grey\_question: |
-| CochlearMatching | FruitStroop\_Date    | :grey\_question: |
-| Medu             | FruitStroop\_Date    | :grey\_question: |
 | Medu             | MBCDI\_Date          | :grey\_question: |
 | Medu             | CDI\_Extension\_Date | :grey\_question: |

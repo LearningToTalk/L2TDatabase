@@ -73,6 +73,7 @@ get_scores_from_info <- function(df) {
            PPVT_Raw = maybe_starts_with("PPVT_raw"),
            PPVT_Standard = maybe_starts_with("PPVT_standard"),
            PPVT_GSV = maybe_starts_with("PPVT_GSV"),
+           FruitStroop_Date = maybe_starts_with("FruitStroop_Date"),
            FruitStroop_Score = maybe_starts_with("fruitstroop_time"),
            VerbalFluency_Date = maybe_starts_with("VerbalFluency_Date"),
            VerbalFluency_Score = maybe_starts_with("verbalfluency_raw"),
