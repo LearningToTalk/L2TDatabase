@@ -3,10 +3,10 @@ library("L2TDatabase")
 library("dplyr")
 library("tidyr")
 library("stringr")
+library("readr")
 
 # Load external dependencies
 source("inst/paths.R")
-source("inst/migrations/dates.R")
 source(paths$GetSiteInfo, chdir = TRUE)
 
 # Download/backup db beforehand
@@ -25,34 +25,50 @@ lt <- get_study_info("LateTalker")
 medu <- get_study_info("Medu") %>%
   lapply(. %>% mutate(Study = "MaternalEd"))
 
-process_scores <- . %>%
-  select(Study,
-         ShortResearchID = Participant_ID,
-         VerbalFluency_Completion = maybe_matches("VerbalFluency_Date"),
-         VerbalFluency_Score = maybe_starts_with("verbalfluency_raw"),
-         VerbalFluency_AgeEquivalent = maybe_starts_with("verbalfluency_AE")) %>%
-  readr::type_convert() %>%
-  mutate(VerbalFluency_Completion = format(VerbalFluency_Completion))
+
+# Select the VerbalFluency columns if they exist, otherwise return a blank
+# dataframe
+process_vf_scores <- function(df) {
+  if (nrow(df) == 0) {
+    return(data_frame())
+  }
+
+  # Rules for converting the columns
+  cols_types <- cols(
+    Study = col_character(),
+    ShortResearchID = col_character(),
+    VerbalFluency_AgeEquivalent = col_character())
+
+  format_if_exists <- function(...) format(..., na.encode = FALSE)
+
+  df_data <- df %>%
+    select(Study,
+           ShortResearchID = Participant_ID,
+           VerbalFluency_Completion = maybe_matches("VerbalFluency_Date"),
+           VerbalFluency_Score = maybe_starts_with("verbalfluency_raw"),
+           VerbalFluency_AgeEquivalent = maybe_starts_with("verbalfluency_AE")) %>%
+    type_convert(cols_types) %>%
+    # Convert the date to a string
+    mutate_at(vars(ends_with("Completion")), format_if_exists)
+
+  # FruitStroop not administered in every study, so return an empty dataframe if
+  # no data found
+  no_data <- identical(names(df_data), c("Study", "ShortResearchID"))
+  if (no_data) {
+    df_data <- data_frame()
+  }
+
+  df_data
+}
 
 df_scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
-  lapply(process_scores) %>%
+  lapply(process_vf_scores) %>%
   bind_rows()
 
 # Have verbal fluency norms at hand
 df_vf_norms <- l2t_connect(cnf_file, "norms") %>%
   tbl("RetrievalFluency") %>%
   collect()
-
-# # Collect dates/scores from the DIRT spreadsheet
-# df_dates <- collect_dates(paths$score_dates, recursive = TRUE)
-#
-# # Keep just verbal fluency data from DIRT
-# df_vf <- df_dates %>%
-#   filter(Study %in% c("TimePoint1", "TimePoint2", "TimePoint3")) %>%
-#   filter(str_detect(Variable, "VerbalFluency")) %>%
-#   spread(Variable, Value) %>%
-#   filter(!is.na(VerbalFluency_Score)) %>%
-#   readr::type_convert(.)
 
 # Check formatting
 df_scores %>%
@@ -63,33 +79,33 @@ df_scores %>%
 df_scores %>%
   filter(str_detect(VerbalFluency_AgeEquivalent, " "))
 
-# Norm check for DIRT data
+# Norm check
 df_scores %>%
   rename(Raw = VerbalFluency_Score) %>%
   left_join(df_vf_norms) %>%
   filter(VerbalFluency_AgeEquivalent != AgeEq) %>%
   print(n = Inf)
 
-df_vf_scores <- df_scores %>%
+df_scores_to_add <- df_scores %>%
   filter(!is.na(VerbalFluency_Completion))
 
 # No double counted scores
-df_vf_scores %>%
+df_scores_to_add %>%
   count(Study, ShortResearchID) %>%
   filter(n != 1)
 
-cds <- tbl(l2t, "ChildStudy") %>%
+df_cds <- tbl(l2t, "ChildStudy") %>%
   left_join(tbl(l2t, "Child")) %>%
   left_join(tbl(l2t, "Study")) %>%
   collect() %>%
   select(ShortResearchID, Study, ChildStudyID, Birthdate)
 
 # Make sure every verbal fluency corresponds to a database ChildStudy key
-anti_join(df_vf_scores, cds) %>%
+anti_join(df_scores_to_add, df_cds) %>%
   print(n = Inf)
 
-df_can_be_added <- df_vf_scores %>%
-  inner_join(cds) %>%
+df_can_be_added <- df_scores_to_add %>%
+  inner_join(df_cds) %>%
   rename(VerbalFluency_Raw = VerbalFluency_Score,
          VerbalFluency_AgeEq = VerbalFluency_AgeEquivalent)
 
@@ -97,7 +113,6 @@ df_can_be_added <- df_vf_scores %>%
 df_can_be_added <- df_can_be_added %>%
   mutate(VerbalFluency_Age = chrono_age(Birthdate, VerbalFluency_Completion)) %>%
   select(-Study, -ShortResearchID, -Birthdate)
-
 df_can_be_added
 
 
@@ -105,18 +120,18 @@ df_can_be_added
 ## Compare local table with remote table and update database
 
 # Subtract current rows from new rows to see what data is new
-current_rows <- collect("VerbalFluency" %from% l2t)
+df_current_rows <- collect("VerbalFluency" %from% l2t)
 
 # Find completely new records that need to be added
-to_add <- find_new_rows_in_table(
+df_to_add <- find_new_rows_in_table(
   data = df_can_be_added,
-  ref_data = current_rows,
+  ref_data = df_current_rows,
   required_cols = "ChildStudyID")
 
-to_add %>% print(n = Inf)
+df_to_add %>% print(n = Inf)
 
 # Add to database
-append_rows_to_table(l2t, "VerbalFluency", to_add)
+append_rows_to_table(l2t, "VerbalFluency", df_to_add)
 
 
 
@@ -125,34 +140,36 @@ append_rows_to_table(l2t, "VerbalFluency", to_add)
 ## Find records that need to be updated
 
 # Redownload the table
-remote_data <- collect("VerbalFluency" %from% l2t)
+df_remote <- collect("VerbalFluency" %from% l2t)
 
 # Attach the database keys to latest local data
-current_indices <- remote_data %>%
+df_remote_indices <- df_remote %>%
   select(ChildStudyID, VerbalFluencyID)
 
-latest_data <- df_can_be_added %>%
-  inner_join(current_indices) %>%
+df_local <- df_can_be_added %>%
+  inner_join(df_remote_indices) %>%
   arrange(VerbalFluencyID)
 
 # Keep just the columns in the latest data (i.e., drop database-oriented
 # VerbalFluency_Timestamp)
-remote_data <- match_columns(remote_data, latest_data) %>%
-  filter(ChildStudyID %in% latest_data$ChildStudyID)
+df_remote <- match_columns(df_remote, df_local) %>%
+  filter(ChildStudyID %in% df_local$ChildStudyID)
 
 # Preview changes with daff
 library("daff")
-daff <- diff_data(remote_data, latest_data, context = 0)
+daff <- diff_data(df_remote, df_local, context = 0)
 render_diff(daff)
 
 # Or see them itemized in a long data-frame
-create_diff_table(latest_data, remote_data, "VerbalFluencyID")
+create_diff_table(df_local, df_remote, "VerbalFluencyID")
 
-overwrite_rows_in_table(l2t, "VerbalFluency", rows = latest_data, preview = TRUE)
-overwrite_rows_in_table(l2t, "VerbalFluency", rows = latest_data, preview = FALSE)
+overwrite_rows_in_table(l2t, "VerbalFluency", rows = df_local, preview = TRUE)
+overwrite_rows_in_table(l2t, "VerbalFluency", rows = df_local, preview = FALSE)
 
 # Check one last time
-remote_data <- collect("VerbalFluency" %from% l2t)
-anti_join(remote_data, latest_data, by = "VerbalFluencyID")
-anti_join(remote_data, latest_data)
-anti_join(latest_data, remote_data)
+df_remote <- collect("VerbalFluency" %from% l2t)
+anti_join(df_remote, df_local, by = "VerbalFluencyID")
+anti_join(df_remote, df_local)
+anti_join(df_local, df_remote)
+anti_join(df_can_be_added, df_remote)
+anti_join(df_remote, df_can_be_added)
