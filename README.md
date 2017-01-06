@@ -107,16 +107,16 @@ man_moon_practice
 #> 
 #>    MinPairID         Running Trial Item1 Item2 ImageSide CorrectResponse
 #>        <int>           <chr> <int> <chr> <chr>     <chr>           <chr>
-#> 1        304 Familiarization     5   man  moon      Left             man
-#> 2        425 Familiarization     3   man  moon     Right            moon
-#> 3        207 Familiarization     6   man  moon     Right            moon
-#> 4        407 Familiarization     5   man  moon      Left             man
-#> 5        208 Familiarization     6   man  moon     Right            moon
-#> 6        306 Familiarization     5   man  moon      Left             man
-#> 7        427 Familiarization     3   man  moon     Right            moon
-#> 8        209 Familiarization     6   man  moon     Right            moon
-#> 9        409 Familiarization     5   man  moon      Left             man
-#> 10       147 Familiarization     1   man  moon      Left             man
+#> 1        442 Familiarization     3   man  moon     Right            moon
+#> 2        220 Familiarization     5   man  moon      Left             man
+#> 3        179 Familiarization     3   man  moon     Right            moon
+#> 4        359 Familiarization     5   man  moon      Left             man
+#> 5        240 Familiarization     5   man  moon      Left             man
+#> 6        326 Familiarization     6   man  moon      Left             man
+#> 7        341 Familiarization     5   man  moon      Left             man
+#> 8        444 Familiarization     3   man  moon     Right            moon
+#> 9        222 Familiarization     5   man  moon      Left             man
+#> 10       181 Familiarization     3   man  moon     Right            moon
 #> # ... with more rows, and 1 more variables: Correct <int>
 ```
 
@@ -128,16 +128,16 @@ man_moon_practice
 #> # A tibble: 640 × 8
 #>    MinPairID         Running Trial Item1 Item2 ImageSide CorrectResponse
 #>        <int>           <chr> <int> <chr> <chr>     <chr>           <chr>
-#> 1        183 Familiarization     6   man  moon      Left             man
-#> 2        278 Familiarization     3   man  moon     Right            moon
-#> 3        260 Familiarization     3   man  moon     Right            moon
-#> 4        185 Familiarization     6   man  moon      Left             man
-#> 5        280 Familiarization     3   man  moon     Right            moon
-#> 6        262 Familiarization     3   man  moon     Right            moon
-#> 7        187 Familiarization     6   man  moon      Left             man
-#> 8        282 Familiarization     3   man  moon     Right            moon
-#> 9        264 Familiarization     3   man  moon     Right            moon
-#> 10       284 Familiarization     3   man  moon     Right            moon
+#> 1        280 Familiarization     3   man  moon     Right            moon
+#> 2        381 Familiarization     3   man  moon     Right            moon
+#> 3        262 Familiarization     3   man  moon     Right            moon
+#> 4        187 Familiarization     6   man  moon      Left             man
+#> 5        401 Familiarization     3   man  moon     Right            moon
+#> 6        282 Familiarization     3   man  moon     Right            moon
+#> 7        383 Familiarization     3   man  moon     Right            moon
+#> 8        264 Familiarization     3   man  moon     Right            moon
+#> 9        284 Familiarization     3   man  moon     Right            moon
+#> 10       385 Familiarization     3   man  moon     Right            moon
 #> # ... with 630 more rows, and 1 more variables: Correct <int>
 ```
 
@@ -155,22 +155,41 @@ Query tables start with the prefix `q_`. We can view the names of all the tables
 ``` r
 # list all the tbls in the database
 src_tbls(l2t)
-#>  [1] "BRIEF"                      "Blending_Admin"            
-#>  [3] "Blending_Responses"         "Caregivers"                
-#>  [5] "Caregivers_Entry"           "Child"                     
-#>  [7] "ChildStudy"                 "EVT"                       
-#>  [9] "FruitStroop"                "GFTA"                      
-#> [11] "LENA_Admin"                 "LENA_Hours"                
-#> [13] "Literacy"                   "MinPair_Admin"             
-#> [15] "MinPair_Responses"          "PPVT"                      
-#> [17] "SAILS_Admin"                "SAILS_Responses"           
-#> [19] "SES"                        "SES_Entry"                 
-#> [21] "Siblings"                   "Study"                     
-#> [23] "VerbalFluency"              "q_LENA_Averages"           
-#> [25] "q_MinPair_Aggregate"        "q_SAILS_Aggregate"         
-#> [27] "q_SAILS_ModulesPropCorrect" "q_SAILS_PropCorrect"       
-#> [29] "q_Scores_TimePoint1"        "q_Scores_TimePoint2"       
-#> [31] "q_Scores_TimePoint3"
+#>  [1] "BRIEF"                             
+#>  [2] "Blending_Admin"                    
+#>  [3] "Blending_Responses"                
+#>  [4] "Caregiver"                         
+#>  [5] "Caregiver_Entry"                   
+#>  [6] "Child"                             
+#>  [7] "ChildStudy"                        
+#>  [8] "EVT"                               
+#>  [9] "FruitStroop"                       
+#> [10] "GFTA"                              
+#> [11] "Household"                         
+#> [12] "LENA_Admin"                        
+#> [13] "LENA_Hours"                        
+#> [14] "Literacy"                          
+#> [15] "MinPair_Admin"                     
+#> [16] "MinPair_Responses"                 
+#> [17] "PPVT"                              
+#> [18] "RealWordRep_Admin"                 
+#> [19] "SAILS_Admin"                       
+#> [20] "SAILS_Responses"                   
+#> [21] "SES"                               
+#> [22] "SES_Entry"                         
+#> [23] "Study"                             
+#> [24] "VerbalFluency"                     
+#> [25] "q_Household_Education"             
+#> [26] "q_Household_Maternal_Caregiver"    
+#> [27] "q_Household_Max_Maternal_Education"
+#> [28] "q_LENA_Averages"                   
+#> [29] "q_MinPair_Aggregate"               
+#> [30] "q_SAILS_Aggregate"                 
+#> [31] "q_SAILS_ModulesPropCorrect"        
+#> [32] "q_SAILS_PropCorrect"               
+#> [33] "q_Scores_TimePoint1"               
+#> [34] "q_Scores_TimePoint2"               
+#> [35] "q_Scores_TimePoint3"
 ```
 
 The `q_MinPair_Aggregate` shows the proportion correct of non-practice trials in the minimal pairs task by participant and by study. (I `select` a subset of columns to exclude unnecessary columns like the name of the Eprime file containing the raw data.) The `Study` and `ResearchID` are the conventional identifiers for studies and participants.
@@ -246,16 +265,16 @@ We can also download the table-level comments from a database with `describe_db`
 describe_db(src = l2t) %>% head()
 #>   Database              Table Rows
 #> 1      l2t              BRIEF  224
-#> 2      l2t     Blending_Admin    0
-#> 3      l2t Blending_Responses    0
-#> 4      l2t         Caregivers    0
-#> 5      l2t   Caregivers_Entry  526
-#> 6      l2t              Child  247
+#> 2      l2t     Blending_Admin   66
+#> 3      l2t Blending_Responses 1670
+#> 4      l2t          Caregiver  517
+#> 5      l2t    Caregiver_Entry    6
+#> 6      l2t              Child  338
 #>                                                   Description
 #> 1 Scores from Behvr Rating Inventory of Exec Func (Preschool)
 #> 2                  Administrations of the Blending experiment
 #> 3           Trials and responses from the Blending experiment
-#> 4                [Todo] Demographics of children's caregivers
+#> 4                       Demographics of children's caregivers
 #> 5     [Temp Data Entry] Demographics of children's caregivers
 #> 6         Unique IDs and demographics of children in database
 ```
@@ -271,43 +290,47 @@ We can download and back up each table in the database with `l2t_backup`. The fi
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
-#> Writing ./inst/backup/2016-09-13_10-45/BRIEF.csv
-#> Writing ./inst/backup/2016-09-13_10-45/Blending_Admin.csv
-#> Writing ./inst/backup/2016-09-13_10-45/Blending_Responses.csv
-#> Writing ./inst/backup/2016-09-13_10-45/Caregivers.csv
-#> Writing ./inst/backup/2016-09-13_10-45/Caregivers_Entry.csv
-#> Writing ./inst/backup/2016-09-13_10-45/Child.csv
-#> Writing ./inst/backup/2016-09-13_10-45/ChildStudy.csv
-#> Writing ./inst/backup/2016-09-13_10-45/EVT.csv
-#> Writing ./inst/backup/2016-09-13_10-45/FruitStroop.csv
-#> Writing ./inst/backup/2016-09-13_10-45/GFTA.csv
-#> Writing ./inst/backup/2016-09-13_10-45/LENA_Admin.csv
-#> Writing ./inst/backup/2016-09-13_10-45/LENA_Hours.csv
-#> Writing ./inst/backup/2016-09-13_10-45/Literacy.csv
-#> Writing ./inst/backup/2016-09-13_10-45/MinPair_Admin.csv
-#> Writing ./inst/backup/2016-09-13_10-45/MinPair_Responses.csv
-#> Writing ./inst/backup/2016-09-13_10-45/PPVT.csv
-#> Writing ./inst/backup/2016-09-13_10-45/SAILS_Admin.csv
-#> Writing ./inst/backup/2016-09-13_10-45/SAILS_Responses.csv
-#> Writing ./inst/backup/2016-09-13_10-45/SES.csv
-#> Writing ./inst/backup/2016-09-13_10-45/SES_Entry.csv
-#> Writing ./inst/backup/2016-09-13_10-45/Siblings.csv
-#> Writing ./inst/backup/2016-09-13_10-45/Study.csv
-#> Writing ./inst/backup/2016-09-13_10-45/VerbalFluency.csv
-#> Writing ./inst/backup/2016-09-13_10-45/q_LENA_Averages.csv
-#> Writing ./inst/backup/2016-09-13_10-45/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2016-09-13_10-45/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2016-09-13_10-45/q_SAILS_ModulesPropCorrect.csv
-#> Writing ./inst/backup/2016-09-13_10-45/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2016-09-13_10-45/q_Scores_TimePoint1.csv
-#> Writing ./inst/backup/2016-09-13_10-45/q_Scores_TimePoint2.csv
-#> Writing ./inst/backup/2016-09-13_10-45/q_Scores_TimePoint3.csv
-#> Writing ./inst/backup/2016-09-13_10-45/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2016-09-13_10-45/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-01-06_10-51/BRIEF.csv
+#> Writing ./inst/backup/2017-01-06_10-51/Blending_Admin.csv
+#> Writing ./inst/backup/2017-01-06_10-51/Blending_Responses.csv
+#> Writing ./inst/backup/2017-01-06_10-51/Caregiver.csv
+#> Writing ./inst/backup/2017-01-06_10-51/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-01-06_10-51/Child.csv
+#> Writing ./inst/backup/2017-01-06_10-51/ChildStudy.csv
+#> Writing ./inst/backup/2017-01-06_10-51/EVT.csv
+#> Writing ./inst/backup/2017-01-06_10-51/FruitStroop.csv
+#> Writing ./inst/backup/2017-01-06_10-51/GFTA.csv
+#> Writing ./inst/backup/2017-01-06_10-51/Household.csv
+#> Writing ./inst/backup/2017-01-06_10-51/LENA_Admin.csv
+#> Writing ./inst/backup/2017-01-06_10-51/LENA_Hours.csv
+#> Writing ./inst/backup/2017-01-06_10-51/Literacy.csv
+#> Writing ./inst/backup/2017-01-06_10-51/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-01-06_10-51/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-01-06_10-51/PPVT.csv
+#> Writing ./inst/backup/2017-01-06_10-51/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-01-06_10-51/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-01-06_10-51/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-01-06_10-51/SES.csv
+#> Writing ./inst/backup/2017-01-06_10-51/SES_Entry.csv
+#> Writing ./inst/backup/2017-01-06_10-51/Study.csv
+#> Writing ./inst/backup/2017-01-06_10-51/VerbalFluency.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_Household_Education.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_SAILS_ModulesPropCorrect.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_Scores_TimePoint1.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_Scores_TimePoint2.csv
+#> Writing ./inst/backup/2017-01-06_10-51/q_Scores_TimePoint3.csv
+#> Writing ./inst/backup/2017-01-06_10-51/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-01-06_10-51/metadata/table_descriptions.csv
 
 # l2t_backup also returns each tbl in a list, so we can view them as well.
 all_tbls$ChildStudy
-#> # A tibble: 604 × 8
+#> # A tibble: 697 × 8
 #>    ChildStudyID ChildID StudyID ShortResearchID FullResearchID
 #>           <int>   <int>   <int>           <chr>          <chr>
 #> 1             1      23       1            600L      600L37MS2
@@ -320,7 +343,7 @@ all_tbls$ChildStudy
 #> 8             8      30       1            607L      607L36MS2
 #> 9             9      31       1            608L      608L39FS2
 #> 10           10      32       1            609L      609L28MS1
-#> # ... with 594 more rows, and 3 more variables:
+#> # ... with 687 more rows, and 3 more variables:
 #> #   ChildStudy_Timestamp <chr>, ChildStudy_Exclude <int>,
 #> #   ChildStudy_ExcludeNote <chr>
 ```
@@ -366,7 +389,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1           15  Hello!  2016-09-13 10:45:15
+#> 1            1  Hello!  2017-01-06 10:51:25
 ```
 
 Other helpers
