@@ -1,12 +1,12 @@
 library("L2TDatabase")
 library("dplyr")
 library("tidyr")
+library("readr")
 library("stringr")
 
 # Load external dependencies
 source("inst/paths.R")
-source("inst/migrations/dates.R")
-
+source(paths$GetSiteInfo, chdir = TRUE)
 
 # Download/backup db beforehand
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
@@ -14,7 +14,7 @@ l2t <- l2t_connect(cnf_file)
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
 # Get child demographics
-cds <- l2t_dl$Child %>%
+df_cds <- l2t_dl$Child %>%
   left_join(l2t_dl$ChildStudy) %>%
   left_join(l2t_dl$Study) %>%
   select(ChildStudyID, Study, ShortResearchID, Female, Birthdate) %>%
@@ -23,52 +23,104 @@ cds <- l2t_dl$Child %>%
   select(-Female) %>%
   readr::type_convert()
 
-# Collect dates/scores
-df_dates <- collect_dates(paths$score_dates, recursive = TRUE) %>%
-  filter(Study != "Dialect")
+# Get info for both sites. Function sourced via paths$GetSiteInfo
+t1 <- get_study_info("TimePoint1")
+t2 <- get_study_info("TimePoint2")
+t3 <- get_study_info("TimePoint3")
+ci1 <- get_study_info("CochlearV1")
+ci2 <- get_study_info("CochlearV2")
+cim <- get_study_info("CochlearMatching")
+lt <- get_study_info("LateTalker")
+medu <- get_study_info("Medu") %>%
+  lapply(. %>% mutate(Study = "MaternalEd"))
 
-df_gfta_dates <- df_dates %>%
-  filter(str_detect(Variable, "GFTA.Date")) %>%
-  rename(GFTA_Completion = Value) %>%
-  readr::type_convert() %>%
-  rename(ShortResearchID = ParticipantID) %>%
-  select(Study, ShortResearchID, GFTA_Completion) %>%
-  mutate(Study = ifelse(Study == "Medu", "MaternalEd", Study))
+# Extract the data of the GFTA from a participant-info spreadsheet, or return an
+# empty dataframe if it cannot be found
+get_gfta_date <- function(df) {
+  if (nrow(df) == 0) {
+    return(data_frame())
+  }
+
+  # Rules for converting the columns
+  cols_types <- cols(
+    Study = col_character(),
+    ShortResearchID = col_character())
+
+  format_if_exists <- function(...) format(..., na.encode = FALSE)
+
+  df_data <- df %>%
+    select(Study,
+           ShortResearchID = Participant_ID,
+           GFTA_Completion = maybe_matches("GFTA_COMPLETION_DATE|GFTA_Date")) %>%
+    type_convert(cols_types) %>%
+    # Convert the date to a string
+    mutate_at(vars(ends_with("Completion")), format_if_exists)
+
+  # GFTA not administered in every study, so return an empty dataframe if no
+  # data found
+  no_data <- identical(names(df_data), c("Study", "ShortResearchID"))
+  if (no_data) {
+    df_data <- data_frame()
+  }
+
+  df_data
+}
+
+df_gfta_dates <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
+  lapply(get_gfta_date) %>%
+  bind_rows()
+
+# GFTAs per study
+df_gfta_dates %>% filter(!is.na(GFTA_Completion)) %>% count(Study)
+
 
 df_gfta_scores <- "./inst/migrations/gfta/2016-12-14-scores_per_study.csv" %>%
-  readr::read_csv() %>%
+  readr::read_csv()
+
+# Make sure the CochlearMatching kids have the correct Study name
+cimatching_ids <- df_cds %>%
+  filter(Study == "CochlearMatching") %>%
+  getElement("ShortResearchID")
+
+df_gfta_scores <- df_gfta_scores %>%
+  mutate(Study = ifelse(ShortResearchID %in% cimatching_ids, "CochlearMatching", Study)) %>%
   left_join(df_gfta_dates)
+
+df_gfta_scores %>% count(Study)
 
 # Couldn't find dates
 df_gfta_scores %>% filter(is.na(GFTA_Completion))
 
 
-df_gfta_scores <- df_gfta_scores %>%
+df_scores_with_dates <- df_gfta_scores %>%
   filter(!is.na(GFTA_Completion)) %>%
   rename(AdjustedScore = normScore, RawScore = rawScore,
          NumTrans = numTrans) %>%
   mutate(Score = 77 - AdjustedScore)
 
 # Add demographics. Compute test age
-with_demographics <- df_gfta_scores %>%
-  left_join(cds) %>%
+df_with_demographics <- df_scores_with_dates %>%
+  left_join(df_cds) %>%
   mutate(Age = chrono_age(Birthdate, GFTA_Completion))
 
 # Download norms
-gfta_norms <- l2t_connect(cnf_file, "norms") %>%
+df_gfta_norms <- l2t_connect(cnf_file, "norms") %>%
   tbl("GFTA2") %>%
   collect()
 
-# Look up norms
-with_norms <- with_demographics %>%
-  left_join(gfta_norms)
-
 # The database will turn <40 into 0, so just make it 39.
-with_norms$Standard <- with_norms$Standard %>%
+df_gfta_norms$Standard <- df_gfta_norms$Standard %>%
   str_replace("<40", 39)
 
+# Look up norms
+df_with_norms <- df_with_demographics %>%
+  left_join(df_gfta_norms)
+
+df_with_norms %>% filter(is.na(Standard))
+
+
 # Format to match database
-db_ready <- with_norms %>%
+df_can_be_added <- df_with_norms %>%
   select(ChildStudyID,
          GFTA_Completion,
          GFTA_RawCorrect = RawScore,
@@ -83,44 +135,59 @@ db_ready <- with_norms %>%
 
 
 # Find completely new records that need to be added
-remote_version <- tbl(l2t, "GFTA") %>% collect %>% arrange(ChildStudyID)
-
-to_add <- db_ready %>%
-  anti_join(remote_version, by = "ChildStudyID") %>%
+df_current_rows <- tbl(l2t, "GFTA") %>%
+  collect() %>%
   arrange(ChildStudyID)
+
+# Find completely new records that need to be added
+df_to_add <- find_new_rows_in_table(
+  data = df_can_be_added,
+  ref_data = df_current_rows,
+  required_cols = "ChildStudyID")
+
+df_to_add %>% print(n = Inf)
 
 # Update the remote table. An error here is a good thing if there are no new
 # rows to add
-append_rows_to_table(l2t, "GFTA", to_add)
+append_rows_to_table(l2t, "GFTA", df_to_add)
 
 
-# Find updated rows
+
 
 ## Find records that need to be updated
 
 # Redownload the table
-remote_data <- collect("GFTA" %from% l2t)
+df_remote <- collect("GFTA" %from% l2t)
 
 # Attach the database keys to latest data
-current_indices <- remote_data %>%
+df_remote_indices <- df_remote %>%
   select(ChildStudyID, GFTAID)
 
-latest_data <- db_ready %>%
-  inner_join(current_indices)
+df_local <- df_can_be_added %>%
+  inner_join(df_remote_indices) %>%
+  arrange(GFTAID)
 
 # Keep just the columns in the latest data
-remote_data <- match_columns(remote_data, latest_data) %>%
-  filter(ChildStudyID %in% latest_data$ChildStudyID)
+df_remote <- match_columns(df_remote, df_local) %>%
+  filter(ChildStudyID %in% df_local$ChildStudyID)
 
 # Preview changes with daff
 library("daff")
-daff <- diff_data(remote_data, latest_data, context = 0)
+daff <- diff_data(df_remote, df_local, context = 0)
 render_diff(daff)
 
 # Or see them itemized in a long data-frame
-create_diff_table(latest_data, remote_data, "GFTAID")
+create_diff_table(df_local, df_remote, "GFTAID")
 
-overwrite_rows_in_table(l2t, "GFTA", rows = latest_data, preview = TRUE)
-overwrite_rows_in_table(l2t, "GFTA", rows = latest_data, preview = FALSE)
+overwrite_rows_in_table(l2t, "GFTA", rows = df_local, preview = TRUE)
+overwrite_rows_in_table(l2t, "GFTA", rows = df_local, preview = FALSE)
 
 
+
+# Check one last time
+df_remote <- collect("GFTA" %from% l2t)
+anti_join(df_remote, df_local, by = "GFTAID")
+anti_join(df_remote, df_local)
+anti_join(df_local, df_remote)
+anti_join(df_can_be_added, df_remote)
+anti_join(df_remote, df_can_be_added)
