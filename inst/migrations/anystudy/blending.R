@@ -50,6 +50,16 @@ local_blending_data <- paths$blending %>%
   mutate(Administered = as.numeric(Administered),
          Correct = as.numeric(Correct))
 
+# Make sure the CochlearMatching kids have the correct Study name
+cimatching_ids <- cds %>%
+  filter(Study == "CochlearMatching") %>%
+  getElement("ShortResearchID")
+
+local_blending_data <- local_blending_data %>%
+  mutate(Study = ifelse(ShortResearchID %in% cimatching_ids, "CochlearMatching", Study))
+
+local_blending_data %>% count(Study)
+
 # Make a table of administrations by getting one row per eprime file
 local_blending_admins <- local_blending_data %>%
   select(Study, ShortResearchID, Blending_EprimeFile, Blending_Completion) %>%
@@ -85,16 +95,9 @@ local_blending_admins <- local_blending_admins %>%
   filter(!is.na(ChildStudyID)) %>%
   arrange(Study, ChildStudyID, Blending_EprimeFile)
 
-
-
-
-
-
-
-
 # Format administration rows to match database
 curr_admins <- l2t_dl$Blending_Admin %>%
-  type_convert
+  type_convert()
 
 local_admins <- match_columns(local_blending_admins, curr_admins)
 
@@ -205,6 +208,4 @@ remote_data <- remote_admin_data %>%
 # the local data-set
 library("daff")
 daff <- diff_data(remote_data, local_data, context = 0)
-daff
-daff$raw()
 render_diff(daff)

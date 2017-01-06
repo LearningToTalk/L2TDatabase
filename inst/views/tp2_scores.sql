@@ -44,7 +44,15 @@ alter algorithm = undefined view  `q_Scores_TimePoint2` as
     sails.SAILS_ProportionTestCorrect,
     rwr.RealWordRep_Completion,
     rwr.RealWordRep_Age,
-    rwr.RealWordRep_Experiment
+    rwr.RealWordRep_Experiment,
+    blending.Blending_Completion,
+    blending.Blending_Age,
+    blending.Blending_NumTrials_BothConditions,
+    blending.Blending_ProportionCorrect_BothConditions,
+    blending.Blending_NumTrials_Audiovisual,
+    blending.Blending_ProportionCorrect_Audiovisual,
+    blending.Blending_NumTrials_Audio,
+    blending.Blending_ProportionCorrect_Audio
   from
     Study study
     left join ChildStudy childstudy
@@ -66,6 +74,8 @@ alter algorithm = undefined view  `q_Scores_TimePoint2` as
     left join q_SAILS_Aggregate sails
       using (ChildStudyID)
     left join RealWordRep_Admin rwr
+      using (ChildStudyID)
+    left join q_Blending_Summary blending
       using (ChildStudyID)
   where
     study.Study = "TimePoint2"
