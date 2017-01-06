@@ -94,11 +94,12 @@ df_scores_to_add %>%
   count(Study, ShortResearchID) %>%
   filter(n != 1)
 
+# Combine child-study-childstudy tbls
 df_cds <- tbl(l2t, "ChildStudy") %>%
-  left_join(tbl(l2t, "Child")) %>%
   left_join(tbl(l2t, "Study")) %>%
-  collect() %>%
-  select(ShortResearchID, Study, ChildStudyID, Birthdate)
+  left_join(tbl(l2t, "Child")) %>%
+  select(ShortResearchID, Study, ChildStudyID, Birthdate) %>%
+  collect()
 
 # Make sure every verbal fluency corresponds to a database ChildStudy key
 anti_join(df_scores_to_add, df_cds) %>%

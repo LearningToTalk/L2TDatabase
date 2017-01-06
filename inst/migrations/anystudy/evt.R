@@ -33,80 +33,87 @@ process_scores <- . %>%
          EVT_GSV) %>%
   mutate(EVT_Completion = format(EVT_Completion))
 
-scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
+df_scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
   lapply(process_scores) %>%
   bind_rows()
 
 # Combine child-study-childstudy tbls
-cds <- l2t_dl$ChildStudy %>%
-  left_join(l2t_dl$Study) %>%
-  left_join(l2t_dl$Child)
-cds
-
-# Attach the database identifiers to the EVT scores
-with_evt <- left_join(scores, cds)
+df_cds <- tbl(l2t, "ChildStudy") %>%
+  left_join(tbl(l2t, "Study")) %>%
+  left_join(tbl(l2t, "Child")) %>%
+  select(ShortResearchID, Study, ChildStudyID, Birthdate) %>%
+  collect()
 
 # Kids in spreadsheets not in database. Should be empty rows (attrition)
-scores %>%
-  anti_join(cds) %>%
+df_scores %>%
+  anti_join(df_cds) %>%
   as.data.frame() %>%
   arrange(Study, ShortResearchID)
+
+# Attach the database identifiers to the EVT scores
+df_with_evt <- left_join(df_scores, df_cds)
 
 # Calculate chronological ages, default to NA if error encountered
 chr_age <- failwith(NA, chrono_age)
 
-# with_evt %>% filter(is.na(Birthdate))
-
-with_evt <-  with_evt %>%
+df_can_be_added <-  df_with_evt %>%
   filter(!is.na(EVT_Completion)) %>%
-  mutate(EVT_Age = unlist(Map(chr_age, EVT_Completion, Birthdate)))
+  mutate(EVT_Age = unlist(Map(chr_age, EVT_Completion, Birthdate))) %>%
+  select(-Study, -ShortResearchID, -Birthdate)
+
 
 # Find completely new records that need to be added
-to_add <- find_new_rows_in_table(
-  data = with_evt,
+df_to_add <- find_new_rows_in_table(
+  data = df_can_be_added,
   ref_data = l2t_dl$EVT,
   required_cols = "ChildStudyID")
 
-to_add %>% print(n = Inf)
+df_to_add %>% print(n = Inf)
 
 # Update the remote table. An error here is a good thing if there are no new
 # rows to add
-append_rows_to_table(l2t, "EVT", to_add)
+append_rows_to_table(l2t, "EVT", df_to_add)
 
 
 
 ## Find records that need to be updated
 
 # Redownload the table
-remote_data <- collect("EVT" %from% l2t)
+df_remote <- collect("EVT" %from% l2t)
 
 # Attach the database keys to latest data
-current_indices <- remote_data %>%
+df_remote_indices <- df_remote %>%
   select(ChildStudyID, EVTID)
 
-latest_data <- match_columns(with_evt, l2t_dl$EVT) %>%
-  arrange(ChildStudyID)
-
-latest_data <- latest_data %>%
-  inner_join(current_indices)
+df_local <- df_can_be_added %>%
+  inner_join(df_remote_indices) %>%
+  arrange(EVTID)
 
 # Keep just the columns in the latest data
-remote_data <- match_columns(remote_data, latest_data) %>%
-  filter(ChildStudyID %in% latest_data$ChildStudyID)
+df_remote <- match_columns(df_remote, df_local) %>%
+  filter(ChildStudyID %in% df_local$ChildStudyID) %>%
+  arrange(EVTID)
 
 # Preview changes with daff
 library("daff")
-daff <- diff_data(remote_data, latest_data, context = 0)
+daff <- diff_data(df_remote, df_local, context = 0)
 stamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
 render_diff(daff)
 
 # save them
-render_diff(daff, file = sprintf("inst/diffs/%s_evt_diffs.html", stamp))
-daff::write_diff(daff, file = sprintf("inst/diffs/%s_evt_.csv", stamp))
+# render_diff(daff, file = sprintf("inst/diffs/%s_evt_diffs.html", stamp))
+# daff::write_diff(daff, file = sprintf("inst/diffs/%s_evt_.csv", stamp))
 
 # Or see them itemized in a long data-frame
-create_diff_table(latest_data, remote_data, "EVTID")
+create_diff_table(df_local, df_remote, "EVTID")
 
-overwrite_rows_in_table(l2t, "EVT", rows = latest_data, preview = TRUE)
-overwrite_rows_in_table(l2t, "EVT", rows = latest_data, preview = FALSE)
+overwrite_rows_in_table(l2t, "EVT", rows = df_local, preview = TRUE)
+overwrite_rows_in_table(l2t, "EVT", rows = df_local, preview = FALSE)
+
+# Check one last time
+df_remote <- collect("EVT" %from% l2t)
+anti_join(df_remote, df_local, by = "EVTID")
+anti_join(df_local, df_remote)
+anti_join(df_can_be_added, df_remote)
+anti_join(df_remote, df_can_be_added)
 

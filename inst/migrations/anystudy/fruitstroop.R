@@ -87,12 +87,12 @@ all(round(df_scores_to_add$FruitStroop_Raw / 9, 2) == df_scores_to_add$FruitStro
 
 
 
-# Get child-level info and keys
+# Combine child-study-childstudy tbls
 df_cds <- tbl(l2t, "ChildStudy") %>%
-  left_join(tbl(l2t, "Child")) %>%
   left_join(tbl(l2t, "Study")) %>%
-  collect() %>%
-  select(ShortResearchID, Study, ChildStudyID, Birthdate)
+  left_join(tbl(l2t, "Child")) %>%
+  select(ShortResearchID, Study, ChildStudyID, Birthdate) %>%
+  collect()
 
 # Make sure every Fruit Stroop corresponds to a database ChildStudy key
 anti_join(df_scores_to_add, df_cds)
@@ -105,15 +105,6 @@ df_can_be_added <- df_can_be_added %>%
   mutate(FruitStroop_Age = chrono_age(Birthdate, FruitStroop_Completion)) %>%
   select(-Study, -ShortResearchID, -Birthdate)
 df_can_be_added
-
-
-# df_can_be_added %>% filter(is.na(ChildStudyID))
-#
-#
-#
-#
-#
-#
 
 ## Compare local table with remote table and update database
 
