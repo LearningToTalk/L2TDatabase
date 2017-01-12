@@ -1,19 +1,47 @@
---
 -- Create a view to display the proportion correct for non-training trials in
 -- each administration of the Minimal Pairs experiment.
---
+create or replace algorithm = undefined view backend.q_MinPair_Aggregate as
+  select
+    childstudy.ChildStudyID,
+    study.Study,
+    childstudy.ShortResearchID as `ResearchID`,
+    minp_admin.MinPairID,
+    minp_admin.MinPair_EprimeFile,
+    minp_admin.MinPair_Dialect,
+    minp_admin.MinPair_Completion,
+    minp_admin.MinPair_Age,
+    count(case minp_resp.Running when "Test" then 1 else null end) as `MinPair_NumTestTrials`,
+    round(avg(minp_resp.Correct), 4.0) as `MinPair_ProportionCorrect`
+  from
+    backend.ChildStudy childstudy
+    left join backend.Study study
+      using (StudyID)
+    left join backend.MinPair_Admin minp_admin
+      using (ChildStudyID)
+    left join backend.MinPair_Responses minp_resp
+      using (MinPairID)
+  where
+    minp_resp.Running = "Test"
+  group by
+    minp_admin.MinPairID
+  order by
+    minp_admin.MinPairID;
 
-CREATE ALGORITHM = UNDEFINED VIEW  `q_MinPair_Aggregate` AS
-  SELECT d.ChildStudyID, c.Study, d.ShortResearchID AS `ResearchID`,
-    b.MinPairID, b.MinPair_EprimeFile, b.MinPair_Completion, b.MinPair_Dialect, b.MinPair_Age,
-    ROUND( AVG( a.Correct ) , 4.0 ) AS `MinPair_ProportionCorrect`
-  FROM ChildStudy d
-  LEFT JOIN Study c
-  USING ( StudyID )
-  LEFT JOIN MinPair_Admin b
-  USING ( ChildStudyID )
-  LEFT JOIN MinPair_Responses a
-  USING ( MinPairID )
-  WHERE a.Running = "Test"
-  GROUP BY b.MinPairID
-  ORDER BY b.MinPairID
+
+-- User-facing version
+create or replace algorithm = undefined view l2t.MinPair_Aggregate as
+  select
+    Study,
+    ResearchID,
+    MinPair_EprimeFile,
+    MinPair_Dialect,
+    MinPair_Completion,
+    MinPair_Age,
+    MinPair_NumTestTrials,
+    MinPair_ProportionCorrect
+  from
+    backend.q_MinPair_Aggregate
+  order by
+    Study,
+    ResearchID;
+

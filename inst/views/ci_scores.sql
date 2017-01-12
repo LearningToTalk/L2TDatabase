@@ -1,12 +1,12 @@
-create algorithm = undefined view  `q_Scores_CochlearV1` as
+create or replace algorithm = undefined view l2t.Scores_CochlearV1 as
   select
-    childstudy.ChildStudyID,
     study.Study,
     childstudy.ShortResearchID as `ResearchID`,
     child.Female,
     child.AAE,
     child.LateTalker,
     child.CImplant,
+    child.HouseholdID,
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,
     medu.Caregiver_EduScale as `Maternal_Education_Level`,
@@ -37,6 +37,7 @@ create algorithm = undefined view  `q_Scores_CochlearV1` as
     fruit.FruitStroop_Score,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
+    minpair.MinPair_NumTestTrials,
     minpair.MinPair_ProportionCorrect,
     sails.SAILS_Completion,
     sails.SAILS_Age,
@@ -44,41 +45,41 @@ create algorithm = undefined view  `q_Scores_CochlearV1` as
     sails.SAILS_NumTestTrials,
     sails.SAILS_ProportionTestCorrect
   from
-    Study study
-    left join ChildStudy childstudy
+    backend.Study study
+    left join backend.ChildStudy childstudy
       using (StudyID)
-    left join Child child
+    left join backend.Child child
       using (ChildID)
-    left join q_Household_Max_Maternal_Education medu
+    left join backend.q_Household_Max_Maternal_Education medu
       using (HouseholdID)
-    left join EVT evt
+    left join backend.EVT evt
       using (ChildStudyID)
-    left join PPVT ppvt
+    left join backend.PPVT ppvt
       using (ChildStudyID)
-    left join GFTA gfta
+    left join backend.GFTA gfta
       using (ChildStudyID)
-    left join VerbalFluency vf
+    left join backend.VerbalFluency vf
       using (ChildStudyID)
-    left join FruitStroop fruit
+    left join backend.FruitStroop fruit
       using (ChildStudyID)
-    left join q_MinPair_Aggregate minpair
+    left join backend.q_MinPair_Aggregate minpair
       using (ChildStudyID)
-    left join q_SAILS_Aggregate sails
+    left join backend.q_SAILS_Aggregate sails
       using (ChildStudyID)
   where
     study.Study = "CochlearV1"
   order by
     childstudy.ShortResearchID;
 
-create algorithm = undefined view  `q_Scores_CochlearV2` as
+create or replace algorithm = undefined view l2t.Scores_CochlearV2 as
   select
-    childstudy.ChildStudyID,
     study.Study,
     childstudy.ShortResearchID as `ResearchID`,
     child.Female,
     child.AAE,
     child.LateTalker,
     child.CImplant,
+    child.HouseholdID,
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,
     medu.Caregiver_EduScale as `Maternal_Education_Level`,
@@ -109,6 +110,7 @@ create algorithm = undefined view  `q_Scores_CochlearV2` as
     fruit.FruitStroop_Score,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
+    minpair.MinPair_NumTestTrials,
     minpair.MinPair_ProportionCorrect,
     sails.SAILS_Completion,
     sails.SAILS_Age,
@@ -116,26 +118,26 @@ create algorithm = undefined view  `q_Scores_CochlearV2` as
     sails.SAILS_NumTestTrials,
     sails.SAILS_ProportionTestCorrect
   from
-    Study study
-    left join ChildStudy childstudy
+    backend.Study study
+    left join backend.ChildStudy childstudy
       using (StudyID)
-    left join Child child
+    left join backend.Child child
       using (ChildID)
-    left join q_Household_Max_Maternal_Education medu
+    left join backend.q_Household_Max_Maternal_Education medu
       using (HouseholdID)
-    left join EVT evt
+    left join backend.EVT evt
       using (ChildStudyID)
-    left join PPVT ppvt
+    left join backend.PPVT ppvt
       using (ChildStudyID)
-    left join GFTA gfta
+    left join backend.GFTA gfta
       using (ChildStudyID)
-    left join VerbalFluency vf
+    left join backend.VerbalFluency vf
       using (ChildStudyID)
-    left join FruitStroop fruit
+    left join backend.FruitStroop fruit
       using (ChildStudyID)
-    left join q_MinPair_Aggregate minpair
+    left join backend.q_MinPair_Aggregate minpair
       using (ChildStudyID)
-    left join q_SAILS_Aggregate sails
+    left join backend.q_SAILS_Aggregate sails
       using (ChildStudyID)
   where
     study.Study = "CochlearV2"

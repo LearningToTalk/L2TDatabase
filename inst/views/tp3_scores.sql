@@ -3,7 +3,7 @@
 -- Replace "create" with "alter" to update an existing view
 --
 
-alter algorithm = undefined view  `q_Scores_TimePoint3` as
+create or replace algorithm = undefined view  l2t.Scores_TimePoint3 as
   select
     childstudy.ChildStudyID,
     study.Study,
@@ -12,6 +12,7 @@ alter algorithm = undefined view  `q_Scores_TimePoint3` as
     child.AAE,
     child.LateTalker,
     child.CImplant,
+    child.HouseholdID,
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,
     medu.Caregiver_EduScale as `Maternal_Education_Level`,
@@ -39,6 +40,7 @@ alter algorithm = undefined view  `q_Scores_TimePoint3` as
     gfta.GFTA_Standard,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
+    minpair.MinPair_NumTestTrials,
     minpair.MinPair_ProportionCorrect,
     sails.SAILS_Completion,
     sails.SAILS_Age,
@@ -49,26 +51,26 @@ alter algorithm = undefined view  `q_Scores_TimePoint3` as
     rwr.RealWordRep_Age,
     rwr.RealWordRep_Experiment
   from
-    Study study
-    left join ChildStudy childstudy
+    backend.Study study
+    left join backend.ChildStudy childstudy
       using (StudyID)
-    left join Child child
+    left join backend.Child child
       using (ChildID)
-    left join q_Household_Max_Maternal_Education medu
+    left join backend.q_Household_Max_Maternal_Education medu
       using (HouseholdID)
-    left join EVT evt
+    left join backend.EVT evt
       using (ChildStudyID)
-    left join PPVT ppvt
+    left join backend.PPVT ppvt
       using (ChildStudyID)
-    left join VerbalFluency vf
+    left join backend.VerbalFluency vf
       using (ChildStudyID)
-    left join GFTA gfta
+    left join backend.GFTA gfta
       using (ChildStudyID)
-    left join q_MinPair_Aggregate minpair
+    left join backend.q_MinPair_Aggregate minpair
       using (ChildStudyID)
-    left join q_SAILS_Aggregate sails
+    left join backend.q_SAILS_Aggregate sails
       using (ChildStudyID)
-    left join RealWordRep_Admin rwr
+    left join backend.RealWordRep_Admin rwr
       using (ChildStudyID)
   where
     study.Study = "TimePoint3"

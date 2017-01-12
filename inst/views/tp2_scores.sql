@@ -1,9 +1,5 @@
---
 -- Create a view to display the test scores of TimePoint2 participants
--- Replace CREATE with ALTER to update an existing view
---
-
-alter algorithm = undefined view  `q_Scores_TimePoint2` as
+create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
   select
     childstudy.ChildStudyID,
     study.Study,
@@ -12,6 +8,7 @@ alter algorithm = undefined view  `q_Scores_TimePoint2` as
     child.AAE,
     child.LateTalker,
     child.CImplant,
+    child.HouseholdID,
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,
     medu.Caregiver_EduScale as `Maternal_Education_Level`,
@@ -36,6 +33,7 @@ alter algorithm = undefined view  `q_Scores_TimePoint2` as
     fruit.FruitStroop_Score,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
+    minpair.MinPair_NumTestTrials,
     minpair.MinPair_ProportionCorrect,
     sails.SAILS_Completion,
     sails.SAILS_Age,
@@ -47,35 +45,35 @@ alter algorithm = undefined view  `q_Scores_TimePoint2` as
     rwr.RealWordRep_Experiment,
     blending.Blending_Completion,
     blending.Blending_Age,
-    blending.Blending_NumTrials_BothConditions,
-    blending.Blending_ProportionCorrect_BothConditions,
-    blending.Blending_NumTrials_Audiovisual,
-    blending.Blending_ProportionCorrect_Audiovisual,
-    blending.Blending_NumTrials_Audio,
-    blending.Blending_ProportionCorrect_Audio
+    blending.Blending_BothConditions_NumTrials,
+    blending.Blending_BothConditions_ProportionCorrect,
+    blending.Blending_Audiovisual_NumTrials,
+    blending.Blending_Audiovisual_ProportionCorrect,
+    blending.Blending_Audio_NumTrials,
+    blending.Blending_Audio_ProportionCorrect
   from
-    Study study
-    left join ChildStudy childstudy
+    backend.Study study
+    left join backend.ChildStudy childstudy
       using (StudyID)
-    left join Child child
+    left join backend.Child child
       using (ChildID)
-    left join q_Household_Max_Maternal_Education medu
+    left join backend.q_Household_Max_Maternal_Education medu
       using (HouseholdID)
-    left join EVT evt
+    left join backend.EVT evt
       using (ChildStudyID)
-    left join PPVT ppvt
+    left join backend.PPVT ppvt
       using (ChildStudyID)
-    left join VerbalFluency vf
+    left join backend.VerbalFluency vf
       using (ChildStudyID)
-    left join FruitStroop fruit
+    left join backend.FruitStroop fruit
       using (ChildStudyID)
-    left join q_MinPair_Aggregate minpair
+    left join backend.q_MinPair_Aggregate minpair
       using (ChildStudyID)
-    left join q_SAILS_Aggregate sails
+    left join backend.q_SAILS_Aggregate sails
       using (ChildStudyID)
-    left join RealWordRep_Admin rwr
+    left join backend.RealWordRep_Admin rwr
       using (ChildStudyID)
-    left join q_Blending_Summary blending
+    left join backend.q_Blending_Summary blending
       using (ChildStudyID)
   where
     study.Study = "TimePoint2"
