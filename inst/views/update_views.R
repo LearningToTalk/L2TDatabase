@@ -33,7 +33,7 @@ run_queries("./inst/views/sails.sql")
 run_queries("./inst/views/standardized_tests.sql")
 
 
-
+run_queries("./inst/views/lena.sql")
 run_queries("./inst/views/et_blocks.sql")
 
 run_queries("./inst/views/tp1_scores.sql")
