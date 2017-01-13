@@ -43,7 +43,19 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV1 as
     sails.SAILS_Age,
     sails.SAILS_NumPracticeTrials,
     sails.SAILS_NumTestTrials,
-    sails.SAILS_ProportionTestCorrect
+    sails.SAILS_ProportionTestCorrect,
+    lena.LENA_Completion,
+    lena.LENA_FirstHour,
+    lena.LENA_FinalHour,
+    lena.LENA_Hours,
+    lena.LENA_Prop_Meaningful,
+    lena.LENA_Prop_Distant,
+    lena.LENA_Prop_TV,
+    lena.LENA_Prop_Noise,
+    lena.LENA_Prop_Silence,
+    lena.LENA_AWC_Hourly,
+    lena.LENA_CTC_Hourly,
+    lena.LENA_CVC_Hourly
   from
     backend.Study study
     left join backend.ChildStudy childstudy
@@ -65,6 +77,8 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV1 as
     left join backend.q_MinPair_Aggregate minpair
       using (ChildStudyID)
     left join backend.q_SAILS_Aggregate sails
+      using (ChildStudyID)
+    left join backend.q_LENA_Averages lena
       using (ChildStudyID)
   where
     study.Study = "CochlearV1"
@@ -116,7 +130,19 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV2 as
     sails.SAILS_Age,
     sails.SAILS_NumPracticeTrials,
     sails.SAILS_NumTestTrials,
-    sails.SAILS_ProportionTestCorrect
+    sails.SAILS_ProportionTestCorrect,
+    lena.LENA_Completion,
+    lena.LENA_FirstHour,
+    lena.LENA_FinalHour,
+    lena.LENA_Hours,
+    lena.LENA_Prop_Meaningful,
+    lena.LENA_Prop_Distant,
+    lena.LENA_Prop_TV,
+    lena.LENA_Prop_Noise,
+    lena.LENA_Prop_Silence,
+    lena.LENA_AWC_Hourly,
+    lena.LENA_CTC_Hourly,
+    lena.LENA_CVC_Hourly
   from
     backend.Study study
     left join backend.ChildStudy childstudy
@@ -138,6 +164,8 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV2 as
     left join backend.q_MinPair_Aggregate minpair
       using (ChildStudyID)
     left join backend.q_SAILS_Aggregate sails
+      using (ChildStudyID)
+    left join backend.q_LENA_Averages lena
       using (ChildStudyID)
   where
     study.Study = "CochlearV2"

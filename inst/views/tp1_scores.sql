@@ -42,7 +42,19 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint1 as
     minpair.MinPair_ProportionCorrect,
     rwr.RealWordRep_Completion,
     rwr.RealWordRep_Age,
-    rwr.RealWordRep_Experiment
+    rwr.RealWordRep_Experiment,
+    lena.LENA_Completion,
+    lena.LENA_FirstHour,
+    lena.LENA_FinalHour,
+    lena.LENA_Hours,
+    lena.LENA_Prop_Meaningful,
+    lena.LENA_Prop_Distant,
+    lena.LENA_Prop_TV,
+    lena.LENA_Prop_Noise,
+    lena.LENA_Prop_Silence,
+    lena.LENA_AWC_Hourly,
+    lena.LENA_CTC_Hourly,
+    lena.LENA_CVC_Hourly
   from
     backend.Study study
     left join backend.ChildStudy childstudy
@@ -64,6 +76,8 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint1 as
     left join backend.q_MinPair_Aggregate minpair
       using (ChildStudyID)
     left join backend.RealWordRep_Admin rwr
+      using (ChildStudyID)
+    left join backend.q_LENA_Averages lena
       using (ChildStudyID)
   where
     study.Study = "TimePoint1"

@@ -50,7 +50,19 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
     blending.Blending_Audiovisual_NumTrials,
     blending.Blending_Audiovisual_ProportionCorrect,
     blending.Blending_Audio_NumTrials,
-    blending.Blending_Audio_ProportionCorrect
+    blending.Blending_Audio_ProportionCorrect,
+    lena.LENA_Completion,
+    lena.LENA_FirstHour,
+    lena.LENA_FinalHour,
+    lena.LENA_Hours,
+    lena.LENA_Prop_Meaningful,
+    lena.LENA_Prop_Distant,
+    lena.LENA_Prop_TV,
+    lena.LENA_Prop_Noise,
+    lena.LENA_Prop_Silence,
+    lena.LENA_AWC_Hourly,
+    lena.LENA_CTC_Hourly,
+    lena.LENA_CVC_Hourly
   from
     backend.Study study
     left join backend.ChildStudy childstudy
@@ -74,6 +86,8 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
     left join backend.RealWordRep_Admin rwr
       using (ChildStudyID)
     left join backend.q_Blending_Summary blending
+      using (ChildStudyID)
+    left join backend.q_LENA_Averages lena
       using (ChildStudyID)
   where
     study.Study = "TimePoint2"

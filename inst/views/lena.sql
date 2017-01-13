@@ -2,11 +2,12 @@
 -- Create a view to display overall LENA averages
 --
 
-create or replace algorithm = undefined view l2t.LENA_Averages as
+create or replace algorithm = undefined view backend.q_LENA_Averages as
   select
+    childstudy.ChildStudyID,
     study.Study,
     childstudy.ShortResearchID as ResearchID,
-    recording.LENA_Date,
+    recording.LENA_Date as LENA_Completion,
     time_format(min(hours.Hour), '%h:%m %p') as LENA_FirstHour,
     time_format(max(hours.Hour), '%h:%m %p') as LENA_FinalHour,
     sum(hours.Duration) / 3600 as LENA_Hours,
@@ -32,7 +33,29 @@ create or replace algorithm = undefined view l2t.LENA_Averages as
     recording.LENA_Date is not null and
     hour(hours.Hour) between 6 and 22
   group by
-    recording.LENAID
+    recording.LENAID;
+
+
+-- user-facing version
+create or replace algorithm = undefined view l2t.LENA_Averages as
+  select
+    Study,
+    ResearchID,
+    LENA_Completion,
+    LENA_FirstHour,
+    LENA_FinalHour,
+    LENA_Hours,
+    LENA_Prop_Meaningful,
+    LENA_Prop_Distant,
+    LENA_Prop_TV,
+    LENA_Prop_Noise,
+    LENA_Prop_Silence,
+    LENA_AWC_Hourly,
+    LENA_CTC_Hourly,
+    LENA_CVC_Hourly,
+    LENA_Notes
+  from
+    backend.q_LENA_Averages
   order by
-    study.Study,
-    childstudy.ShortResearchID;
+    Study,
+    ResearchID;
