@@ -281,3 +281,141 @@ find_updates_in_daff <- function(ref_data, new_data) {
 
   updated_rows
 }
+
+
+
+
+
+
+
+
+#' Remove records in a table
+#' @param src a dplyr-managed database connection or a MySQLConnection
+#' @param tbl_name name of the table to modify
+#' @param rows a data-frame of rows to remove
+#' @param guard whether to prevent the delete statement (the default) if it
+#'   would delete all rows in the table
+#' @param preview whether the delete should be performed or just previewed
+#' @return TRUE if the delete succeeded.
+#' @export
+delete_rows_in_table <- function(src, tbl_name, rows, guard = TRUE, preview = TRUE) {
+  # Unpack dplyr connection
+  if (inherits(src, "src_mysql")) {
+    db_name <- src$info$dbname
+    dplyr_src <- src
+    src <- src$con
+  }
+
+  # Confirm classes
+  assert_that(inherits(src, "MySQLConnection"), !inherits(src, "src"))
+
+  # Make sure data exists.
+  assert_that(not_empty(rows))
+
+  # Make sure table exists.
+  assert_that(has_table(src, tbl_name))
+
+  # Make sure there are not any new columns of data
+  ref_rows <- collect(tbl_name %from% dplyr_src)
+  rows <- match_columns(rows, ref_rows)
+
+  # Locate the primary key
+  tbl_desc <- describe_tbl(src, tbl_name)
+  tbl_indices <- tbl_desc %>%
+    select(Field, Index) %>%
+    filter(Index != "")
+
+  # We assume there is just one field for the primary key
+  tbl_primary_key <- tbl_indices %>%
+    filter(Index == "PRI")
+  assert_that(nrow(tbl_primary_key) == 1)
+
+  primary_key <- tbl_primary_key$Field
+  assert_that(primary_key %in% names(rows))
+
+  rows_to_delete <- ref_rows %>%
+    semi_join(rows, by = primary_key) %>%
+    match_columns(rows)
+
+
+  if (guard && nrow(rows_to_delete) == nrow(ref_rows)) {
+    stop("Aborting -- this query would remove every row in the table!")
+  }
+
+  # Create a version of the conversion function with some arguments filled in
+  partial_convert <- function(tbl_row) {
+    convert_row_to_delete_statement(src, tbl_name, primary_key, tbl_row)
+  }
+
+  # Create a set of SQL DELETE statements
+  queries_to_run <- rows_to_delete %>%
+    split(.[[primary_key]]) %>%
+    lapply(partial_convert)
+
+  if (preview) {
+    message("Previewing queries")
+    for (query in queries_to_run) {
+      message("\t", query)
+    }
+  } else {
+    message("Performing queries")
+    for (query in queries_to_run) {
+      message("\t", query)
+      result <- dbGetQuery(src, statement = query)
+    }
+  }
+
+  TRUE
+}
+
+#' Create a SQL DELETE query from a row of a dataframe
+convert_row_to_delete_statement <- function(src, tbl_name, primary_key, tbl_row) {
+  # Only update one record
+  records_to_delete <- tbl_row %>%
+    select(one_of(primary_key)) %>%
+    distinct()
+  assert_that(nrow(records_to_delete) == 1)
+
+  # Escape values
+  tbl_name_esc <- sql_escape_ident(src, tbl_name)
+  primary_key_esc <- sql_escape_ident(src, primary_key)
+
+  # Assuming that the primary key is a single field
+  key_value <- tbl_row[[primary_key]] %>%
+    unique() %>%
+    sql_escape_string(src, .)
+
+  where_part <- sprintf("%s = %s", primary_key_esc, key_value)
+
+  sprintf("DELETE FROM %s WHERE %s",
+          tbl_name_esc,
+          where_part)
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
