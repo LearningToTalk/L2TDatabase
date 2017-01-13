@@ -55,7 +55,7 @@ ci_age <- get_study_info("CochlearMatching")
 
 lt <- get_study_info("LateTalker")
 
-medu <- get_study_info("Medu")
+medu <- get_study_info("MaternalEd")
 
 # Select necessary columns
 get_scores_from_info <- function(df) {
@@ -74,10 +74,10 @@ get_scores_from_info <- function(df) {
            PPVT_Standard = maybe_starts_with("PPVT_standard"),
            PPVT_GSV = maybe_starts_with("PPVT_GSV"),
            FruitStroop_Date = maybe_starts_with("FruitStroop_Date"),
-           FruitStroop_Score = maybe_starts_with("fruitstroop_time"),
+           FruitStroop_Score = maybe_starts_with("fruitstroop_time|FruitStroop_Score"),
            VerbalFluency_Date = maybe_starts_with("VerbalFluency_Date"),
-           VerbalFluency_Score = maybe_starts_with("verbalfluency_raw"),
-           VerbalFluency_AgeEquivalent = maybe_starts_with("verbalfluency_AE"),
+           VerbalFluency_Score = maybe_starts_with("verbalfluency_raw|VerbalFluency_Score"),
+           VerbalFluency_AgeEquivalent = maybe_starts_with("verbalfluency_AE|VerbalFluency_AgeEquivalent"),
            CTOPPElision_Date = maybe_starts_with("CTOPPElision_Date"),
            CTOPPElision_Raw = maybe_matches("CTOPP_Elision_raw|CTOPPElision_Raw"),
            CTOPPElision_Scaled = maybe_matches("CTOPP_Elision_scaled|CTOPPElision_Scaled"),

@@ -9,7 +9,7 @@ source(paths$GetSiteInfo, chdir = TRUE)
 
 # Download/backup db beforehand
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
 # Get info for both sites. Function sourced via paths$GetSiteInfo
@@ -20,8 +20,8 @@ ci1 <- get_study_info("CochlearV1")
 ci2 <- get_study_info("CochlearV2")
 cim <- get_study_info("CochlearMatching")
 lt <- get_study_info("LateTalker")
-medu <- get_study_info("Medu") %>%
-  lapply(. %>% mutate(Study = "MaternalEd"))
+medu <- get_study_info("MaternalEd")
+dialect <- get_study_info("DialectSwitch")
 
 process_scores <- . %>%
   select(Study,
@@ -33,7 +33,7 @@ process_scores <- . %>%
          PPVT_GSV) %>%
   mutate(PPVT_Completion = format(PPVT_Completion))
 
-df_scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
+df_scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu, dialect) %>%
   lapply(process_scores) %>%
   bind_rows()
 
@@ -64,7 +64,8 @@ df_to_add <- find_new_rows_in_table(
   ref_data = l2t_dl$PPVT,
   required_cols = "ChildStudyID")
 
-df_to_add %>% print(n = Inf)
+df_to_add %>%
+  print(n = Inf)
 
 df_with_ppvt %>%
   inner_join(df_to_add) %>%

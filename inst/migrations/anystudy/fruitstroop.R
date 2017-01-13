@@ -12,9 +12,8 @@ source(paths$GetSiteInfo, chdir = TRUE)
 
 # Download/backup db beforehand
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 l2t_dl <- l2t_backup(l2t, "inst/backup")
-
 
 # Get info for both sites. Function sourced via paths$GetSiteInfo
 t1 <- get_study_info("TimePoint1")
@@ -24,8 +23,8 @@ ci1 <- get_study_info("CochlearV1")
 ci2 <- get_study_info("CochlearV2")
 cim <- get_study_info("CochlearMatching")
 lt <- get_study_info("LateTalker")
-medu <- get_study_info("Medu") %>%
-  lapply(. %>% mutate(Study = "MaternalEd"))
+medu <- get_study_info("MaternalEd")
+dialect <- get_study_info("DialectSwitch")
 
 # Select the Fruit Stroop columns if they exist, otherwise return a blank
 # dataframe
@@ -41,7 +40,7 @@ process_fs_scores <- function(df) {
     select(Study,
            ShortResearchID = Participant_ID,
            FruitStroop_Date = maybe_starts_with("FruitStroop_Date"),
-           FruitStroop_Score = maybe_starts_with("fruitstroop_time")) %>%
+           FruitStroop_Score = maybe_matches("fruitstroop_time|FruitStroop_Score")) %>%
     type_convert(cols_types) %>%
     # Convert the date to a string
     mutate_at(vars(ends_with("Date")), format_if_exists)
@@ -56,9 +55,12 @@ process_fs_scores <- function(df) {
   df_data
 }
 
-df_scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
+df_scores <- c(t1, t2, t3, ci1, ci2, cim, lt, medu, dialect) %>%
   lapply(process_fs_scores) %>%
   bind_rows()
+
+df_scores %>%
+  count(Study)
 
 # Some possible roundings of Fruit Stroop scores
 possible_fs_scores <- as.data.frame(data_frame(
@@ -71,7 +73,7 @@ possible_fs_scores <- as.data.frame(data_frame(
 
 # Check for data that doesn't match the standard 2-digit rounding
 df_scores %>%
-  filter(!(FruitStroop_Score %in% scores$Round2)) %>%
+  filter(!(FruitStroop_Score %in% possible_fs_scores$Round2)) %>%
   as.data.frame() %>%
   filter(!is.na(FruitStroop_Score))
 
@@ -99,7 +101,7 @@ anti_join(df_scores_to_add, df_cds)
 
 # Attach child-level info to scores
 df_can_be_added <- df_scores_to_add %>%
-  left_join(df_cds)
+  inner_join(df_cds)
 
 df_can_be_added <- df_can_be_added %>%
   mutate(FruitStroop_Age = chrono_age(Birthdate, FruitStroop_Completion)) %>%
@@ -118,6 +120,7 @@ df_to_add <- find_new_rows_in_table(
   required_cols = "ChildStudyID")
 
 df_to_add %>% print(n = Inf)
+df_to_add %>% left_join(df_cds) %>% print(n = Inf)
 
 # Check for multiple administrations
 df_to_add %>% count(ChildStudyID) %>% filter(n != 1)

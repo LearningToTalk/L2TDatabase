@@ -10,7 +10,7 @@ source(paths$GetSiteInfo, chdir = TRUE)
 
 # Download/backup db beforehand
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
 # Get child demographics
@@ -31,8 +31,10 @@ ci1 <- get_study_info("CochlearV1")
 ci2 <- get_study_info("CochlearV2")
 cim <- get_study_info("CochlearMatching")
 lt <- get_study_info("LateTalker")
-medu <- get_study_info("Medu") %>%
-  lapply(. %>% mutate(Study = "MaternalEd"))
+medu <- get_study_info("MaternalEd")
+dialect <- get_study_info("DialectSwitch")
+
+
 
 # Extract the data of the GFTA from a participant-info spreadsheet, or return an
 # empty dataframe if it cannot be found
@@ -66,7 +68,7 @@ get_gfta_date <- function(df) {
   df_data
 }
 
-df_gfta_dates <- c(t1, t2, t3, ci1, ci2, cim, lt, medu) %>%
+df_gfta_dates <- c(t1, t2, t3, ci1, ci2, cim, lt, medu, dialect) %>%
   lapply(get_gfta_date) %>%
   bind_rows()
 
