@@ -1,6 +1,4 @@
---
 -- Create views to summarize the Blending experiment
---
 
 
 -- Overall proportion correct

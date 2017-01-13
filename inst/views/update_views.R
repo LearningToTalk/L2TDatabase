@@ -30,6 +30,9 @@ run_queries("./inst/views/caregiver_education.sql")
 run_queries("./inst/views/blending.sql")
 run_queries("./inst/views/minp.sql")
 run_queries("./inst/views/sails.sql")
+run_queries("./inst/views/standardized_tests.sql")
+
+
 
 run_queries("./inst/views/et_blocks.sql")
 
