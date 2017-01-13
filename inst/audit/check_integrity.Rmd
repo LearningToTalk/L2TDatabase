@@ -25,7 +25,7 @@ source("inst/migrations/dates.R")
 
 # Collect dates/scores
 df_dates <- collect_dates(paths$score_dates, recursive = TRUE) %>% 
-  filter(Study != "Dialect")
+  mutate(Study = ifelse(Study == "Medu", "MaternalEd", Study))
 
 df_no_visits <- df_dates %>% 
   filter(Variable == "Visited") %>% 
@@ -42,20 +42,15 @@ df_dates$Variable %>% unique() %>% sort()
 
 # Get T1 scores for both sites. Function sourced via paths$GetSiteInfo
 t1 <- get_study_info("TimePoint1")
-
 t2 <- get_study_info("TimePoint2")
-
 t3 <- get_study_info("TimePoint3")
-
 ci1 <- get_study_info("CochlearV1")
-
 ci2 <- get_study_info("CochlearV2")
-
 ci_age <- get_study_info("CochlearMatching")
-
 lt <- get_study_info("LateTalker")
-
 medu <- get_study_info("MaternalEd")
+dialect <- get_study_info("DialectSwitch") %>% 
+  lapply(. %>% mutate(Study = "Dialect"))
 
 # Select necessary columns
 get_scores_from_info <- function(df) {
@@ -106,18 +101,18 @@ get_scores_from_info <- function(df) {
 normalize_sheets <- . %>% 
   lapply(get_scores_from_info) %>% 
   Filter(function(x) nrow(x) != 0, .) %>% 
-  bind_rows %>% 
+  bind_rows() %>% 
   gather(Variable, Value, -ParticipantID, -Study, -Source)
 
 # Normalize data from all three studies, combine to single study
-df_info_long <- list(t1, t2, t3, ci1, ci2, ci_age, lt, medu) %>% 
+df_info_long <- list(t1, t2, t3, ci1, ci2, ci_age, lt, medu, dialect) %>% 
   lapply(normalize_sheets) %>% 
-  bind_rows
+  bind_rows()
 
 # Which columns need to be compared?
 columns_in_info_sheets <- df_info_long %>% 
   select(Study, Variable) %>% 
-  distinct
+  distinct()
 
 # Get the re-entered scores into the same format
 df_dirt <- df_dates %>%
@@ -148,7 +143,7 @@ Do the same participants contribute scores in each set?
 df_both <- bind_rows(df_dirt, df_info_long)
 df_sources_per_id <- df_both %>% 
   select(-Variable, -Value) %>% 
-  distinct %>% 
+  distinct() %>% 
   mutate(Found = TRUE) %>% 
   spread(Source, Found) %>% 
   arrange(Study, ParticipantID)
@@ -184,7 +179,7 @@ on participants in both score-sets.
 df_children_to_compare <- df_sources_per_id %>% 
   filter(!is.na(DIRT), !is.na(ParticipantInfo)) %>% 
   select(Study, ParticipantID) %>% 
-  distinct
+  distinct()
 
 df_comparing_scores <- df_both %>% 
   semi_join(df_children_to_compare) 
@@ -210,8 +205,8 @@ columns_with_discrepancies <- discrepancies %>% names()
 
 columns_with_errors <- discrepancies %>% 
   lapply(. %>% select(Study, Variable)) %>% 
-  bind_rows %>% 
-  distinct %>% 
+  bind_rows() %>% 
+  distinct() %>% 
   arrange(Study, Variable) %>% 
   mutate(Passing = FALSE)
 
@@ -229,9 +224,9 @@ columns_in_info_sheets %>%
   mutate(Passing = if_else(is.na(Passing), TRUE, Passing)) %>% 
   arrange(Study, Variable) %>% 
   mutate(Status = if_else(Passing, ":white_check_mark:", ":x:")) %>% 
-  as.data.frame %>% 
+  as.data.frame() %>% 
   rename(` ` = Status) %>% 
-  kable
+  kable()
 ```
 
 ### Details
@@ -251,13 +246,13 @@ matching column in the participant info spreadsheets
 ```{r}
 columns_in_dirt_by_study <- df_dates %>% 
   select(Study, Variable) %>% 
-  distinct
+  distinct()
 
 columns_in_dirt_by_study %>% 
   anti_join(columns_in_info_sheets) %>% 
   filter(Variable != "DOB", Variable != "Visited") %>% 
-  as.data.frame %>% 
+  as.data.frame() %>% 
   mutate(Status = ":grey_question:") %>% 
   rename(` ` = Status) %>% 
-  kable
+  kable()
 ```
