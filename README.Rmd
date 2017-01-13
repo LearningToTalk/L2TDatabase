@@ -42,6 +42,8 @@ This R package contains helper functions for working with the MySQL database for
 the [Learning To Talk](http://learningtotalk.org) project.
 
 
+
+
 Installation
 -------------------------------------------------------------------------------
 
@@ -53,6 +55,8 @@ devtools::install_github("LearningToTalk/L2TDatabase")
 ```
 
 
+
+
 Connecting with .cnf files
 -------------------------------------------------------------------------------
 
@@ -60,7 +64,7 @@ Connections to the database are managed by [.cnf files][cnf-ref]. We use these
 files so that login credentials and connection information are not hard-coded 
 into analysis scripts. 
 
-This package provides the helper function `make_cnf_file` which creates a .cnf
+This package provides the helper function `make_cnf_file()` which creates a .cnf
 file from login and connection information. Once the file is created, we can
 just point to this file whenever we want to connect to the database.
 
@@ -80,7 +84,7 @@ make_cnf_file(
   port = 3306)
 ```
 
-We use the function `l2t_connect` to connect to the database. This function
+We use the function `l2t_connect()` to connect to the database. This function
 takes the location of a .cnf file and the name of the database and returns
 a connection to the database. By default, `l2t_connect` connects to the `l2t`
 database.
@@ -98,44 +102,44 @@ Using dplyr to look at the database
 
 This package is built on top of [dplyr][dplyr-page], a package for dealing with
 data stored in tables. dplyr provides a set of tools for working with remote
-data sources --- that is data in databases, usually on other computers. 
+data sources --- that is, data in databases, usually on other computers. 
 Conventionally, to access data in a database, one has to write special queries
 to retrieve information from the database. dplyr lets us write R code for our
 queries, and it translates our R code into the language used by the database.
 (See the dplyr [vignette on databases][dplyr-db] for more information on how to 
 work with remotely stored data using dplyr.) 
 
-In language of dplyr, a remote _source_ of data is a `src`, and a _table_ of
-data is a `tbl`. To connect to a table of data, use `tbl(src, tbl_name)`. 
-For example, here's how I would connect to the `MinPair_Responses` table in the 
-database which contains the trial-level data about minimal pairs experiment.
+In the terminology of dplyr, a remote _source_ of data is a `src`, and a _table_
+of data is a `tbl`. To connect to a table of data, use `tbl(src, tbl_name)`.
+For example, here's how I would connect to the `MinPair_Trials` table in the
+database which contains the trial-level data about the minimal pairs experiment.
 
 ```{r}
 library("dplyr", warn.conflicts = FALSE)
 
 # use tbl to create a link to a tbl in the database
-minp_resp <- tbl(src = l2t, from = "MinPair_Responses") 
+minp_resp <- tbl(src = l2t, from = "MinPair_Trials") 
 minp_resp
 ```
 
-With dplyr, I can perform all kinds of operations on this table. Here, I specify
-a subset of columns to keep with `select` and `filter` to keep just the _man_-
-_moon_ practice trials.
+With dplyr, I can perform all kinds of operations on this table. Here, I
+`filter()` rows to keep just the _man_-_moon_ practice trials and `select()` a
+subset of columns.
 
 ```{r}
 man_moon_practice <- minp_resp %>% 
-  select(MinPairID:Correct) %>% 
-  filter(Item1 == "man", Item2 == "moon")
+  filter(MinPair_Item1 == "man", MinPair_Item2 == "moon") %>% 
+  select(Study, ResearchID, MinPair_TargetItem, MinPair_Correct)
 man_moon_practice
 ```
 
 This data lives in "the cloud" on a remote computer. That's why the first line
-of the print out says `Source: query [?? x 8]`. When we print the data as we
+of the print out says `Source: query [?? x 4]`. When we print the data as we
 did above, dplyr downloads just enough rows of data to give us a preview of
 the data. There are approximately 12,000 rows of data in the `minp_resp` table,
 and this just-a-preview behavior prevented us from accidentally or prematurely
 downloading thousands of rows when we peeked at the data. We have to 
-**use `collect` to download data to our computer**.
+**use `collect()` to download data to our computer**.
 
 ```{r}
 man_moon_practice <- collect(man_moon_practice)
@@ -144,11 +148,12 @@ man_moon_practice
 
 In this printout, there is no longer a line specifying the source. Instead, we
 are told that we have a `tibble`, which is just a kind of data-frame. The data
-now live locally, in our R session. Now, we can plot or model this data like any
-other data-frame in R.
+now lives locally, in our R session. Now, we can plot or model this data like
+any other data-frame in R.
 
-**Take-away**: We use dplyr to create queries for data from tables in a database,
-and we use `collect` download the results of the query to our computer.
+**Take-away**: We use dplyr to create queries for data from tables in a
+database, and we use `collect()` download the results of the query to our
+computer.
 
 
 
@@ -156,31 +161,78 @@ and we use `collect` download the results of the query to our computer.
 L2T Database conventions
 -------------------------------------------------------------------------------
 
-There are two kinds of tables, basically, in the `l2t` database: raw data and
-queries. The raw data tables do not contain any of our participant IDs or study
-names. The query tables provide useful summaries of the raw data and include our
-conventional participant IDs. 
+### User-ready data lives in the default database `l2t`
 
-Query tables start with the prefix `q_`. We can view the names of all the tables
-in the database with `dplyr::src_tbls`.
+Information about our participants and their testing data are stored in two
+separate databases. The first is `l2t`. This database contains user-friendly,
+analysis-ready tables of information. `l2t` is the default database that
+`l2t_connect()` uses. This database probably has the information that you need
+in a ready to use form.
 
 ```{r}
 # list all the tbls in the database
 src_tbls(l2t)
 ```
 
-The `q_MinPair_Aggregate` shows the proportion correct of non-practice trials
-in the minimal pairs task by participant and by study. (I `select` a subset
-of columns to exclude unnecessary columns like the name of the Eprime file
-containing the raw data.) The `Study` and `ResearchID` are the conventional
-identifiers for studies and participants.
+The tables here are _queries_: Tables that are computed on-the-fly whenever the
+data is requested. For example, `MinPair_Aggregate` shows the proportion correct
+of non-practice trials in the minimal pairs task by participant and by study. (I
+`select()` a subset of columns to exclude unnecessary columns like the name of
+the Eprime file containing the raw data.) The `Study` and `ResearchID` are the
+conventional identifiers for studies and participants.
 
 ```{r, warning = FALSE}
-tbl(l2t, "q_MinPair_Aggregate") %>% 
+tbl(l2t, "MinPair_Aggregate") %>% 
   select(Study, ResearchID, MinPair_Dialect, MinPair_ProportionCorrect)
 ```
 
-Take-away: The data you probably want lives in a table that starts with `q_`.
+The values in `MinPair_ProportionCorrect` are not stored or hard-coded but
+computed on the fly as part of a query. Thus, if for some reason, the 
+trial-level data about the experiment were to change in the database, then the
+`MinPair_ProportionCorrect` column would update automatically.
+
+
+### Raw data lives in `backend`
+
+The tables in `l2t` are queries, so they are assembled by combining information
+from tables of raw data. The raw-data tables live in the second database (the
+`backend` for our queries.) These raw data tables do not contain any of our
+participant IDs or study names, so they are not user-friendly. You probably
+don't need to work with the backend of the database, unless you are developing
+new aggregations of data that are not yet presented in the `l2t` database.
+
+```{r}
+l2t_backend <- l2t_connect("./inst/l2t_db.cnf", db_name = "backend")
+# list all the tbls in the database
+src_tbls(l2t_backend)
+```
+
+Some of the tables in the backend are not tables of raw data but
+intermediate, helper queries that are used in the main database. These
+helpers queries are prefixed with `q_`. For example, `q_Household_Education`,
+`q_Household_Maternal_Caregiver`, and `q_Household_Max_Maternal_Education` are a
+pipeline of calculations that determine the highest maternal education level in
+each household.
+
+
+### Other databases
+
+Our eyetracking data lives in `eyetracking`. I separated it from the other kinds
+of data because it contains individual frames of eyetracking data, so it houses
+a tremendous amount of data. One of the tables has at least 10 millions rows of
+data. The database contains user-ready queries. They are prefixed by `q_`.
+
+```{r}
+l2t_eyetracking <- l2t_connect("./inst/l2t_db.cnf", db_name = "eyetracking")
+src_tbls(l2t_eyetracking)
+```
+
+There is also a database `norms` with some raw-score-to-standardized-score
+look-up tables for some standardized tests. 
+
+**Take-away**: The data you probably want lives in the default database `l2t`.
+
+
 
 
 Metadata
@@ -189,78 +241,86 @@ Metadata
 As I've worked on the back-end of the database, I've been using the database
 comments to describe the data that goes into each table and each field. We can
 download these comments along with other pieces of information about a table by
-using `describe_tbl`. With this function, we can quickly create a "codebook" to
-accompany our data. 
+using `describe_tbl()`. With this function, we can quickly create a "codebook" 
+to accompany our data. 
 
 ```{r}
-describe_tbl(src = l2t, tbl_name = "q_MinPair_Aggregate")
+describe_tbl(src = l2t, tbl_name = "MinPair_Aggregate")
 ```
 
-In some queries, the fields are computed dynamically, whenever the data is
-requested. For example, in the `q_MinPair_Aggregate` query, the proportion
-correct is calculated on-the-fly. Our database system does not let us write
+In some queries, the fields are computed dynamically, whenever the data
+is requested. In the `MinPair_Aggregate` query, the proportion correct is
+calculated when the data is requested. Our database system does not let us write
 comments for these dynamically created columns, so that column has a blank for
-its description.
+its description. 
 
 We can also download the table-level comments from a database with
-`describe_db`, although these descriptions have a much tighter length limit.
-Table-level comments are also unavailable for the query table.
+`describe_db()`, although these descriptions have a much tighter length limit.
+Table-level comments are also unavailable for query tables, so they are only
+useful for raw-data tables.
 
 ```{r}
 # just a few rows
-describe_db(src = l2t) %>% head()
+describe_db(src = l2t_backend) %>% head()
 ```
 
-These two forms of metadata are backed up by the `l2t_backup` helper.
+These two forms of metadata are backed up by the `l2t_backup()` helper function.
+
 
 
 
 Back up
 -------------------------------------------------------------------------------
 
-We can download and back up each table in the database with `l2t_backup`. The
+We can download and back up each table in a database with `l2t_backup()`. The
 final two messages from the back-up function show that the metadata tables are
 saved to a `metadata` folder.
+
+Here's how backing up the backend of the database looks:
 
 ```{r, warning = FALSE}
 # back up each tbl
 backup_dir <- "./inst/backup"
-all_tbls <- l2t_backup(src = l2t, backup_dir = backup_dir)
+all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
 
-# l2t_backup also returns each tbl in a list, so we can view them as well.
-all_tbls$ChildStudy
+# l2t_backup() also returns each tbl in a list, so we can view them as well.
+all_tbls$EVT
 ```
-
-
 
 
 ### Dumping the database
 
-A final option for backing up the database is `dump_database`. This function
+A final option for backing up the database is `dump_database()`. This function
 calls on the `mysqldump` utility which exports a database into a series of SQL
-statements that can be used to reconstruct the database. This function is more
+statements that can be used to reconstruct the database. This function is very 
 finicky because it requires other programs to be installed on one's machine.
 
 ```{r, eval = FALSE}
 dump_database(
-  cnf_file = cnf_file, 
+  cnf_file = "./inst/l2t_db.cnf", 
   backup_dir = "./inst/backup",
   db_name = "l2t")
+
+dump_database(
+  cnf_file = "./inst/l2t_db.cnf", 
+  backup_dir = "./inst/backup",
+  db_name = "backend")
 ```
 
 
 
-Writing
+
+Writing new data to a database
 -------------------------------------------------------------------------------
 
-dplyr provides read-only access to a database, so we can't accidentally do 
-stupid things to our data. We want to use R to migrate existing dataframes into 
+dplyr provides read-only access to a database, so we can't accidentally do
+stupid things to our data. We want to use R to migrate existing dataframes into
 the database, but we also don't want to do stupid things either. Therefore, I've
-developed conservative helper functions for writing data. In fact there is 
-only one such function so far: `append_rows_to_table`. (I'd like to add an
-`overwrite_rows_in_table` eventually.) These functions work on dplyr-managed
-database connections. For the purposes of this demo, we will work on the
-separate `l2t_test` database.
+developed conservative helper functions for writing data. These functions work
+on dplyr-managed database connections. For the purposes of this demo, we will
+work on the separate `l2t_test` database.
+
+The function `append_rows_to_table()` simply adds new rows to a database table.
 
 ```{r}
 l2t_test <- l2t_connect("./inst/l2t_db.cnf", db_name = "l2ttest")
@@ -278,6 +338,12 @@ append_rows_to_table(
 tbl(l2t_test, "TestWrites")
 ```
 
+I also have an _experimental_ helper function. `overwrite_rows_in_table()`
+which will update existing rows in a table, but this one is not as robust or
+user-friendly as I would like. In my scripts, I usually have lots of checks
+on the data before and after using this function to confirm that it behaves as
+expected.
+
 ```{r clean up, echo = FALSE, results = 'hide'}
 DBI::dbSendQuery(l2t_test$con, "DELETE FROM `l2ttest`.`TestWrites`")
 file.remove("./my_connection.cnf")
@@ -285,13 +351,14 @@ file.remove("./my_connection.cnf")
 
 
 
+
 Other helpers
 -------------------------------------------------------------------------------
 
-This package also provides some helper functions for working with our data. 
-`undo_excel_date` converts Excel's dates into R dates. `chrono_age` computes the
-number of months (rounded down) between two dates, as you would when computing
-chronological age.
+This package also provides some helper functions for working with our data.
+`undo_excel_date()` converts Excel's dates into R dates. `chrono_age()` computes
+the number of months (rounded down) between two dates, as you would when
+computing chronological age.
 
 ```{r}
 # Create a date and another 18 months later
@@ -308,6 +375,23 @@ chrono_age("2014-01-20", "2012-01-20")
 chrono_age("2014-01-20", "2011-12-20")
 chrono_age("2014-01-20", "2011-11-20")
 ```
+
+
+
+
+Repository structure
+-------------------------------------------------------------------------------
+
+This repository is an R package, so the `R/`, `man/` and `tests/` contain
+the source code, documentation, and unit tests for the package. 
+
+Most of the action is in the `inst/` directory. `inst/migrations/` contains
+R scripts that add data from our various spreadsheets and csv files to
+the database. `inst/audit/` contains some helper scripts that check for
+inconsistencys in our data. `inst/views/` contains the source code for our SQL
+queries used by the database.
+
+
 
 
 [cnf-ref]: http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html
