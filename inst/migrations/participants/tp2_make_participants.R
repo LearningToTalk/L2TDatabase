@@ -43,7 +43,7 @@ tp2_no_cohort
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 
 # Other parameters for migration
-db_name <- "l2t"
+db_name <- "backend"
 backup_dir <- "inst/backup"
 
 # Connect and download each table to csv

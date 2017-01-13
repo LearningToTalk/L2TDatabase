@@ -78,7 +78,7 @@ df_siblings
 
 library(L2TDatabase)
 
-l2t <- l2t_connect("./inst/l2t_db.cnf")
+l2t <- l2t_connect("./inst/l2t_db.cnf", "backend")
 
 tbl_child <- tbl(l2t, "Child")
 tbl_childstudy <- tbl(l2t, "ChildStudy")

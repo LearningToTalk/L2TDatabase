@@ -78,7 +78,7 @@ rows_to_add <- participants_to_add %>%
   select(-short_id)
 
 library("L2TDatabase")
-l2t <- l2t_connect("./inst/l2t_db.cnf")
+l2t <- l2t_connect("./inst/l2t_db.cnf", "backend")
 
 # append_rows_to_table(l2t, tbl_name = "Child", rows = rows_to_add)
 

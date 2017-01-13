@@ -6,7 +6,7 @@ library("readxl")
 
 # Connect to db
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 
 kids_to_add <- read_excel("C:/Users/mahr/Desktop/manual_ci_import.xls") %>%
   # 306E was manually added bc she also partipated in longitudinal study

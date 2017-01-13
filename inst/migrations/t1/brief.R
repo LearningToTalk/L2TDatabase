@@ -10,7 +10,7 @@ source(paths$GetSiteInfo, chdir = TRUE)
 
 # Download/backup db beforehand
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
 # Treat "NA" and NA identically
@@ -95,7 +95,7 @@ to_add
 
 # Update the remote table. An error here is a good thing if there are no new
 # rows to add
-append_rows_to_table(l2t, "PPVT", to_add)
+append_rows_to_table(l2t, "BRIEF", to_add)
 
 # Check that composite scores were added correctly
 brief <- collect("BRIEF" %from% l2t) %>% left_join(cds)

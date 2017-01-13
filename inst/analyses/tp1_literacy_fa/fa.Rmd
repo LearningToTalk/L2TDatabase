@@ -17,7 +17,7 @@ library("dplyr", warn.conflicts = FALSE)
 
 # connect to the database using my cnf file
 cnf_file <- file.path("../../l2t_db.cnf")
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 ```
 
 First, we prepare the data-set by downloading the tables of child-study IDs, of 

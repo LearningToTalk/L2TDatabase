@@ -11,7 +11,7 @@ source("inst/migrations/dates.R")
 
 # Download/backup db beforehand
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 # l2t_dl <- l2t_backup(l2t, "inst/backup")
 
 # Collect dates

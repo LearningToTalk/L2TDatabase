@@ -16,7 +16,7 @@ opts_knit$set(root.dir = "../../")
 library("L2TDatabase")
 library("dplyr", warn.conflicts = FALSE)
 cnf_file <- "inst/l2t_db.cnf"
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 
 # Combine child, study, childstudy, and ppvts tbls
 ppvts <- tbl(l2t, "ChildStudy")  %>%

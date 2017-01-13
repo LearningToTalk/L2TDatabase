@@ -3,7 +3,7 @@ library(dplyr)
 library(L2TDatabase)
 
 # Download/backup db beforehand
-cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
+cnf_file <- file.path(getwd(), "inst/l2t_db.cnf", "backend")
 l2t <- l2t_connect(cnf_file)
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 

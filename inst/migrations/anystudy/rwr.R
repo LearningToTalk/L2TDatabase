@@ -86,7 +86,7 @@ administrations <- administrations %>% anti_join(wrong_block_given)
 
 
 library(L2TDatabase)
-l2t <- l2t_connect("./inst/l2t_db.cnf")
+l2t <- l2t_connect("./inst/l2t_db.cnf", "backend")
 
 dobs <- tbl(l2t, "Child") %>%
   left_join("ChildStudy" %from% l2t) %>%

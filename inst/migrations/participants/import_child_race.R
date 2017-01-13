@@ -5,7 +5,7 @@ library("L2TDatabase")
 library("dplyr")
 
 cnf_file <- "inst/l2t_db.cnf"
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
 t1_ids <- l2t_dl$ChildStudy %>%

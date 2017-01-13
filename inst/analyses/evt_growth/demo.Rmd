@@ -16,7 +16,7 @@ library("dplyr")
 
 # Connect to dat-base
 cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 
 # Combine EVT and Child tables to get LateTalker/Implant status
 evts <- tbl(l2t, "EVT") %>% 
