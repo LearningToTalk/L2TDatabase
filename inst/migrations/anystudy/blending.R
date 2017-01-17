@@ -11,12 +11,13 @@ cnf_file <- file.path(getwd(), "./inst/l2t_db.cnf")
 l2t <- l2t_connect(cnf_file, "backend")
 l2t_dl <- l2t_backup(l2t, "./inst/backup")
 
-# Map from study to study number, from study/short research id to child-study
-# id, from child-study id to research id
-cds <- l2t_dl$ChildStudy %>% left_join(l2t_dl$Study) %>% left_join(l2t_dl$Child)
+# Combine child-study-childstudy tbls
+cds <- tbl(l2t, "ChildStudy") %>%
+  left_join(tbl(l2t, "Study")) %>%
+  left_join(tbl(l2t, "Child")) %>%
+  select(ShortResearchID, Study, ChildStudyID, Birthdate) %>%
+  collect()
 
-# Studies in the database
-cds %>% select(Study) %>% distinct
 
 
 # Get Blending responses
