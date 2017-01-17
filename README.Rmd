@@ -410,6 +410,7 @@ tbls_to_check <- c(
   LENA = "LENA_Averages", 
   MinPair = "MinPair_Aggregate", 
   PPVT = "PPVT", 
+  Rhyming = "Rhyming_Aggregate", 
   SAILS = "SAILS_Aggregate", 
   VerbalFluency = "VerbalFluency")
 
