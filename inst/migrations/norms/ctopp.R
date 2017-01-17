@@ -59,3 +59,4 @@ norms <- current_rows %>%
 # General filtering
 norms %>%
   filter(Raw == 4, Age %in% c(48, 54, 60))
+

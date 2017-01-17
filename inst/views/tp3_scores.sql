@@ -38,6 +38,18 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint3 as
     gfta.GFTA_NumTranscribed,
     gfta.GFTA_AdjCorrect,
     gfta.GFTA_Standard,
+    ctopp_blending.CTOPP_Blending_Completion,
+    ctopp_blending.CTOPP_Blending_Age,
+    ctopp_blending.CTOPP_Blending_Raw,
+    ctopp_blending.CTOPP_Blending_Scaled,
+    ctopp_elision.CTOPP_Elision_Completion,
+    ctopp_elision.CTOPP_Elision_Age,
+    ctopp_elision.CTOPP_Elision_Raw,
+    ctopp_elision.CTOPP_Elision_Scaled,
+    ctopp_memory.CTOPP_Memory_Completion,
+    ctopp_memory.CTOPP_Memory_Age,
+    ctopp_memory.CTOPP_Memory_Raw,
+    ctopp_memory.CTOPP_Memory_Scaled,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
     minpair.MinPair_NumTestTrials,
@@ -71,6 +83,12 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint3 as
     left join backend.q_SAILS_Aggregate sails
       using (ChildStudyID)
     left join backend.RealWordRep_Admin rwr
+      using (ChildStudyID)
+    left join backend.CTOPP_Blending ctopp_blending
+      using (ChildStudyID)
+    left join backend.CTOPP_Elision ctopp_elision
+      using (ChildStudyID)
+    left join backend.CTOPP_Memory ctopp_memory
       using (ChildStudyID)
   where
     study.Study = "TimePoint3"

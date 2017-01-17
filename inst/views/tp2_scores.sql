@@ -31,6 +31,14 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
     fruit.FruitStroop_Completion,
     fruit.FruitStroop_Age,
     fruit.FruitStroop_Score,
+    ctopp_blending.CTOPP_Blending_Completion,
+    ctopp_blending.CTOPP_Blending_Age,
+    ctopp_blending.CTOPP_Blending_Raw,
+    ctopp_blending.CTOPP_Blending_Scaled,
+    ctopp_elision.CTOPP_Elision_Completion,
+    ctopp_elision.CTOPP_Elision_Age,
+    ctopp_elision.CTOPP_Elision_Raw,
+    ctopp_elision.CTOPP_Elision_Scaled,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
     minpair.MinPair_NumTestTrials,
@@ -96,6 +104,10 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
     left join backend.q_Rhyming_Aggregate rhyming
       using (ChildStudyID)
     left join backend.q_LENA_Averages lena
+      using (ChildStudyID)
+    left join backend.CTOPP_Blending ctopp_blending
+      using (ChildStudyID)
+    left join backend.CTOPP_Elision ctopp_elision
       using (ChildStudyID)
   where
     study.Study = "TimePoint2"

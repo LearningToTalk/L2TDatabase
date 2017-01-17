@@ -35,6 +35,10 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV1 as
     fruit.FruitStroop_Completion,
     fruit.FruitStroop_Age,
     fruit.FruitStroop_Score,
+    ctopp_memory.CTOPP_Memory_Completion,
+    ctopp_memory.CTOPP_Memory_Age,
+    ctopp_memory.CTOPP_Memory_Raw,
+    ctopp_memory.CTOPP_Memory_Scaled,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
     minpair.MinPair_NumTestTrials,
@@ -80,6 +84,8 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV1 as
     left join backend.q_SAILS_Aggregate sails
       using (ChildStudyID)
     left join backend.q_LENA_Averages lena
+      using (ChildStudyID)
+    left join backend.CTOPP_Memory ctopp_memory
       using (ChildStudyID)
   where
     study.Study = "CochlearV1"
@@ -123,6 +129,10 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV2 as
     fruit.FruitStroop_Completion,
     fruit.FruitStroop_Age,
     fruit.FruitStroop_Score,
+    ctopp_memory.CTOPP_Memory_Completion,
+    ctopp_memory.CTOPP_Memory_Age,
+    ctopp_memory.CTOPP_Memory_Raw,
+    ctopp_memory.CTOPP_Memory_Scaled,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
     minpair.MinPair_NumTestTrials,
@@ -168,6 +178,8 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV2 as
     left join backend.q_SAILS_Aggregate sails
       using (ChildStudyID)
     left join backend.q_LENA_Averages lena
+      using (ChildStudyID)
+    left join backend.CTOPP_Memory ctopp_memory
       using (ChildStudyID)
   where
     study.Study = "CochlearV2"
