@@ -75,4 +75,4 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint3 as
   where
     study.Study = "TimePoint3"
   order by
-    childstudy.ShortResearchID
+    childstudy.ShortResearchID;

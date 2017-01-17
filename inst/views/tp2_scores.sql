@@ -51,6 +51,11 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
     blending.Blending_Audiovisual_ProportionCorrect,
     blending.Blending_Audio_NumTrials,
     blending.Blending_Audio_ProportionCorrect,
+    rhyming.Rhyming_Completion,
+    rhyming.Rhyming_Age,
+    rhyming.Rhyming_NumPracticeTrials,
+    rhyming.Rhyming_NumTestTrials,
+    rhyming.Rhyming_ProportionTestCorrect,
     lena.LENA_Completion,
     lena.LENA_Age,
     lena.LENA_FirstHour,
@@ -88,9 +93,11 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
       using (ChildStudyID)
     left join backend.q_Blending_Summary blending
       using (ChildStudyID)
+    left join backend.q_Rhyming_Aggregate rhyming
+      using (ChildStudyID)
     left join backend.q_LENA_Averages lena
       using (ChildStudyID)
   where
     study.Study = "TimePoint2"
   order by
-    childstudy.ShortResearchID
+    childstudy.ShortResearchID;
