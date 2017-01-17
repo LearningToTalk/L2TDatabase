@@ -1,8 +1,18 @@
+L2TDatabase
+================
+
+-   [Installation](#installation)
+-   [Connecting with .cnf files](#connecting-with-.cnf-files)
+-   [Using dplyr to look at the database](#using-dplyr-to-look-at-the-database)
+-   [L2T Database conventions](#l2t-database-conventions)
+-   [Metadata](#metadata)
+-   [Back up](#back-up)
+-   [Writing new data to a database](#writing-new-data-to-a-database)
+-   [Other helpers](#other-helpers)
+-   [Repository structure](#repository-structure)
+-   [Study coverage](#study-coverage)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-L2TDatabase
-===========
-
 This R package contains helper functions for working with the MySQL database for the [Learning To Talk](http://learningtotalk.org) project.
 
 Installation
@@ -331,43 +341,43 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-01-13_12-52/BRIEF.csv
-#> Writing ./inst/backup/2017-01-13_12-52/Blending_Admin.csv
-#> Writing ./inst/backup/2017-01-13_12-52/Blending_Responses.csv
-#> Writing ./inst/backup/2017-01-13_12-52/Caregiver.csv
-#> Writing ./inst/backup/2017-01-13_12-52/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-01-13_12-52/Child.csv
-#> Writing ./inst/backup/2017-01-13_12-52/ChildStudy.csv
-#> Writing ./inst/backup/2017-01-13_12-52/EVT.csv
-#> Writing ./inst/backup/2017-01-13_12-52/FruitStroop.csv
-#> Writing ./inst/backup/2017-01-13_12-52/GFTA.csv
-#> Writing ./inst/backup/2017-01-13_12-52/Household.csv
-#> Writing ./inst/backup/2017-01-13_12-52/LENA_Admin.csv
-#> Writing ./inst/backup/2017-01-13_12-52/LENA_Hours.csv
-#> Writing ./inst/backup/2017-01-13_12-52/Literacy.csv
-#> Writing ./inst/backup/2017-01-13_12-52/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-01-13_12-52/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-01-13_12-52/PPVT.csv
-#> Writing ./inst/backup/2017-01-13_12-52/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-01-13_12-52/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-01-13_12-52/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-01-13_12-52/SES.csv
-#> Writing ./inst/backup/2017-01-13_12-52/SES_Entry.csv
-#> Writing ./inst/backup/2017-01-13_12-52/Study.csv
-#> Writing ./inst/backup/2017-01-13_12-52/VerbalFluency.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_Household_Education.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-01-13_12-52/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-13_12-52/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-01-13_12-52/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-01-17_08-40/BRIEF.csv
+#> Writing ./inst/backup/2017-01-17_08-40/Blending_Admin.csv
+#> Writing ./inst/backup/2017-01-17_08-40/Blending_Responses.csv
+#> Writing ./inst/backup/2017-01-17_08-40/Caregiver.csv
+#> Writing ./inst/backup/2017-01-17_08-40/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-01-17_08-40/Child.csv
+#> Writing ./inst/backup/2017-01-17_08-40/ChildStudy.csv
+#> Writing ./inst/backup/2017-01-17_08-40/EVT.csv
+#> Writing ./inst/backup/2017-01-17_08-40/FruitStroop.csv
+#> Writing ./inst/backup/2017-01-17_08-40/GFTA.csv
+#> Writing ./inst/backup/2017-01-17_08-40/Household.csv
+#> Writing ./inst/backup/2017-01-17_08-40/LENA_Admin.csv
+#> Writing ./inst/backup/2017-01-17_08-40/LENA_Hours.csv
+#> Writing ./inst/backup/2017-01-17_08-40/Literacy.csv
+#> Writing ./inst/backup/2017-01-17_08-40/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-01-17_08-40/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-01-17_08-40/PPVT.csv
+#> Writing ./inst/backup/2017-01-17_08-40/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-01-17_08-40/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-01-17_08-40/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-01-17_08-40/SES.csv
+#> Writing ./inst/backup/2017-01-17_08-40/SES_Entry.csv
+#> Writing ./inst/backup/2017-01-17_08-40/Study.csv
+#> Writing ./inst/backup/2017-01-17_08-40/VerbalFluency.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_Household_Education.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_08-40/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_08-40/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-01-17_08-40/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
@@ -436,7 +446,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1            7  Hello!  2017-01-13 12:52:17
+#> 1           12  Hello!  2017-01-17 08:40:39
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.
@@ -475,3 +485,81 @@ Repository structure
 This repository is an R package, so the `R/`, `man/` and `tests/` contain the source code, documentation, and unit tests for the package.
 
 Most of the action is in the `inst/` directory. `inst/migrations/` contains R scripts that add data from our various spreadsheets and csv files to the database. `inst/audit/` contains some helper scripts that check for inconsistencys in our data. `inst/views/` contains the source code for our SQL queries used by the database.
+
+Study coverage
+--------------
+
+The following table summarizes how many scores/administrations of each task were collected for each study. It is included here to show which tasks and which studies have been migrated into the database.
+
+| Table         | Study            |  Participants|  Administrations|
+|:--------------|:-----------------|-------------:|----------------:|
+| Blending      | TimePoint2       |            65|               65|
+| EVT           | CochlearMatching |             4|                4|
+| EVT           | CochlearV1       |            24|               24|
+| EVT           | CochlearV2       |            10|               10|
+| EVT           | DialectDensity   |            12|               12|
+| EVT           | DialectSwitch    |            43|               43|
+| EVT           | LateTalker       |             7|                7|
+| EVT           | MaternalEd       |            19|               19|
+| EVT           | TimePoint1       |           201|              201|
+| EVT           | TimePoint2       |           178|              178|
+| EVT           | TimePoint3       |           164|              164|
+| FruitStroop   | CochlearMatching |             1|                1|
+| FruitStroop   | CochlearV1       |            22|               22|
+| FruitStroop   | CochlearV2       |             6|                6|
+| FruitStroop   | DialectDensity   |             8|                8|
+| FruitStroop   | DialectSwitch    |            43|               43|
+| FruitStroop   | LateTalker       |             7|                7|
+| FruitStroop   | MaternalEd       |            16|               16|
+| FruitStroop   | TimePoint1       |           209|              209|
+| FruitStroop   | TimePoint2       |           178|              178|
+| GFTA          | CochlearMatching |             1|                1|
+| GFTA          | CochlearV1       |            24|               24|
+| GFTA          | CochlearV2       |            10|               10|
+| GFTA          | LateTalker       |             6|                6|
+| GFTA          | MaternalEd       |            16|               16|
+| GFTA          | TimePoint1       |           176|              176|
+| GFTA          | TimePoint3       |           156|              156|
+| LENA          | CochlearMatching |             1|                1|
+| LENA          | CochlearV1       |            21|               21|
+| LENA          | CochlearV2       |             7|                7|
+| LENA          | DialectSwitch    |            30|               30|
+| LENA          | LateTalker       |             6|                6|
+| LENA          | MaternalEd       |            13|               13|
+| LENA          | TimePoint1       |           182|              182|
+| LENA          | TimePoint2       |           140|              140|
+| LENA          | TimePoint3       |             1|                1|
+| MinPair       | CochlearMatching |             3|                3|
+| MinPair       | CochlearV1       |            24|               24|
+| MinPair       | CochlearV2       |            10|               10|
+| MinPair       | DialectSwitch    |            43|               84|
+| MinPair       | LateTalker       |             9|                9|
+| MinPair       | MaternalEd       |            13|               25|
+| MinPair       | TimePoint1       |           190|              190|
+| MinPair       | TimePoint2       |            94|               94|
+| MinPair       | TimePoint3       |             3|                3|
+| PPVT          | CochlearMatching |             4|                4|
+| PPVT          | CochlearV1       |            24|               24|
+| PPVT          | CochlearV2       |            10|               10|
+| PPVT          | DialectDensity   |             6|                6|
+| PPVT          | DialectSwitch    |            44|               44|
+| PPVT          | LateTalker       |             7|                7|
+| PPVT          | MaternalEd       |            21|               21|
+| PPVT          | TimePoint1       |           200|              200|
+| PPVT          | TimePoint2       |           180|              180|
+| PPVT          | TimePoint3       |            29|               29|
+| SAILS         | CochlearMatching |             2|                2|
+| SAILS         | CochlearV1       |            11|               11|
+| SAILS         | CochlearV2       |             8|                8|
+| SAILS         | LateTalker       |             5|                5|
+| SAILS         | MaternalEd       |            10|               10|
+| SAILS         | TimePoint2       |           161|              161|
+| SAILS         | TimePoint3       |           156|              156|
+| VerbalFluency | CochlearMatching |             3|                3|
+| VerbalFluency | CochlearV1       |            23|               23|
+| VerbalFluency | CochlearV2       |            10|               10|
+| VerbalFluency | LateTalker       |             9|                9|
+| VerbalFluency | MaternalEd       |            20|               20|
+| VerbalFluency | TimePoint1       |           196|              196|
+| VerbalFluency | TimePoint2       |           179|              179|
+| VerbalFluency | TimePoint3       |           161|              161|

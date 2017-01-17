@@ -1,5 +1,11 @@
 ---
-output: github_document
+title: "L2TDatabase"
+
+output: 
+  github_document:
+    toc: true
+    toc_depth: 2
+
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -35,13 +41,8 @@ print.tbl_sql <- function(x, ..., n = NULL, width = NULL) {
 
 
 
-L2TDatabase
-===============================================================================
-
 This R package contains helper functions for working with the MySQL database for
 the [Learning To Talk](http://learningtotalk.org) project.
-
-
 
 
 Installation
@@ -390,6 +391,49 @@ R scripts that add data from our various spreadsheets and csv files to
 the database. `inst/audit/` contains some helper scripts that check for
 inconsistencys in our data. `inst/views/` contains the source code for our SQL
 queries used by the database.
+
+
+
+Study coverage
+-------------------------------------------------------------------------------
+
+The following table summarizes how many scores/administrations of each task
+were collected for each study. It is included here to show which tasks and which
+studies have been migrated into the database.
+
+```{r, echo = FALSE, warning = FALSE}
+tbls_to_check <- c(
+  Blending = "Blending_Summary", 
+  EVT = "EVT", 
+  FruitStroop = "FruitStroop", 
+  GFTA = "GFTA", 
+  LENA = "LENA_Averages", 
+  MinPair = "MinPair_Aggregate", 
+  PPVT = "PPVT", 
+  SAILS = "SAILS_Aggregate", 
+  VerbalFluency = "VerbalFluency")
+
+count_studies <- function(tbl_name, db = l2t) {
+  responses <- tbl(db, tbl_name) %>% 
+    collect() %>% 
+    select(everything(), Date = ends_with("Completion")) %>% 
+    filter(!is.na(Date))
+  
+  responses %>% 
+    group_by(Study) %>% 
+    summarise(Participants = n_distinct(ResearchID), 
+              Administrations = n()) %>% 
+    select(Study, Participants, Administrations)
+}
+
+
+study_counts <- tbls_to_check %>% 
+  lapply(count_studies) %>% 
+  bind_rows(.id = "Table")
+
+knitr::kable(study_counts)
+```
+
 
 
 
