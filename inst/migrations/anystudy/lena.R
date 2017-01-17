@@ -21,15 +21,25 @@ cnf_file <- file.path(getwd(), "inst/l2t_db.cnf")
 l2t <- l2t_connect(cnf_file, "backend")
 l2t_dl <- l2t_backup(l2t, "inst/backup")
 
-# Use ShortResearchID and Study columns to get ChildStudyID
-df_cds <- left_join(l2t_dl$ChildStudy, l2t_dl$Study)
-df_cds
+# Combine child-study-childstudy tbls
+df_cds <- tbl(l2t, "ChildStudy") %>%
+  left_join(tbl(l2t, "Study")) %>%
+  left_join(tbl(l2t, "Child")) %>%
+  select(ShortResearchID, Study, ChildStudyID, Birthdate) %>%
+  collect()
+
+
+# Calculate chronological ages, default to NA if error encountered
+chr_age <- failwith(NA, chrono_age)
 
 df_lena_hours <- lena_csvs %>%
   bind_rows() %>%
   left_join(df_cds) %>%
-  rename(LENA_Date = LENADate)
-df_lena_hours
+  rename(LENA_Date = LENADate) %>%
+  mutate(LENA_Age = unlist(Map(chr_age, LENA_Date, Birthdate)))
+
+df_lena_hours %>% filter(is.na(ChildStudyID))
+df_lena_hours %>% filter(is.na(LENA_Age))
 
 # Keep just the columns in the LENA_Admin table. Since there are several hours
 # per admin, use `distinct` to get one row per admin
@@ -41,18 +51,17 @@ df_local_admins <- df_lena_hours %>%
 n_distinct(df_local_admins$ChildStudyID)
 nrow(df_local_admins)
 
-# NB: The remote table has a Notes column, whereas the local copy doesn't. This
-# doesn't affect the anti_join below. If the two did have Notes columns that
-# disagreed, then duplicated data could make its way to the database.
+# The remote table has a Notes column, whereas the local copy doesn't.
 df_remote_admins
 df_local_admins
 
 # Remove duplicated data.
-df_local_admins_to_add <- df_local_admins %>%
-  anti_join(df_remote_admins) %>%
-  arrange(ChildStudyID, LENA_Date)
-df_local_admins_to_add
+df_local_admins_to_add <- find_new_rows_in_table(
+  data = df_local_admins,
+  ref_data = df_remote_admins,
+  required_cols = "ChildStudyID")
 
+df_local_admins_to_add
 
 # Update db
 append_rows_to_table(l2t, "LENA_Admin", df_local_admins_to_add)

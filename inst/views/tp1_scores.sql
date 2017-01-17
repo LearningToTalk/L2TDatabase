@@ -44,6 +44,7 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint1 as
     rwr.RealWordRep_Age,
     rwr.RealWordRep_Experiment,
     lena.LENA_Completion,
+    lena.LENA_Age,
     lena.LENA_FirstHour,
     lena.LENA_FinalHour,
     lena.LENA_Hours,

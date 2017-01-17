@@ -52,6 +52,7 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
     blending.Blending_Audio_NumTrials,
     blending.Blending_Audio_ProportionCorrect,
     lena.LENA_Completion,
+    lena.LENA_Age,
     lena.LENA_FirstHour,
     lena.LENA_FinalHour,
     lena.LENA_Hours,
