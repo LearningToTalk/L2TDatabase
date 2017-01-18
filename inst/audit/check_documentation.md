@@ -1,7 +1,7 @@
 Documentation Check
 ================
 Tristan Mahr
-2016-03-17
+2017-01-17
 
 MySQL allows users to write short documentation comments for database tables (up to 80 characters) and for database fields (up to 255 characters). These documentation comments can be queried and retrieved like other data, so they provide a handy way to store descriptive metadata.
 
@@ -15,7 +15,7 @@ library("L2TDatabase")
 library("dplyr")
 
 cnf_file <- "inst/l2t_db.cnf"
-l2t <- l2t_connect(cnf_file)
+l2t <- l2t_connect(cnf_file, "backend")
 ```
 
 ### We cannot document views
@@ -27,11 +27,20 @@ The following tables are views and can only have have limited documentation.
 ``` r
 describe_db(l2t) %>% 
   filter(Description == "VIEW")
-#>   Database               Table Rows Description
-#> 1      l2t q_MinPair_Aggregate   NA        VIEW
-#> 2      l2t q_Scores_TimePoint1   NA        VIEW
-#> 3      l2t q_Scores_TimePoint2   NA        VIEW
-#> 4      l2t q_Scores_TimePoint3   NA        VIEW
+#>    Database                              Table Rows Description
+#> 1   backend       q_Blending_ModulePropCorrect   NA        VIEW
+#> 2   backend             q_Blending_PropCorrect   NA        VIEW
+#> 3   backend                 q_Blending_Summary   NA        VIEW
+#> 4   backend      q_Blending_SupportPropCorrect   NA        VIEW
+#> 5   backend              q_Household_Education   NA        VIEW
+#> 6   backend     q_Household_Maternal_Caregiver   NA        VIEW
+#> 7   backend q_Household_Max_Maternal_Education   NA        VIEW
+#> 8   backend                    q_LENA_Averages   NA        VIEW
+#> 9   backend                q_MinPair_Aggregate   NA        VIEW
+#> 10  backend                q_Rhyming_Aggregate   NA        VIEW
+#> 11  backend              q_Rhyming_PropCorrect   NA        VIEW
+#> 12  backend                  q_SAILS_Aggregate   NA        VIEW
+#> 13  backend                q_SAILS_PropCorrect   NA        VIEW
 ```
 
 In the `q_MinPair_Aggregate` view, the proportion correct for non-training trials is a derived value. The field `MinPair_ProportionCorrect` is created and computed as the query is executed. Therefore, there is no documentation available for it.
@@ -41,9 +50,11 @@ l2t %>%
   describe_tbl("q_MinPair_Aggregate") %>% 
   filter(Description == "")
 #>                 Table                     Field Index     DataType
-#> 1 q_MinPair_Aggregate MinPair_ProportionCorrect       decimal(7,4)
+#> 1 q_MinPair_Aggregate     MinPair_NumTestTrials         bigint(21)
+#> 2 q_MinPair_Aggregate MinPair_ProportionCorrect       decimal(7,4)
 #>   DefaultValue NullAllowed Description
-#> 1         <NA>         YES
+#> 1            0          NO            
+#> 2         <NA>         YES
 ```
 
 Undocumented Tables
@@ -52,14 +63,13 @@ Undocumented Tables
 The following tables are missing documentation:
 
 ``` r
-describe_db(l2t) %>% 
-  filter(Description == "")
-#>   Database         Table Rows Description
-#> 1      l2t    ChildStudy  559            
-#> 2      l2t   FruitStroop    0            
-#> 3      l2t      Literacy  207            
-#> 4      l2t         Study    3            
-#> 5      l2t VerbalFluency    0
+no_table_doc <- describe_db(l2t) %>% filter(Description == "")
+no_table_doc
+#>   Database      Table Rows Description
+#> 1  backend ChildStudy  697            
+#> 2  backend  Household  298            
+#> 3  backend   Literacy  207            
+#> 4  backend      Study   10
 ```
 
 Undocumented Fields
@@ -77,34 +87,21 @@ non_view_tbls <- src_tbls(l2t) %>% str_reject("q_")
 
 # Get description of each non-view table. Combine them.
 all_descriptions <- Map(function(x) describe_tbl(l2t, x), non_view_tbls) %>% 
-  bind_rows 
+  bind_rows() %>% 
+  as_data_frame()
 
 # Keep only undocumented rows
-all_descriptions %>% 
-  filter(Description == "") %>% 
+undocumented_fields <- all_descriptions %>% 
+  # Ignore the temporary tables used for mass data-entry
+  mutate(IsEntryTable = stringr::str_detect(Table, "_Entry")) %>% 
+  filter(Description == "", !IsEntryTable) %>% 
   select(Table, Field, Description) %>% 
-  print(n = nrow(.))
-#> Source: local data frame [17 x 3]
-#> 
-#>            Table                            Field Description
-#>            (chr)                            (chr)       (chr)
-#> 1      SES_Entry                            SESID            
-#> 2      SES_Entry                  SESID_Timestamp            
-#> 3      SES_Entry                       ResearchID            
-#> 4      SES_Entry                  Child_Ethnicity            
-#> 5      SES_Entry                       Child_Race            
-#> 6      SES_Entry                Household_Under18            
-#> 7      SES_Entry                 Household_Adults            
-#> 8      SES_Entry Household_AdultsContributeIncome            
-#> 9      SES_Entry           Household_FamilyIncome            
-#> 10     SES_Entry          Household_MaritalStatus            
-#> 11     SES_Entry                        SES_Notes            
-#> 12 VerbalFluency                  VerbalFluencyID            
-#> 13 VerbalFluency                     ChildStudyID            
-#> 14 VerbalFluency          VerbalFluency_Timestamp            
-#> 15 VerbalFluency         VerbalFluency_Completion            
-#> 16 VerbalFluency                VerbalFluency_Raw            
-#> 17 VerbalFluency              VerbalFluency_AgeEq
+  print(n = Inf)
+#> # A tibble: 0 × 3
+#> # ... with 3 variables: Table <chr>, Field <chr>, Description <chr>
+undocumented_fields
+#> # A tibble: 0 × 3
+#> # ... with 3 variables: Table <chr>, Field <chr>, Description <chr>
 ```
 
 Name checks
@@ -112,24 +109,27 @@ Name checks
 
 We need to be careful about tables that share field names because they will not join correctly. For example, trying to combine an Experiment table with a `Dialect` column to a ParticipantInfo table with `Dialect` column will wrongly combine experiments and children that share the same values in the Dialect column. Which is not what we want, especially the same child is exposed to different versions of an experiment with different dialects.
 
-Ideally, only index fields should be allowed to appear in more than one table, and we check that this is the case:
+Ideally, only index fields should be allowed to appear in more than one table, and we check that this is the case. We allow tables for item-level data to have repeated names (like Trial or Stimulus1), so we ignore tables with `_Responses` in the name.
 
 ``` r
 # Get description of each non-view table. Combine them.
-all_descriptions %>% 
+repeated_names <- all_descriptions %>% 
   # Ignore the temporary tables used for mass data-entry
-  mutate(IsEntryTable = stringr::str_detect(Table, "_Entry")) %>% 
-  filter(Index == "", !IsEntryTable) %>% 
+  mutate(IsEntryTable = stringr::str_detect(Table, "_Entry"),
+         IsItemTable = stringr::str_detect(Table, "_Responses")) %>% 
+  filter(Index == "", !IsEntryTable, !IsItemTable) %>% 
   # Count the occurrence of each field
   group_by(Field) %>% 
   mutate(FieldCount = length(Field)) %>% 
-  ungroup %>% 
+  ungroup() %>% 
   # Keep duplicated fields
   filter(FieldCount != 1) %>% 
   select(Field, Table) %>% 
   arrange(Field) %>% 
-  print(n = nrow(.))
-#> Source: local data frame [0 x 2]
-#> 
-#> Variables not shown: Field (chr), Table (chr)
+  print(n = Inf)
+#> # A tibble: 0 × 2
+#> # ... with 2 variables: Field <chr>, Table <chr>
+repeated_names
+#> # A tibble: 0 × 2
+#> # ... with 2 variables: Field <chr>, Table <chr>
 ```

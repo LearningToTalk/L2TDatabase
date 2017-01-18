@@ -62,8 +62,8 @@ l2t %>%
 The following tables are missing documentation:
 
 ```{r}
-describe_db(l2t) %>% 
-  filter(Description == "")
+no_table_doc <- describe_db(l2t) %>% filter(Description == "")
+no_table_doc
 ```
 
 ## Undocumented Fields
@@ -80,13 +80,17 @@ non_view_tbls <- src_tbls(l2t) %>% str_reject("q_")
 
 # Get description of each non-view table. Combine them.
 all_descriptions <- Map(function(x) describe_tbl(l2t, x), non_view_tbls) %>% 
-  bind_rows 
+  bind_rows() %>% 
+  as_data_frame()
 
 # Keep only undocumented rows
-all_descriptions %>% 
-  filter(Description == "") %>% 
+undocumented_fields <- all_descriptions %>% 
+  # Ignore the temporary tables used for mass data-entry
+  mutate(IsEntryTable = stringr::str_detect(Table, "_Entry")) %>% 
+  filter(Description == "", !IsEntryTable) %>% 
   select(Table, Field, Description) %>% 
-  print(n = nrow(.))
+  print(n = Inf)
+undocumented_fields
 ```
 
 ## Name checks
@@ -98,26 +102,41 @@ combine experiments and children that share the same values in the Dialect
 column. Which is not what we want, especially the same child is exposed to
 different versions of an experiment with different dialects. 
 
-Ideally, only index fields should be allowed to appear in more than one table,
-and we check that this is the case:
+Ideally, only index fields should be allowed to appear in more than one table, 
+and we check that this is the case. We allow tables for item-level data to have 
+repeated names (like Trial or Stimulus1), so we ignore tables with `_Responses`
+in the name.
 
 ```{r}
 # Get description of each non-view table. Combine them.
-all_descriptions %>% 
+repeated_names <- all_descriptions %>% 
   # Ignore the temporary tables used for mass data-entry
-  mutate(IsEntryTable = stringr::str_detect(Table, "_Entry")) %>% 
-  filter(Index == "", !IsEntryTable) %>% 
+  mutate(IsEntryTable = stringr::str_detect(Table, "_Entry"),
+         IsItemTable = stringr::str_detect(Table, "_Responses")) %>% 
+  filter(Index == "", !IsEntryTable, !IsItemTable) %>% 
   # Count the occurrence of each field
   group_by(Field) %>% 
   mutate(FieldCount = length(Field)) %>% 
-  ungroup %>% 
+  ungroup() %>% 
   # Keep duplicated fields
   filter(FieldCount != 1) %>% 
   select(Field, Table) %>% 
   arrange(Field) %>% 
-  print(n = nrow(.))
+  print(n = Inf)
+repeated_names
 ```
 
+
+
+```{r, echo = FALSE}
+results <- bind_rows(repeated_names, undocumented_fields, no_table_doc)
+results <- data_frame(
+  Check = "MySQL metadata",
+  Date = format(Sys.Date()),
+  Passing = nrow(results) == 0
+)
+readr::write_csv(results, "./inst/audit/results_metadata.csv")
+```
 
 
 

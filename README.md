@@ -14,8 +14,6 @@ L2TDatabase
 -   [Study coverage](#study-coverage)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-    ## Warning: package 'dplyr' was built under R version 3.3.2
-
 This R package contains helper functions for working with the MySQL database for the [Learning To Talk](http://learningtotalk.org) project.
 
 Installation
@@ -353,50 +351,50 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-01-17_20-42/BRIEF.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Blending_Admin.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Blending_Responses.csv
-#> Writing ./inst/backup/2017-01-17_20-42/CTOPP_Blending.csv
-#> Writing ./inst/backup/2017-01-17_20-42/CTOPP_Elision.csv
-#> Writing ./inst/backup/2017-01-17_20-42/CTOPP_Memory.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Caregiver.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Child.csv
-#> Writing ./inst/backup/2017-01-17_20-42/ChildStudy.csv
-#> Writing ./inst/backup/2017-01-17_20-42/EVT.csv
-#> Writing ./inst/backup/2017-01-17_20-42/FruitStroop.csv
-#> Writing ./inst/backup/2017-01-17_20-42/GFTA.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Household.csv
-#> Writing ./inst/backup/2017-01-17_20-42/LENA_Admin.csv
-#> Writing ./inst/backup/2017-01-17_20-42/LENA_Hours.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Literacy.csv
-#> Writing ./inst/backup/2017-01-17_20-42/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-01-17_20-42/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-01-17_20-42/PPVT.csv
-#> Writing ./inst/backup/2017-01-17_20-42/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Rhyming_Admin.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Rhyming_Responses.csv
-#> Writing ./inst/backup/2017-01-17_20-42/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-01-17_20-42/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-01-17_20-42/SES.csv
-#> Writing ./inst/backup/2017-01-17_20-42/SES_Entry.csv
-#> Writing ./inst/backup/2017-01-17_20-42/Study.csv
-#> Writing ./inst/backup/2017-01-17_20-42/VerbalFluency.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Household_Education.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Rhyming_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_Rhyming_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_20-42/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_20-42/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-01-17_20-42/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-01-17_21-00/BRIEF.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Blending_Admin.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Blending_Responses.csv
+#> Writing ./inst/backup/2017-01-17_21-00/CTOPP_Blending.csv
+#> Writing ./inst/backup/2017-01-17_21-00/CTOPP_Elision.csv
+#> Writing ./inst/backup/2017-01-17_21-00/CTOPP_Memory.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Caregiver.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Child.csv
+#> Writing ./inst/backup/2017-01-17_21-00/ChildStudy.csv
+#> Writing ./inst/backup/2017-01-17_21-00/EVT.csv
+#> Writing ./inst/backup/2017-01-17_21-00/FruitStroop.csv
+#> Writing ./inst/backup/2017-01-17_21-00/GFTA.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Household.csv
+#> Writing ./inst/backup/2017-01-17_21-00/LENA_Admin.csv
+#> Writing ./inst/backup/2017-01-17_21-00/LENA_Hours.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Literacy.csv
+#> Writing ./inst/backup/2017-01-17_21-00/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-01-17_21-00/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-01-17_21-00/PPVT.csv
+#> Writing ./inst/backup/2017-01-17_21-00/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Rhyming_Admin.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Rhyming_Responses.csv
+#> Writing ./inst/backup/2017-01-17_21-00/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-01-17_21-00/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-01-17_21-00/SES.csv
+#> Writing ./inst/backup/2017-01-17_21-00/SES_Entry.csv
+#> Writing ./inst/backup/2017-01-17_21-00/Study.csv
+#> Writing ./inst/backup/2017-01-17_21-00/VerbalFluency.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Household_Education.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Rhyming_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_Rhyming_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_21-00/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_21-00/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-01-17_21-00/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
@@ -465,7 +463,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1           20  Hello!  2017-01-17 20:43:15
+#> 1           22  Hello!  2017-01-17 21:01:44
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.
@@ -510,11 +508,12 @@ Data audits
 
 We have some scripts that audit our data-sets. The results of these checks are printed here.
 
-| Check         | Date       | Passing | Result               | Link                                                      |
-|:--------------|:-----------|:--------|:---------------------|:----------------------------------------------------------|
-| EVT           | 2017-01-17 | TRUE    | :white\_check\_mark: | [EVT](inst/audit/audit-evt.md)                            |
-| PPVT          | 2017-01-17 | TRUE    | :white\_check\_mark: | [PPVT](inst/audit/audit-ppvt.md)                          |
-| Discrepancies | 2017-01-17 | TRUE    | :white\_check\_mark: | [Data entry discrepancies](inst/audit/check_integrity.md) |
+| Check          | Date       | Passing | Result               | Link                                                             |
+|:---------------|:-----------|:--------|:---------------------|:-----------------------------------------------------------------|
+| EVT            | 2017-01-17 | TRUE    | :white\_check\_mark: | [EVT](inst/audit/audit-evt.md)                                   |
+| PPVT           | 2017-01-17 | TRUE    | :white\_check\_mark: | [PPVT](inst/audit/audit-ppvt.md)                                 |
+| Discrepancies  | 2017-01-17 | TRUE    | :white\_check\_mark: | [Data entry discrepancies](inst/audit/check_integrity.md)        |
+| MySQL metadata | 2017-01-17 | FALSE   | :x:                  | [MySQL metadata completeness](inst/audit/check_documentation.md) |
 
 Study coverage
 --------------

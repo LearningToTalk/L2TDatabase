@@ -10,7 +10,7 @@ output:
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, warning = FALSE}
 library("dplyr", warn.conflicts = FALSE)
 
 knitr::opts_chunk$set(
@@ -407,8 +407,10 @@ ppvt <- readr::read_csv("./inst/audit/results_ppvt.csv") %>%
   mutate(Link = "[PPVT](inst/audit/audit-ppvt.md)")
 integrity <- readr::read_csv("./inst/audit/results_integrity.csv") %>% 
   mutate(Link = "[Data entry discrepancies](inst/audit/check_integrity.md)")
+docs <- readr::read_csv("./inst/audit/results_metadata.csv") %>% 
+  mutate(Link = "[MySQL metadata completeness](inst/audit/check_documentation.md)")
 
-checks <- bind_rows(evt, ppvt, integrity) %>% 
+checks <- bind_rows(evt, ppvt, integrity, docs) %>% 
   mutate(Result = ifelse(Passing, ":white_check_mark:", ":x:")) %>% 
   select(Check, Date, Passing, Result, Link)
 knitr::kable(checks)
