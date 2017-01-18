@@ -10,6 +10,7 @@ L2TDatabase
 -   [Writing new data to a database](#writing-new-data-to-a-database)
 -   [Other helpers](#other-helpers)
 -   [Repository structure](#repository-structure)
+-   [Data audits](#data-audits)
 -   [Study coverage](#study-coverage)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
@@ -352,50 +353,50 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-01-17_18-36/BRIEF.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Blending_Admin.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Blending_Responses.csv
-#> Writing ./inst/backup/2017-01-17_18-36/CTOPP_Blending.csv
-#> Writing ./inst/backup/2017-01-17_18-36/CTOPP_Elision.csv
-#> Writing ./inst/backup/2017-01-17_18-36/CTOPP_Memory.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Caregiver.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Child.csv
-#> Writing ./inst/backup/2017-01-17_18-36/ChildStudy.csv
-#> Writing ./inst/backup/2017-01-17_18-36/EVT.csv
-#> Writing ./inst/backup/2017-01-17_18-36/FruitStroop.csv
-#> Writing ./inst/backup/2017-01-17_18-36/GFTA.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Household.csv
-#> Writing ./inst/backup/2017-01-17_18-36/LENA_Admin.csv
-#> Writing ./inst/backup/2017-01-17_18-36/LENA_Hours.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Literacy.csv
-#> Writing ./inst/backup/2017-01-17_18-36/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-01-17_18-36/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-01-17_18-36/PPVT.csv
-#> Writing ./inst/backup/2017-01-17_18-36/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Rhyming_Admin.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Rhyming_Responses.csv
-#> Writing ./inst/backup/2017-01-17_18-36/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-01-17_18-36/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-01-17_18-36/SES.csv
-#> Writing ./inst/backup/2017-01-17_18-36/SES_Entry.csv
-#> Writing ./inst/backup/2017-01-17_18-36/Study.csv
-#> Writing ./inst/backup/2017-01-17_18-36/VerbalFluency.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Household_Education.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Rhyming_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_Rhyming_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_18-36/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_18-36/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-01-17_18-36/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-01-17_20-42/BRIEF.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Blending_Admin.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Blending_Responses.csv
+#> Writing ./inst/backup/2017-01-17_20-42/CTOPP_Blending.csv
+#> Writing ./inst/backup/2017-01-17_20-42/CTOPP_Elision.csv
+#> Writing ./inst/backup/2017-01-17_20-42/CTOPP_Memory.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Caregiver.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Child.csv
+#> Writing ./inst/backup/2017-01-17_20-42/ChildStudy.csv
+#> Writing ./inst/backup/2017-01-17_20-42/EVT.csv
+#> Writing ./inst/backup/2017-01-17_20-42/FruitStroop.csv
+#> Writing ./inst/backup/2017-01-17_20-42/GFTA.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Household.csv
+#> Writing ./inst/backup/2017-01-17_20-42/LENA_Admin.csv
+#> Writing ./inst/backup/2017-01-17_20-42/LENA_Hours.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Literacy.csv
+#> Writing ./inst/backup/2017-01-17_20-42/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-01-17_20-42/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-01-17_20-42/PPVT.csv
+#> Writing ./inst/backup/2017-01-17_20-42/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Rhyming_Admin.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Rhyming_Responses.csv
+#> Writing ./inst/backup/2017-01-17_20-42/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-01-17_20-42/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-01-17_20-42/SES.csv
+#> Writing ./inst/backup/2017-01-17_20-42/SES_Entry.csv
+#> Writing ./inst/backup/2017-01-17_20-42/Study.csv
+#> Writing ./inst/backup/2017-01-17_20-42/VerbalFluency.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Household_Education.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Rhyming_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_Rhyming_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_20-42/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_20-42/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-01-17_20-42/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
@@ -464,7 +465,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1           16  Hello!  2017-01-17 18:37:49
+#> 1           20  Hello!  2017-01-17 20:43:15
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.
@@ -503,6 +504,17 @@ Repository structure
 This repository is an R package, so the `R/`, `man/` and `tests/` contain the source code, documentation, and unit tests for the package.
 
 Most of the action is in the `inst/` directory. `inst/migrations/` contains R scripts that add data from our various spreadsheets and csv files to the database. `inst/audit/` contains some helper scripts that check for inconsistencys in our data. `inst/views/` contains the source code for our SQL queries used by the database.
+
+Data audits
+-----------
+
+We have some scripts that audit our data-sets. The results of these checks are printed here.
+
+| Check         | Date       | Passing | Result               | Link                                                      |
+|:--------------|:-----------|:--------|:---------------------|:----------------------------------------------------------|
+| EVT           | 2017-01-17 | TRUE    | :white\_check\_mark: | [EVT](inst/audit/audit-evt.md)                            |
+| PPVT          | 2017-01-17 | TRUE    | :white\_check\_mark: | [PPVT](inst/audit/audit-ppvt.md)                          |
+| Discrepancies | 2017-01-17 | TRUE    | :white\_check\_mark: | [Data entry discrepancies](inst/audit/check_integrity.md) |
 
 Study coverage
 --------------

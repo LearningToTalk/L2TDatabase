@@ -1,12 +1,12 @@
 
 
-stamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
+# stamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
 
 audit_evt <- "inst/audit/audit_evt.R"
-evt_out_name <- paste0(stamp, "_audit-evt.md")
+evt_out_name <- "audit-evt.md"
 
 audit_ppvt <- "inst/audit/audit_ppvt.R"
-ppvt_out_name <- paste0(stamp, "_audit-ppvt.md")
+ppvt_out_name <- "audit-ppvt.md"
 
 rmarkdown::render(
   audit_evt,

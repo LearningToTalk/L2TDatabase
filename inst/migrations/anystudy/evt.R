@@ -53,12 +53,9 @@ df_scores %>%
 # Attach the database identifiers to the EVT scores
 df_with_evt <- left_join(df_scores, df_cds)
 
-# Calculate chronological ages, default to NA if error encountered
-chr_age <- failwith(NA, chrono_age)
-
 df_can_be_added <-  df_with_evt %>%
   filter(!is.na(EVT_Completion)) %>%
-  mutate(EVT_Age = unlist(Map(chr_age, EVT_Completion, Birthdate))) %>%
+  mutate(EVT_Age = chrono_age(EVT_Completion, Birthdate)) %>%
   select(-Study, -ShortResearchID, -Birthdate)
 
 
@@ -116,3 +113,4 @@ anti_join(df_remote, df_local, by = "EVTID")
 anti_join(df_local, df_remote)
 anti_join(df_can_be_added, df_remote)
 anti_join(df_remote, df_can_be_added)
+

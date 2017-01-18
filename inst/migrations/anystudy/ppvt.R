@@ -50,12 +50,9 @@ df_with_ppvt <- left_join(df_scores, df_cds)
 # Kids in spreadsheets not in database. Should be empty rows (attrition)
 df_scores %>% anti_join(df_cds) %>% as.data.frame
 
-# Calculate chronological ages, default to NA if error encountered
-chr_age <- failwith(NA, chrono_age)
-
 df_can_be_added <-  df_with_ppvt %>%
   filter(!is.na(PPVT_Completion)) %>%
-  mutate(PPVT_Age = unlist(Map(chr_age, PPVT_Completion, Birthdate))) %>%
+  mutate(PPVT_Age = chrono_age(PPVT_Completion, Birthdate)) %>%
   select(-Study, -ShortResearchID, -Birthdate)
 
 # Find completely new records that need to be added

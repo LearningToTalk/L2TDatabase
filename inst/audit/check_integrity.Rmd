@@ -69,10 +69,10 @@ get_scores_from_info <- function(df) {
            PPVT_Standard = maybe_starts_with("PPVT_standard"),
            PPVT_GSV = maybe_starts_with("PPVT_GSV"),
            FruitStroop_Date = maybe_starts_with("FruitStroop_Date"),
-           FruitStroop_Score = maybe_starts_with("fruitstroop_time|FruitStroop_Score"),
+           FruitStroop_Score = maybe_matches("fruitstroop_time|FruitStroop_Score"),
            VerbalFluency_Date = maybe_starts_with("VerbalFluency_Date"),
-           VerbalFluency_Score = maybe_starts_with("verbalfluency_raw|VerbalFluency_Score"),
-           VerbalFluency_AgeEquivalent = maybe_starts_with("verbalfluency_AE|VerbalFluency_AgeEquivalent"),
+           VerbalFluency_Score = maybe_matches("verbalfluency_raw|VerbalFluency_Score"),
+           VerbalFluency_AgeEquivalent = maybe_matches("verbalfluency_AE|VerbalFluency_AgeEquivalent"),
            CTOPPElision_Date = maybe_starts_with("CTOPPElision_Date"),
            CTOPPElision_Raw = maybe_matches("CTOPP_Elision_raw|CTOPPElision_Raw"),
            CTOPPElision_Scaled = maybe_matches("CTOPP_Elision_scaled|CTOPPElision_Scaled"),
@@ -202,6 +202,13 @@ were found in that field.
 
 ```{r}
 columns_with_discrepancies <- discrepancies %>% names()
+
+results <- data_frame(
+  Check = "Discrepancies", 
+  Date = format(Sys.Date()),
+  Passing = nrow(bind_rows(discrepancies)) == 0)
+
+readr::write_csv(results, "./inst/audit/results_integrity.csv")
 
 columns_with_errors <- discrepancies %>% 
   lapply(. %>% select(Study, Variable)) %>% 

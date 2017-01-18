@@ -1,7 +1,7 @@
 Data Integrity Check
 ================
 Tristan Mahr
-2017-01-13
+2017-01-17
 
 In Spring 2016, we had our data-entry team re-enter test scores gathered in our studies, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
@@ -55,13 +55,16 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearMatching | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | CochlearMatching | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | CochlearMatching | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
+| CochlearMatching | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | CochlearMatching | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | CochlearMatching | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| CochlearMatching | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | CochlearMatching | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
+| CochlearMatching | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 | CochlearV1       | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
 | CochlearV1       | CTOPPMemory\_Date                        | TRUE    | :white\_check\_mark: |
 | CochlearV1       | CTOPPMemory\_Raw                         | TRUE    | :white\_check\_mark: |
@@ -72,13 +75,16 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearV1       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | CochlearV1       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | CochlearV1       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
+| CochlearV1       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | CochlearV1       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearV1       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearV1       | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | CochlearV1       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | CochlearV1       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | CochlearV1       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| CochlearV1       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | CochlearV1       | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
+| CochlearV1       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 | CochlearV2       | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
 | CochlearV2       | CTOPPMemory\_Date                        | TRUE    | :white\_check\_mark: |
 | CochlearV2       | CTOPPMemory\_Raw                         | TRUE    | :white\_check\_mark: |
@@ -89,27 +95,33 @@ This table lists all the fields that were checked and whether any discrepancies 
 | CochlearV2       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | CochlearV2       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | CochlearV2       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
+| CochlearV2       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | CochlearV2       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | CochlearV2       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| CochlearV2       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | CochlearV2       | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
-| Dialect          | BRIEFP\_Date                             | FALSE   | :x:                  |
-| Dialect          | EVT\_Date                                | FALSE   | :x:                  |
+| CochlearV2       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
+| Dialect          | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
+| Dialect          | EVT\_Date                                | TRUE    | :white\_check\_mark: |
 | Dialect          | EVT\_Form                                | TRUE    | :white\_check\_mark: |
 | Dialect          | EVT\_GSV                                 | TRUE    | :white\_check\_mark: |
 | Dialect          | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | Dialect          | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | Dialect          | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
+| Dialect          | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | Dialect          | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
-| Dialect          | PPVT\_Date                               | FALSE   | :x:                  |
+| Dialect          | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | Dialect          | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
-| Dialect          | PPVT\_GSV                                | FALSE   | :x:                  |
+| Dialect          | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | Dialect          | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
-| Dialect          | PPVT\_Standard                           | FALSE   | :x:                  |
+| Dialect          | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| Dialect          | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | Dialect          | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
+| Dialect          | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 | LateTalker       | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
 | LateTalker       | CTOPPBlending\_Date                      | TRUE    | :white\_check\_mark: |
 | LateTalker       | CTOPPBlending\_Raw                       | TRUE    | :white\_check\_mark: |
@@ -132,13 +144,16 @@ This table lists all the fields that were checked and whether any discrepancies 
 | LateTalker       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | LateTalker       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | LateTalker       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
+| LateTalker       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | LateTalker       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | LateTalker       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| LateTalker       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | LateTalker       | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
+| LateTalker       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 | MaternalEd       | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
 | MaternalEd       | CTOPPBlending\_Date                      | TRUE    | :white\_check\_mark: |
 | MaternalEd       | CTOPPBlending\_Raw                       | TRUE    | :white\_check\_mark: |
@@ -161,13 +176,16 @@ This table lists all the fields that were checked and whether any discrepancies 
 | MaternalEd       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | MaternalEd       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | MaternalEd       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
+| MaternalEd       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | MaternalEd       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | MaternalEd       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | MaternalEd       | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | MaternalEd       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | MaternalEd       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | MaternalEd       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| MaternalEd       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | MaternalEd       | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
+| MaternalEd       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 | TimePoint1       | BRIEFP\_Date                             | TRUE    | :white\_check\_mark: |
 | TimePoint1       | EVT\_Date                                | TRUE    | :white\_check\_mark: |
 | TimePoint1       | EVT\_Form                                | TRUE    | :white\_check\_mark: |
@@ -175,13 +193,16 @@ This table lists all the fields that were checked and whether any discrepancies 
 | TimePoint1       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | TimePoint1       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | TimePoint1       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
+| TimePoint1       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | TimePoint1       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
 | TimePoint1       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | TimePoint1       | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | TimePoint1       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | TimePoint1       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | TimePoint1       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| TimePoint1       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | TimePoint1       | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
+| TimePoint1       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 | TimePoint2       | CTOPPBlending\_Date                      | TRUE    | :white\_check\_mark: |
 | TimePoint2       | CTOPPBlending\_Raw                       | TRUE    | :white\_check\_mark: |
 | TimePoint2       | CTOPPBlending\_Scaled                    | TRUE    | :white\_check\_mark: |
@@ -194,6 +215,7 @@ This table lists all the fields that were checked and whether any discrepancies 
 | TimePoint2       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | TimePoint2       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | TimePoint2       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
+| TimePoint2       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
 | TimePoint2       | KBIT\_Raw                                | TRUE    | :white\_check\_mark: |
 | TimePoint2       | KBIT\_Standard                           | TRUE    | :white\_check\_mark: |
 | TimePoint2       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
@@ -201,7 +223,9 @@ This table lists all the fields that were checked and whether any discrepancies 
 | TimePoint2       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | TimePoint2       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | TimePoint2       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| TimePoint2       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | TimePoint2       | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
+| TimePoint2       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 | TimePoint3       | CTOPPBlending\_Date                      | TRUE    | :white\_check\_mark: |
 | TimePoint3       | CTOPPBlending\_Raw                       | TRUE    | :white\_check\_mark: |
 | TimePoint3       | CTOPPBlending\_Scaled                    | TRUE    | :white\_check\_mark: |
@@ -230,79 +254,34 @@ This table lists all the fields that were checked and whether any discrepancies 
 | TimePoint3       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
 | TimePoint3       | PPVT\_Raw                                | TRUE    | :white\_check\_mark: |
 | TimePoint3       | PPVT\_Standard                           | TRUE    | :white\_check\_mark: |
+| TimePoint3       | VerbalFluency\_AgeEquivalent             | TRUE    | :white\_check\_mark: |
 | TimePoint3       | VerbalFluency\_Date                      | TRUE    | :white\_check\_mark: |
+| TimePoint3       | VerbalFluency\_Score                     | TRUE    | :white\_check\_mark: |
 
 ### Details
 
 These are all the mismatching values.
 
-    #> $BRIEFP_Date
-    #>     Study ParticipantID    Variable       DIRT ParticipantInfo
-    #> 1 Dialect          429D BRIEFP_Date 2014-03-22      2014-03-29
-    #> 2 Dialect          442D BRIEFP_Date 2014-05-30      2014-06-13
-    #> 
-    #> $EVT_Date
-    #>     Study ParticipantID Variable       DIRT ParticipantInfo
-    #> 1 Dialect          405D EVT_Date 2013-10-01      2010-01-13
-    #> 2 Dialect          450D EVT_Date 2014-06-29      2014-06-19
-    #> 
-    #> $PPVT_Date
-    #>     Study ParticipantID  Variable       DIRT ParticipantInfo
-    #> 1 Dialect          421D PPVT_Date 2013-11-09      2013-11-04
-    #> 2 Dialect          459D PPVT_Date 2014-09-27      2011-05-07
-    #> 
-    #> $PPVT_GSV
-    #>     Study ParticipantID Variable DIRT ParticipantInfo
-    #> 1 Dialect          422D PPVT_GSV  126             125
-    #> 
-    #> $PPVT_Standard
-    #>     Study ParticipantID      Variable DIRT ParticipantInfo
-    #> 1 Dialect          402D PPVT_Standard  100             108
+    #> named list()
 
 ### Unchecked fields
 
 The following columns in DIRT were not checked because there is not a matching column in the participant info spreadsheets
 
-| Study            | Variable                     |                  |
-|:-----------------|:-----------------------------|------------------|
-| MaternalEd       | VerbalFluency\_Score         | :grey\_question: |
-| MaternalEd       | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| MaternalEd       | MBCDI\_Date                  | :grey\_question: |
-| MaternalEd       | FruitStroop\_Score           | :grey\_question: |
-| MaternalEd       | CDI\_Extension\_Date         | :grey\_question: |
-| TimePoint1       | VerbalFluency\_Score         | :grey\_question: |
-| TimePoint1       | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| TimePoint1       | MBCDI\_Date                  | :grey\_question: |
-| TimePoint1       | FruitStroop\_Score           | :grey\_question: |
-| TimePoint1       | CDI\_Extension\_Date         | :grey\_question: |
-| TimePoint2       | VerbalFluency\_Score         | :grey\_question: |
-| TimePoint2       | FruitStroop\_Score           | :grey\_question: |
-| TimePoint2       | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| TimePoint2       | KBIT\_Date                   | :grey\_question: |
-| TimePoint3       | VerbalFluency\_Score         | :grey\_question: |
-| TimePoint3       | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| TimePoint3       | KBIT\_Date                   | :grey\_question: |
-| LateTalker       | MBCDI\_Date                  | :grey\_question: |
-| LateTalker       | CDI\_Extension\_Date         | :grey\_question: |
-| LateTalker       | VerbalFluency\_Score         | :grey\_question: |
-| LateTalker       | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| LateTalker       | FruitStroop\_Score           | :grey\_question: |
-| CochlearV1       | CDI\_Extension\_Date         | :grey\_question: |
-| CochlearV1       | MBCDI\_Date                  | :grey\_question: |
-| CochlearV1       | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| CochlearV1       | VerbalFluency\_Score         | :grey\_question: |
-| CochlearV1       | FruitStroop\_Score           | :grey\_question: |
-| CochlearV1       | CDI W&G                      | :grey\_question: |
-| CochlearV2       | MBCDI\_Date                  | :grey\_question: |
-| CochlearV2       | CDI\_Extension\_Date         | :grey\_question: |
-| CochlearV2       | FruitStroop\_Score           | :grey\_question: |
-| CochlearV2       | VerbalFluency\_Score         | :grey\_question: |
-| CochlearV2       | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| CochlearMatching | CDI\_Extension\_Date         | :grey\_question: |
-| CochlearMatching | MBCDI\_Date                  | :grey\_question: |
-| CochlearMatching | FruitStroop\_Score           | :grey\_question: |
-| CochlearMatching | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| CochlearMatching | VerbalFluency\_Score         | :grey\_question: |
-| Dialect          | VerbalFluency\_Score         | :grey\_question: |
-| Dialect          | VerbalFluency\_AgeEquivalent | :grey\_question: |
-| Dialect          | FruitStroop\_Score           | :grey\_question: |
+| Study            | Variable             |                  |
+|:-----------------|:---------------------|------------------|
+| MaternalEd       | MBCDI\_Date          | :grey\_question: |
+| MaternalEd       | CDI\_Extension\_Date | :grey\_question: |
+| TimePoint1       | MBCDI\_Date          | :grey\_question: |
+| TimePoint1       | CDI\_Extension\_Date | :grey\_question: |
+| TimePoint2       | KBIT\_Date           | :grey\_question: |
+| TimePoint3       | KBIT\_Date           | :grey\_question: |
+| LateTalker       | MBCDI\_Date          | :grey\_question: |
+| LateTalker       | CDI\_Extension\_Date | :grey\_question: |
+| CochlearV1       | CDI\_Extension\_Date | :grey\_question: |
+| CochlearV1       | MBCDI\_Date          | :grey\_question: |
+| CochlearV1       | CDI W&G              | :grey\_question: |
+| CochlearV2       | MBCDI\_Date          | :grey\_question: |
+| CochlearV2       | CDI\_Extension\_Date | :grey\_question: |
+| CochlearMatching | CDI\_Extension\_Date | :grey\_question: |
+| CochlearMatching | MBCDI\_Date          | :grey\_question: |

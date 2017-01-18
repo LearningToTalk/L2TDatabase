@@ -394,6 +394,28 @@ queries used by the database.
 
 
 
+Data audits
+-------------------------------------------------------------------------------
+
+We have some scripts that audit our data-sets. The results of these checks are
+printed here.
+
+```{r, echo = FALSE, message = FALSE}
+evt <- readr::read_csv("./inst/audit/results_evt.csv") %>% 
+  mutate(Link = "[EVT](inst/audit/audit-evt.md)")
+ppvt <- readr::read_csv("./inst/audit/results_ppvt.csv") %>% 
+  mutate(Link = "[PPVT](inst/audit/audit-ppvt.md)")
+integrity <- readr::read_csv("./inst/audit/results_integrity.csv") %>% 
+  mutate(Link = "[Data entry discrepancies](inst/audit/check_integrity.md)")
+
+checks <- bind_rows(evt, ppvt, integrity) %>% 
+  mutate(Result = ifelse(Passing, ":white_check_mark:", ":x:")) %>% 
+  select(Check, Date, Passing, Result, Link)
+knitr::kable(checks)
+```
+
+
+
 Study coverage
 -------------------------------------------------------------------------------
 

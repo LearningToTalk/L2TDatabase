@@ -91,10 +91,12 @@ form_a <- norm_check %>%
   select(Study:EVT_Form, NormAge = Age, Raw, OurStnd, Stnd, OurGSV, GSV)
 
 #' #### GSVs
-form_a %>% filter(OurGSV != GSV)
+form_a_gsv <- form_a %>% filter(OurGSV != GSV)
+form_a_gsv
 
 #' #### Standard Scores
-form_a %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
+form_a_std <- form_a %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
+form_a_std
 
 #' ### Form NA checks
 #'
@@ -105,7 +107,20 @@ form_na <- norm_check %>%
   select(Study:EVT_Form, NormAge = Age, Raw, OurStnd, Stnd, OurGSV, GSV)
 
 #' #### GSVs
-form_na %>% filter(OurGSV != GSV)
+form_na_gsv <- form_na %>% filter(OurGSV != GSV)
+form_na_gsv
 
 #' #### Standard Scores
-form_na %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
+form_na_std <- form_na %>% filter(OurStnd != Stnd) %>% arrange(Study, ID)
+form_na_std
+
+
+results <- bind_rows(form_na_gsv, form_na_std, form_a_std, form_a_gsv)
+
+results <- data_frame(
+  Check = "EVT",
+  Date = format(Sys.Date()),
+  Passing = nrow(results) == 0)
+
+readr::write_csv(results, "./inst/audit/results_evt.csv")
+
