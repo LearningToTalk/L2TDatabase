@@ -1,7 +1,7 @@
 Documentation Check
 ================
 Tristan Mahr
-2017-01-17
+2017-01-18
 
 MySQL allows users to write short documentation comments for database tables (up to 80 characters) and for database fields (up to 255 characters). These documentation comments can be queried and retrieved like other data, so they provide a handy way to store descriptive metadata.
 
@@ -65,11 +65,8 @@ The following tables are missing documentation:
 ``` r
 no_table_doc <- describe_db(l2t) %>% filter(Description == "")
 no_table_doc
-#>   Database      Table Rows Description
-#> 1  backend ChildStudy  697            
-#> 2  backend  Household  298            
-#> 3  backend   Literacy  207            
-#> 4  backend      Study   10
+#> [1] Database    Table       Rows        Description
+#> <0 rows> (or 0-length row.names)
 ```
 
 Undocumented Fields

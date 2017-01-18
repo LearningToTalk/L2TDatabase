@@ -351,50 +351,50 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-01-17_21-00/BRIEF.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Blending_Admin.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Blending_Responses.csv
-#> Writing ./inst/backup/2017-01-17_21-00/CTOPP_Blending.csv
-#> Writing ./inst/backup/2017-01-17_21-00/CTOPP_Elision.csv
-#> Writing ./inst/backup/2017-01-17_21-00/CTOPP_Memory.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Caregiver.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Child.csv
-#> Writing ./inst/backup/2017-01-17_21-00/ChildStudy.csv
-#> Writing ./inst/backup/2017-01-17_21-00/EVT.csv
-#> Writing ./inst/backup/2017-01-17_21-00/FruitStroop.csv
-#> Writing ./inst/backup/2017-01-17_21-00/GFTA.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Household.csv
-#> Writing ./inst/backup/2017-01-17_21-00/LENA_Admin.csv
-#> Writing ./inst/backup/2017-01-17_21-00/LENA_Hours.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Literacy.csv
-#> Writing ./inst/backup/2017-01-17_21-00/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-01-17_21-00/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-01-17_21-00/PPVT.csv
-#> Writing ./inst/backup/2017-01-17_21-00/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Rhyming_Admin.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Rhyming_Responses.csv
-#> Writing ./inst/backup/2017-01-17_21-00/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-01-17_21-00/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-01-17_21-00/SES.csv
-#> Writing ./inst/backup/2017-01-17_21-00/SES_Entry.csv
-#> Writing ./inst/backup/2017-01-17_21-00/Study.csv
-#> Writing ./inst/backup/2017-01-17_21-00/VerbalFluency.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Household_Education.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Rhyming_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_Rhyming_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_21-00/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_21-00/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-01-17_21-00/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-01-18_10-02/BRIEF.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Blending_Admin.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Blending_Responses.csv
+#> Writing ./inst/backup/2017-01-18_10-02/CTOPP_Blending.csv
+#> Writing ./inst/backup/2017-01-18_10-02/CTOPP_Elision.csv
+#> Writing ./inst/backup/2017-01-18_10-02/CTOPP_Memory.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Caregiver.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Child.csv
+#> Writing ./inst/backup/2017-01-18_10-02/ChildStudy.csv
+#> Writing ./inst/backup/2017-01-18_10-02/EVT.csv
+#> Writing ./inst/backup/2017-01-18_10-02/FruitStroop.csv
+#> Writing ./inst/backup/2017-01-18_10-02/GFTA.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Household.csv
+#> Writing ./inst/backup/2017-01-18_10-02/LENA_Admin.csv
+#> Writing ./inst/backup/2017-01-18_10-02/LENA_Hours.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Literacy.csv
+#> Writing ./inst/backup/2017-01-18_10-02/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-01-18_10-02/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-01-18_10-02/PPVT.csv
+#> Writing ./inst/backup/2017-01-18_10-02/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Rhyming_Admin.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Rhyming_Responses.csv
+#> Writing ./inst/backup/2017-01-18_10-02/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-01-18_10-02/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-01-18_10-02/SES.csv
+#> Writing ./inst/backup/2017-01-18_10-02/SES_Entry.csv
+#> Writing ./inst/backup/2017-01-18_10-02/Study.csv
+#> Writing ./inst/backup/2017-01-18_10-02/VerbalFluency.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Household_Education.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Rhyming_Aggregate.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_Rhyming_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-01-18_10-02/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-18_10-02/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-01-18_10-02/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
@@ -463,7 +463,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1           22  Hello!  2017-01-17 21:01:44
+#> 1           23  Hello!  2017-01-18 10:03:01
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.
@@ -513,7 +513,7 @@ We have some scripts that audit our data-sets. The results of these checks are p
 | EVT            | 2017-01-17 | TRUE    | :white\_check\_mark: | [EVT](inst/audit/audit-evt.md)                                   |
 | PPVT           | 2017-01-17 | TRUE    | :white\_check\_mark: | [PPVT](inst/audit/audit-ppvt.md)                                 |
 | Discrepancies  | 2017-01-17 | TRUE    | :white\_check\_mark: | [Data entry discrepancies](inst/audit/check_integrity.md)        |
-| MySQL metadata | 2017-01-17 | FALSE   | :x:                  | [MySQL metadata completeness](inst/audit/check_documentation.md) |
+| MySQL metadata | 2017-01-18 | TRUE    | :white\_check\_mark: | [MySQL metadata completeness](inst/audit/check_documentation.md) |
 
 Study coverage
 --------------
