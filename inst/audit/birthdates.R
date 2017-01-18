@@ -3,6 +3,7 @@
 library("L2TDatabase")
 library("dplyr")
 library("tidyr")
+library("readr")
 # library("stringr")
 
 # Load external dependencies
@@ -22,11 +23,12 @@ cds <- tbl(l2t, "Child") %>%
   left_join(tbl(l2t, "ChildStudy")) %>%
   left_join(tbl(l2t, "Study")) %>%
   select(ChildID, Study, ParticipantID = ShortResearchID, Birthdate) %>%
-  collect
+  collect()
 
 df_dobs <- df_dates %>%
   filter(Variable == "DOB") %>%
   select(Study, ParticipantID, Birthdate = Value) %>%
+  type_convert(col_types = cols(Birthdate = col_date())) %>%
   mutate(Source = "DIRT",
          Birthdate = format(Birthdate)) %>%
   left_join(select(cds, -Birthdate))
