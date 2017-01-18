@@ -13,6 +13,8 @@ L2TDatabase
 -   [Study coverage](#study-coverage)
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
+    ## Warning: package 'dplyr' was built under R version 3.3.2
+
 This R package contains helper functions for working with the MySQL database for the [Learning To Talk](http://learningtotalk.org) project.
 
 Installation
@@ -167,15 +169,17 @@ Information about our participants and their testing data are stored in two sepa
 ``` r
 # list all the tbls in the database
 src_tbls(l2t)
-#>  [1] "Blending_Summary"          "EVT"                      
-#>  [3] "FruitStroop"               "GFTA"                     
-#>  [5] "LENA_Averages"             "Maternal_Education_Levels"
-#>  [7] "MinPair_Aggregate"         "MinPair_Trials"           
-#>  [9] "PPVT"                      "Rhyming_Aggregate"        
-#> [11] "SAILS_Aggregate"           "SAILS_Module_Aggregate"   
-#> [13] "Scores_CochlearV1"         "Scores_CochlearV2"        
-#> [15] "Scores_TimePoint1"         "Scores_TimePoint2"        
-#> [17] "Scores_TimePoint3"         "VerbalFluency"
+#>  [1] "Blending_Summary"          "CTOPP_Blending"           
+#>  [3] "CTOPP_Elision"             "CTOPP_Memory"             
+#>  [5] "EVT"                       "FruitStroop"              
+#>  [7] "GFTA"                      "LENA_Averages"            
+#>  [9] "Maternal_Education_Levels" "MinPair_Aggregate"        
+#> [11] "MinPair_Trials"            "PPVT"                     
+#> [13] "Rhyming_Aggregate"         "SAILS_Aggregate"          
+#> [15] "SAILS_Module_Aggregate"    "Scores_CochlearV1"        
+#> [17] "Scores_CochlearV2"         "Scores_TimePoint1"        
+#> [19] "Scores_TimePoint2"         "Scores_TimePoint3"        
+#> [21] "VerbalFluency"
 ```
 
 The tables here are *queries*: Tables that are computed on-the-fly whenever the data is requested. For example, `MinPair_Aggregate` shows the proportion correct of non-practice trials in the minimal pairs task by participant and by study. (I `select()` a subset of columns to exclude unnecessary columns like the name of the Eprime file containing the raw data.) The `Study` and `ResearchID` are the conventional identifiers for studies and participants.
@@ -214,42 +218,45 @@ src_tbls(l2t_backend)
 #>  [1] "BRIEF"                             
 #>  [2] "Blending_Admin"                    
 #>  [3] "Blending_Responses"                
-#>  [4] "Caregiver"                         
-#>  [5] "Caregiver_Entry"                   
-#>  [6] "Child"                             
-#>  [7] "ChildStudy"                        
-#>  [8] "EVT"                               
-#>  [9] "FruitStroop"                       
-#> [10] "GFTA"                              
-#> [11] "Household"                         
-#> [12] "LENA_Admin"                        
-#> [13] "LENA_Hours"                        
-#> [14] "Literacy"                          
-#> [15] "MinPair_Admin"                     
-#> [16] "MinPair_Responses"                 
-#> [17] "PPVT"                              
-#> [18] "RealWordRep_Admin"                 
-#> [19] "Rhyming_Admin"                     
-#> [20] "Rhyming_Responses"                 
-#> [21] "SAILS_Admin"                       
-#> [22] "SAILS_Responses"                   
-#> [23] "SES"                               
-#> [24] "SES_Entry"                         
-#> [25] "Study"                             
-#> [26] "VerbalFluency"                     
-#> [27] "q_Blending_ModulePropCorrect"      
-#> [28] "q_Blending_PropCorrect"            
-#> [29] "q_Blending_Summary"                
-#> [30] "q_Blending_SupportPropCorrect"     
-#> [31] "q_Household_Education"             
-#> [32] "q_Household_Maternal_Caregiver"    
-#> [33] "q_Household_Max_Maternal_Education"
-#> [34] "q_LENA_Averages"                   
-#> [35] "q_MinPair_Aggregate"               
-#> [36] "q_Rhyming_Aggregate"               
-#> [37] "q_Rhyming_PropCorrect"             
-#> [38] "q_SAILS_Aggregate"                 
-#> [39] "q_SAILS_PropCorrect"
+#>  [4] "CTOPP_Blending"                    
+#>  [5] "CTOPP_Elision"                     
+#>  [6] "CTOPP_Memory"                      
+#>  [7] "Caregiver"                         
+#>  [8] "Caregiver_Entry"                   
+#>  [9] "Child"                             
+#> [10] "ChildStudy"                        
+#> [11] "EVT"                               
+#> [12] "FruitStroop"                       
+#> [13] "GFTA"                              
+#> [14] "Household"                         
+#> [15] "LENA_Admin"                        
+#> [16] "LENA_Hours"                        
+#> [17] "Literacy"                          
+#> [18] "MinPair_Admin"                     
+#> [19] "MinPair_Responses"                 
+#> [20] "PPVT"                              
+#> [21] "RealWordRep_Admin"                 
+#> [22] "Rhyming_Admin"                     
+#> [23] "Rhyming_Responses"                 
+#> [24] "SAILS_Admin"                       
+#> [25] "SAILS_Responses"                   
+#> [26] "SES"                               
+#> [27] "SES_Entry"                         
+#> [28] "Study"                             
+#> [29] "VerbalFluency"                     
+#> [30] "q_Blending_ModulePropCorrect"      
+#> [31] "q_Blending_PropCorrect"            
+#> [32] "q_Blending_Summary"                
+#> [33] "q_Blending_SupportPropCorrect"     
+#> [34] "q_Household_Education"             
+#> [35] "q_Household_Maternal_Caregiver"    
+#> [36] "q_Household_Max_Maternal_Education"
+#> [37] "q_LENA_Averages"                   
+#> [38] "q_MinPair_Aggregate"               
+#> [39] "q_Rhyming_Aggregate"               
+#> [40] "q_Rhyming_PropCorrect"             
+#> [41] "q_SAILS_Aggregate"                 
+#> [42] "q_SAILS_PropCorrect"
 ```
 
 Some of the tables in the backend are not tables of raw data but intermediate, helper queries that are used in the main database. These helpers queries are prefixed with `q_`. For example, `q_Household_Education`, `q_Household_Maternal_Caregiver`, and `q_Household_Max_Maternal_Education` are a pipeline of calculations that determine the highest maternal education level in each household.
@@ -320,16 +327,16 @@ describe_db(src = l2t_backend) %>% head()
 #> 1  backend              BRIEF  224
 #> 2  backend     Blending_Admin   65
 #> 3  backend Blending_Responses 1643
-#> 4  backend          Caregiver  526
-#> 5  backend    Caregiver_Entry    6
-#> 6  backend              Child  338
+#> 4  backend     CTOPP_Blending  245
+#> 5  backend      CTOPP_Elision  245
+#> 6  backend       CTOPP_Memory  175
 #>                                                   Description
 #> 1 Scores from Behvr Rating Inventory of Exec Func (Preschool)
 #> 2                  Administrations of the Blending experiment
 #> 3           Trials and responses from the Blending experiment
-#> 4                       Demographics of children's caregivers
-#> 5     [Temp Data Entry] Demographics of children's caregivers
-#> 6         Unique IDs and demographics of children in database
+#> 4     Blending subtest of Comp Test of Phon Processing-2nd ed
+#> 5      Elision subtest of Comp Test of Phon Processing-2nd ed
+#> 6 MemForDigits subtest of Comp Test of Phon Processing-2nd ed
 ```
 
 These two forms of metadata are backed up by the `l2t_backup()` helper function.
@@ -345,47 +352,50 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-01-17_11-55/BRIEF.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Blending_Admin.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Blending_Responses.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Caregiver.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Child.csv
-#> Writing ./inst/backup/2017-01-17_11-55/ChildStudy.csv
-#> Writing ./inst/backup/2017-01-17_11-55/EVT.csv
-#> Writing ./inst/backup/2017-01-17_11-55/FruitStroop.csv
-#> Writing ./inst/backup/2017-01-17_11-55/GFTA.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Household.csv
-#> Writing ./inst/backup/2017-01-17_11-55/LENA_Admin.csv
-#> Writing ./inst/backup/2017-01-17_11-55/LENA_Hours.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Literacy.csv
-#> Writing ./inst/backup/2017-01-17_11-55/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-01-17_11-55/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-01-17_11-55/PPVT.csv
-#> Writing ./inst/backup/2017-01-17_11-55/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Rhyming_Admin.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Rhyming_Responses.csv
-#> Writing ./inst/backup/2017-01-17_11-55/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-01-17_11-55/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-01-17_11-55/SES.csv
-#> Writing ./inst/backup/2017-01-17_11-55/SES_Entry.csv
-#> Writing ./inst/backup/2017-01-17_11-55/Study.csv
-#> Writing ./inst/backup/2017-01-17_11-55/VerbalFluency.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Household_Education.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Rhyming_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_Rhyming_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-01-17_11-55/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-17_11-55/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-01-17_11-55/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-01-17_18-36/BRIEF.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Blending_Admin.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Blending_Responses.csv
+#> Writing ./inst/backup/2017-01-17_18-36/CTOPP_Blending.csv
+#> Writing ./inst/backup/2017-01-17_18-36/CTOPP_Elision.csv
+#> Writing ./inst/backup/2017-01-17_18-36/CTOPP_Memory.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Caregiver.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Child.csv
+#> Writing ./inst/backup/2017-01-17_18-36/ChildStudy.csv
+#> Writing ./inst/backup/2017-01-17_18-36/EVT.csv
+#> Writing ./inst/backup/2017-01-17_18-36/FruitStroop.csv
+#> Writing ./inst/backup/2017-01-17_18-36/GFTA.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Household.csv
+#> Writing ./inst/backup/2017-01-17_18-36/LENA_Admin.csv
+#> Writing ./inst/backup/2017-01-17_18-36/LENA_Hours.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Literacy.csv
+#> Writing ./inst/backup/2017-01-17_18-36/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-01-17_18-36/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-01-17_18-36/PPVT.csv
+#> Writing ./inst/backup/2017-01-17_18-36/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Rhyming_Admin.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Rhyming_Responses.csv
+#> Writing ./inst/backup/2017-01-17_18-36/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-01-17_18-36/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-01-17_18-36/SES.csv
+#> Writing ./inst/backup/2017-01-17_18-36/SES_Entry.csv
+#> Writing ./inst/backup/2017-01-17_18-36/Study.csv
+#> Writing ./inst/backup/2017-01-17_18-36/VerbalFluency.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Household_Education.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Rhyming_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_Rhyming_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-01-17_18-36/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-17_18-36/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-01-17_18-36/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
@@ -454,7 +464,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1           14  Hello!  2017-01-17 11:55:49
+#> 1           16  Hello!  2017-01-17 18:37:49
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.
@@ -499,76 +509,89 @@ Study coverage
 
 The following table summarizes how many scores/administrations of each task were collected for each study. It is included here to show which tasks and which studies have been migrated into the database.
 
-| Table         | Study            |  Participants|  Administrations|
-|:--------------|:-----------------|-------------:|----------------:|
-| Blending      | TimePoint2       |            65|               65|
-| EVT           | CochlearMatching |             4|                4|
-| EVT           | CochlearV1       |            24|               24|
-| EVT           | CochlearV2       |            10|               10|
-| EVT           | DialectDensity   |            12|               12|
-| EVT           | DialectSwitch    |            43|               43|
-| EVT           | LateTalker       |             7|                7|
-| EVT           | MaternalEd       |            19|               19|
-| EVT           | TimePoint1       |           201|              201|
-| EVT           | TimePoint2       |           178|              178|
-| EVT           | TimePoint3       |           164|              164|
-| FruitStroop   | CochlearMatching |             1|                1|
-| FruitStroop   | CochlearV1       |            22|               22|
-| FruitStroop   | CochlearV2       |             6|                6|
-| FruitStroop   | DialectDensity   |             8|                8|
-| FruitStroop   | DialectSwitch    |            43|               43|
-| FruitStroop   | LateTalker       |             7|                7|
-| FruitStroop   | MaternalEd       |            16|               16|
-| FruitStroop   | TimePoint1       |           209|              209|
-| FruitStroop   | TimePoint2       |           178|              178|
-| GFTA          | CochlearMatching |             1|                1|
-| GFTA          | CochlearV1       |            24|               24|
-| GFTA          | CochlearV2       |            10|               10|
-| GFTA          | LateTalker       |             6|                6|
-| GFTA          | MaternalEd       |            16|               16|
-| GFTA          | TimePoint1       |           176|              176|
-| GFTA          | TimePoint3       |           156|              156|
-| LENA          | CochlearMatching |             1|                1|
-| LENA          | CochlearV1       |            21|               21|
-| LENA          | CochlearV2       |             7|                7|
-| LENA          | DialectSwitch    |            30|               30|
-| LENA          | LateTalker       |             6|                6|
-| LENA          | MaternalEd       |            13|               13|
-| LENA          | TimePoint1       |           182|              182|
-| LENA          | TimePoint2       |           140|              140|
-| LENA          | TimePoint3       |             1|                1|
-| MinPair       | CochlearMatching |             3|                3|
-| MinPair       | CochlearV1       |            24|               24|
-| MinPair       | CochlearV2       |            10|               10|
-| MinPair       | DialectSwitch    |            43|               84|
-| MinPair       | LateTalker       |             9|                9|
-| MinPair       | MaternalEd       |            13|               25|
-| MinPair       | TimePoint1       |           190|              190|
-| MinPair       | TimePoint2       |            94|               94|
-| MinPair       | TimePoint3       |             3|                3|
-| PPVT          | CochlearMatching |             4|                4|
-| PPVT          | CochlearV1       |            24|               24|
-| PPVT          | CochlearV2       |            10|               10|
-| PPVT          | DialectDensity   |             6|                6|
-| PPVT          | DialectSwitch    |            44|               44|
-| PPVT          | LateTalker       |             7|                7|
-| PPVT          | MaternalEd       |            21|               21|
-| PPVT          | TimePoint1       |           200|              200|
-| PPVT          | TimePoint2       |           180|              180|
-| PPVT          | TimePoint3       |            29|               29|
-| Rhyming       | TimePoint2       |            69|               69|
-| SAILS         | CochlearMatching |             2|                2|
-| SAILS         | CochlearV1       |            11|               11|
-| SAILS         | CochlearV2       |             8|                8|
-| SAILS         | LateTalker       |             5|                5|
-| SAILS         | MaternalEd       |            10|               10|
-| SAILS         | TimePoint2       |           161|              161|
-| SAILS         | TimePoint3       |           156|              156|
-| VerbalFluency | CochlearMatching |             3|                3|
-| VerbalFluency | CochlearV1       |            23|               23|
-| VerbalFluency | CochlearV2       |            10|               10|
-| VerbalFluency | LateTalker       |             9|                9|
-| VerbalFluency | MaternalEd       |            20|               20|
-| VerbalFluency | TimePoint1       |           196|              196|
-| VerbalFluency | TimePoint2       |           179|              179|
-| VerbalFluency | TimePoint3       |           161|              161|
+| Table           | Study            |  Participants|  Administrations|
+|:----------------|:-----------------|-------------:|----------------:|
+| Blending        | TimePoint2       |            65|               65|
+| CTOPP\_Memory   | CochlearMatching |             3|                3|
+| CTOPP\_Memory   | CochlearV1       |             2|                2|
+| CTOPP\_Memory   | CochlearV2       |             4|                4|
+| CTOPP\_Memory   | MaternalEd       |             4|                4|
+| CTOPP\_Memory   | TimePoint3       |           162|              162|
+| CTOPP\_Blending | LateTalker       |             1|                1|
+| CTOPP\_Blending | MaternalEd       |             7|                7|
+| CTOPP\_Blending | TimePoint2       |            75|               75|
+| CTOPP\_Blending | TimePoint3       |           162|              162|
+| CTOPP\_Elision  | LateTalker       |             1|                1|
+| CTOPP\_Elision  | MaternalEd       |             7|                7|
+| CTOPP\_Elision  | TimePoint2       |            75|               75|
+| CTOPP\_Elision  | TimePoint3       |           162|              162|
+| EVT             | CochlearMatching |             4|                4|
+| EVT             | CochlearV1       |            24|               24|
+| EVT             | CochlearV2       |            10|               10|
+| EVT             | DialectDensity   |            12|               12|
+| EVT             | DialectSwitch    |            43|               43|
+| EVT             | LateTalker       |             7|                7|
+| EVT             | MaternalEd       |            19|               19|
+| EVT             | TimePoint1       |           201|              201|
+| EVT             | TimePoint2       |           178|              178|
+| EVT             | TimePoint3       |           164|              164|
+| FruitStroop     | CochlearMatching |             1|                1|
+| FruitStroop     | CochlearV1       |            22|               22|
+| FruitStroop     | CochlearV2       |             6|                6|
+| FruitStroop     | DialectDensity   |             8|                8|
+| FruitStroop     | DialectSwitch    |            43|               43|
+| FruitStroop     | LateTalker       |             7|                7|
+| FruitStroop     | MaternalEd       |            16|               16|
+| FruitStroop     | TimePoint1       |           209|              209|
+| FruitStroop     | TimePoint2       |           178|              178|
+| GFTA            | CochlearMatching |             1|                1|
+| GFTA            | CochlearV1       |            24|               24|
+| GFTA            | CochlearV2       |            10|               10|
+| GFTA            | LateTalker       |             6|                6|
+| GFTA            | MaternalEd       |            16|               16|
+| GFTA            | TimePoint1       |           176|              176|
+| GFTA            | TimePoint3       |           156|              156|
+| LENA            | CochlearMatching |             1|                1|
+| LENA            | CochlearV1       |            21|               21|
+| LENA            | CochlearV2       |             7|                7|
+| LENA            | DialectSwitch    |            30|               30|
+| LENA            | LateTalker       |             6|                6|
+| LENA            | MaternalEd       |            13|               13|
+| LENA            | TimePoint1       |           182|              182|
+| LENA            | TimePoint2       |           140|              140|
+| LENA            | TimePoint3       |             1|                1|
+| MinPair         | CochlearMatching |             3|                3|
+| MinPair         | CochlearV1       |            24|               24|
+| MinPair         | CochlearV2       |            10|               10|
+| MinPair         | DialectSwitch    |            43|               84|
+| MinPair         | LateTalker       |             9|                9|
+| MinPair         | MaternalEd       |            13|               25|
+| MinPair         | TimePoint1       |           190|              190|
+| MinPair         | TimePoint2       |            94|               94|
+| MinPair         | TimePoint3       |             3|                3|
+| PPVT            | CochlearMatching |             4|                4|
+| PPVT            | CochlearV1       |            24|               24|
+| PPVT            | CochlearV2       |            10|               10|
+| PPVT            | DialectDensity   |             6|                6|
+| PPVT            | DialectSwitch    |            44|               44|
+| PPVT            | LateTalker       |             7|                7|
+| PPVT            | MaternalEd       |            21|               21|
+| PPVT            | TimePoint1       |           200|              200|
+| PPVT            | TimePoint2       |           180|              180|
+| PPVT            | TimePoint3       |            29|               29|
+| Rhyming         | TimePoint2       |            69|               69|
+| SAILS           | CochlearMatching |             2|                2|
+| SAILS           | CochlearV1       |            11|               11|
+| SAILS           | CochlearV2       |             8|                8|
+| SAILS           | LateTalker       |             5|                5|
+| SAILS           | MaternalEd       |            10|               10|
+| SAILS           | TimePoint2       |           161|              161|
+| SAILS           | TimePoint3       |           156|              156|
+| VerbalFluency   | CochlearMatching |             3|                3|
+| VerbalFluency   | CochlearV1       |            23|               23|
+| VerbalFluency   | CochlearV2       |            10|               10|
+| VerbalFluency   | LateTalker       |             9|                9|
+| VerbalFluency   | MaternalEd       |            20|               20|
+| VerbalFluency   | TimePoint1       |           196|              196|
+| VerbalFluency   | TimePoint2       |           179|              179|
+| VerbalFluency   | TimePoint3       |           161|              161|

@@ -404,6 +404,9 @@ studies have been migrated into the database.
 ```{r, echo = FALSE, warning = FALSE}
 tbls_to_check <- c(
   Blending = "Blending_Summary", 
+  CTOPP_Memory = "CTOPP_Memory",
+  CTOPP_Blending = "CTOPP_Blending",
+  CTOPP_Elision = "CTOPP_Elision",
   EVT = "EVT", 
   FruitStroop = "FruitStroop", 
   GFTA = "GFTA", 

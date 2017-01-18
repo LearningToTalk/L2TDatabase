@@ -106,3 +106,67 @@ create or replace algorithm = undefined view l2t.VerbalFluency as
   order by
     study.Study,
     childstudy.ShortResearchID;
+
+
+-- CTOPP_Blending
+create or replace algorithm = undefined view l2t.CTOPP_Blending as
+  select
+    study.Study,
+    childstudy.ShortResearchID as ResearchID,
+    ctopp.CTOPP_Blending_Completion,
+    ctopp.CTOPP_Blending_Age,
+    ctopp.CTOPP_Blending_Raw,
+    ctopp.CTOPP_Blending_Scaled,
+    ctopp.CTOPP_Blending_Notes
+  from
+    backend.CTOPP_Blending ctopp
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Study study
+      using (StudyID)
+  order by
+    study.Study,
+    childstudy.ShortResearchID;
+
+
+-- CTOPP_Elision
+create or replace algorithm = undefined view l2t.CTOPP_Elision as
+  select
+    study.Study,
+    childstudy.ShortResearchID as ResearchID,
+    ctopp.CTOPP_Elision_Completion,
+    ctopp.CTOPP_Elision_Age,
+    ctopp.CTOPP_Elision_Raw,
+    ctopp.CTOPP_Elision_Scaled,
+    ctopp.CTOPP_Elision_Notes
+  from
+    backend.CTOPP_Elision ctopp
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Study study
+      using (StudyID)
+  order by
+    study.Study,
+    childstudy.ShortResearchID;
+
+
+-- CTOPP_Memory
+create or replace algorithm = undefined view l2t.CTOPP_Memory as
+  select
+    study.Study,
+    childstudy.ShortResearchID as ResearchID,
+    ctopp.CTOPP_Memory_Completion,
+    ctopp.CTOPP_Memory_Age,
+    ctopp.CTOPP_Memory_Raw,
+    ctopp.CTOPP_Memory_Scaled,
+    ctopp.CTOPP_Memory_Notes
+  from
+    backend.CTOPP_Memory ctopp
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Study study
+      using (StudyID)
+  order by
+    study.Study,
+    childstudy.ShortResearchID;
+
