@@ -1,7 +1,7 @@
 -- Create user-facing views for various tests.
 
 -- EVT
-create or replace algorithm = undefined view  l2t.EVT as
+create or replace algorithm = undefined view l2t.EVT as
   select
     study.Study,
     childstudy.ShortResearchID as ResearchID,
@@ -170,3 +170,50 @@ create or replace algorithm = undefined view l2t.CTOPP_Memory as
     study.Study,
     childstudy.ShortResearchID;
 
+
+
+
+-- BRIEF
+create or replace algorithm = undefined view l2t.BRIEF as
+  select
+    study.Study,
+    childstudy.ShortResearchID as ResearchID,
+    brief.BRIEF_Completion,
+    brief.BRIEF_Age,
+    brief.Inhibit_Raw,
+    brief.Inhibit_TScore,
+    brief.Inhibit_Percentile,
+    brief.Shift_Raw,
+    brief.Shift_TScore,
+    brief.Shift_Percentile,
+    brief.EC_Raw,
+    brief.EC_TScore,
+    brief.EC_Percentile,
+    brief.WM_Raw,
+    brief.WM_TScore,
+    brief.WM_Percentile,
+    brief.PO_Raw,
+    brief.PO_TScore,
+    brief.PO_Percentile,
+    brief.ISCI_Raw,
+    brief.ISCI_TScore,
+    brief.ISCI_Percentile,
+    brief.FI_Raw,
+    brief.FI_TScore,
+    brief.FI_Percentile,
+    brief.EMI_Raw,
+    brief.EMI_TScore,
+    brief.EMI_Percentile,
+    brief.GEC_Raw,
+    brief.GEC_TScore,
+    brief.GEC_Percentile,
+    brief.BRIEF_Note
+  from
+    backend.BRIEF brief
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Study study
+      using (StudyID)
+  order by
+    study.Study,
+    childstudy.ShortResearchID;

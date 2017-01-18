@@ -427,6 +427,7 @@ studies have been migrated into the database.
 
 ```{r, echo = FALSE, warning = FALSE}
 tbls_to_check <- c(
+  BRIEF = "BRIEF", 
   Blending = "Blending_Summary", 
   CTOPP_Memory = "CTOPP_Memory",
   CTOPP_Blending = "CTOPP_Blending",
@@ -447,19 +448,35 @@ count_studies <- function(tbl_name, db = l2t) {
     select(everything(), Date = ends_with("Completion")) %>% 
     filter(!is.na(Date))
   
-  responses %>% 
+  count_responses(responses)
+}
+
+count_responses <- . %>% 
     group_by(Study) %>% 
     summarise(Participants = n_distinct(ResearchID), 
               Administrations = n()) %>% 
     select(Study, Participants, Administrations)
-}
-
 
 study_counts <- tbls_to_check %>% 
-  lapply(count_studies) %>% 
-  bind_rows(.id = "Table")
+  lapply(count_studies) 
 
-knitr::kable(study_counts)
+# Count eyetracking administrations too
+db_et <- l2t_connect("./inst/l2t_db.cnf", "eyetracking")
+et_blocks <- tbl(db_et, "Blocks") %>% 
+  left_join(tbl(db_et, "q_BlocksByStudy")) %>% 
+  select(Study, ResearchID, Task, Block_Basename) %>% 
+  collect() %>% 
+  mutate(Task = paste0("Eyetracking: ", Task))
+
+et_counts <- et_blocks %>% 
+  split(.$Task) %>% 
+  lapply(count_responses) 
+
+df_counts <- c(study_counts, et_counts) %>% 
+  bind_rows(.id = "Table") %>% 
+  arrange(Table, Study)
+
+knitr::kable(df_counts)
 ```
 
 

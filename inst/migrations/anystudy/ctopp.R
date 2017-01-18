@@ -25,8 +25,7 @@ lt <- get_study_info("LateTalker")
 medu <- get_study_info("MaternalEd")
 dialect <- get_study_info("DialectSwitch")
 
-df <- t3$UW
-# Select the VerbalFluency columns if they exist, otherwise return a blank
+# Select the CTOPP columns if they exist, otherwise return a blank
 # dataframe
 process_ctopp_scores <- function(df) {
   if (nrow(df) == 0) {
@@ -88,7 +87,7 @@ df_scores <- df_scores %>%
     CTOPPElision_Age = chrono_age(Birthdate, CTOPPElision_Completion),
     CTOPPMemory_Age = chrono_age(Birthdate, CTOPPMemory_Completion))
 
-# Make sure every verbal fluency corresponds to a database ChildStudy key
+# Make sure every CTOPP corresponds to a database ChildStudy key
 df_scores %>%
   filter(is.na(ChildStudyID)) %>%
   print(n = Inf)
