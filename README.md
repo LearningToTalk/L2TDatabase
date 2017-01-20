@@ -168,17 +168,18 @@ Information about our participants and their testing data are stored in two sepa
 ``` r
 # list all the tbls in the database
 src_tbls(l2t)
-#>  [1] "BRIEF"                     "Blending_Summary"         
-#>  [3] "CTOPP_Blending"            "CTOPP_Elision"            
-#>  [5] "CTOPP_Memory"              "EVT"                      
-#>  [7] "FruitStroop"               "GFTA"                     
-#>  [9] "LENA_Averages"             "Maternal_Education_Levels"
-#> [11] "MinPair_Aggregate"         "MinPair_Trials"           
-#> [13] "PPVT"                      "Rhyming_Aggregate"        
-#> [15] "SAILS_Aggregate"           "SAILS_Module_Aggregate"   
-#> [17] "Scores_CochlearV1"         "Scores_CochlearV2"        
-#> [19] "Scores_TimePoint1"         "Scores_TimePoint2"        
-#> [21] "Scores_TimePoint3"         "VerbalFluency"
+#>  [1] "BRIEF"                   "Blending_Summary"       
+#>  [3] "CTOPP_Blending"          "CTOPP_Elision"          
+#>  [5] "CTOPP_Memory"            "EVT"                    
+#>  [7] "FruitStroop"             "GFTA"                   
+#>  [9] "LENA_Averages"           "Maternal_Education"     
+#> [11] "MinPair_Aggregate"       "MinPair_Trials"         
+#> [13] "PPVT"                    "Rhyming_Aggregate"      
+#> [15] "SAILS_Aggregate"         "SAILS_Module_Aggregate" 
+#> [17] "Scores_CochlearMatching" "Scores_CochlearV1"      
+#> [19] "Scores_CochlearV2"       "Scores_TimePoint1"      
+#> [21] "Scores_TimePoint2"       "Scores_TimePoint3"      
+#> [23] "VerbalFluency"
 ```
 
 The tables here are *queries*: Tables that are computed on-the-fly whenever the data is requested. For example, `MinPair_Aggregate` shows the proportion correct of non-practice trials in the minimal pairs task by participant and by study. (I `select()` a subset of columns to exclude unnecessary columns like the name of the Eprime file containing the raw data.) The `Study` and `ResearchID` are the conventional identifiers for studies and participants.
@@ -351,50 +352,50 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-01-18_15-57/BRIEF.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Blending_Admin.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Blending_Responses.csv
-#> Writing ./inst/backup/2017-01-18_15-57/CTOPP_Blending.csv
-#> Writing ./inst/backup/2017-01-18_15-57/CTOPP_Elision.csv
-#> Writing ./inst/backup/2017-01-18_15-57/CTOPP_Memory.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Caregiver.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Child.csv
-#> Writing ./inst/backup/2017-01-18_15-57/ChildStudy.csv
-#> Writing ./inst/backup/2017-01-18_15-57/EVT.csv
-#> Writing ./inst/backup/2017-01-18_15-57/FruitStroop.csv
-#> Writing ./inst/backup/2017-01-18_15-57/GFTA.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Household.csv
-#> Writing ./inst/backup/2017-01-18_15-57/LENA_Admin.csv
-#> Writing ./inst/backup/2017-01-18_15-57/LENA_Hours.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Literacy.csv
-#> Writing ./inst/backup/2017-01-18_15-57/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-01-18_15-57/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-01-18_15-57/PPVT.csv
-#> Writing ./inst/backup/2017-01-18_15-57/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Rhyming_Admin.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Rhyming_Responses.csv
-#> Writing ./inst/backup/2017-01-18_15-57/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-01-18_15-57/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-01-18_15-57/SES.csv
-#> Writing ./inst/backup/2017-01-18_15-57/SES_Entry.csv
-#> Writing ./inst/backup/2017-01-18_15-57/Study.csv
-#> Writing ./inst/backup/2017-01-18_15-57/VerbalFluency.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Household_Education.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Rhyming_Aggregate.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_Rhyming_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-01-18_15-57/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-18_15-57/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-01-18_15-57/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-01-20_16-06/BRIEF.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Blending_Admin.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Blending_Responses.csv
+#> Writing ./inst/backup/2017-01-20_16-06/CTOPP_Blending.csv
+#> Writing ./inst/backup/2017-01-20_16-06/CTOPP_Elision.csv
+#> Writing ./inst/backup/2017-01-20_16-06/CTOPP_Memory.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Caregiver.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Child.csv
+#> Writing ./inst/backup/2017-01-20_16-06/ChildStudy.csv
+#> Writing ./inst/backup/2017-01-20_16-06/EVT.csv
+#> Writing ./inst/backup/2017-01-20_16-06/FruitStroop.csv
+#> Writing ./inst/backup/2017-01-20_16-06/GFTA.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Household.csv
+#> Writing ./inst/backup/2017-01-20_16-06/LENA_Admin.csv
+#> Writing ./inst/backup/2017-01-20_16-06/LENA_Hours.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Literacy.csv
+#> Writing ./inst/backup/2017-01-20_16-06/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-01-20_16-06/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-01-20_16-06/PPVT.csv
+#> Writing ./inst/backup/2017-01-20_16-06/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Rhyming_Admin.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Rhyming_Responses.csv
+#> Writing ./inst/backup/2017-01-20_16-06/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-01-20_16-06/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-01-20_16-06/SES.csv
+#> Writing ./inst/backup/2017-01-20_16-06/SES_Entry.csv
+#> Writing ./inst/backup/2017-01-20_16-06/Study.csv
+#> Writing ./inst/backup/2017-01-20_16-06/VerbalFluency.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Household_Education.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Rhyming_Aggregate.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_Rhyming_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-01-20_16-06/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-20_16-06/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-01-20_16-06/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
@@ -463,7 +464,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1           26  Hello!  2017-01-18 15:57:52
+#> 1           28  Hello!  2017-01-20 16:06:16
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.
@@ -512,15 +513,13 @@ We have some scripts that audit our data-sets. The results of these checks are p
 |:---------------|:-----------|:--------|:---------------------|:-----------------------------------------------------------------|
 | EVT            | 2017-01-17 | TRUE    | :white\_check\_mark: | [EVT](inst/audit/audit-evt.md)                                   |
 | PPVT           | 2017-01-17 | TRUE    | :white\_check\_mark: | [PPVT](inst/audit/audit-ppvt.md)                                 |
-| Discrepancies  | 2017-01-17 | TRUE    | :white\_check\_mark: | [Data entry discrepancies](inst/audit/check_integrity.md)        |
+| Discrepancies  | 2017-01-20 | TRUE    | :white\_check\_mark: | [Data entry discrepancies](inst/audit/check_integrity.md)        |
 | MySQL metadata | 2017-01-18 | TRUE    | :white\_check\_mark: | [MySQL metadata completeness](inst/audit/check_documentation.md) |
 
 Study coverage
 --------------
 
 The following table summarizes how many scores/administrations of each task were collected for each study. It is included here to show which tasks and which studies have been migrated into the database.
-
-    #> Joining, by = "BlockID"
 
 | Table            | Study            |  Participants|  Administrations|
 |:-----------------|:-----------------|-------------:|----------------:|
@@ -556,9 +555,21 @@ The following table summarizes how many scores/administrations of each task were
 | EVT              | TimePoint1       |           201|              201|
 | EVT              | TimePoint2       |           178|              178|
 | EVT              | TimePoint3       |           164|              164|
+| Eyetracking: MP  | CochlearMatching |             4|                7|
+| Eyetracking: MP  | CochlearV1       |            24|               47|
+| Eyetracking: MP  | CochlearV2       |            10|               20|
+| Eyetracking: MP  | LateTalker       |             9|               15|
+| Eyetracking: MP  | MaternalEd       |            21|               40|
 | Eyetracking: MP  | TimePoint1       |           207|              399|
 | Eyetracking: MP  | TimePoint2       |           181|              350|
 | Eyetracking: MP  | TimePoint3       |           164|              326|
+| Eyetracking: RWL | CochlearMatching |             5|                9|
+| Eyetracking: RWL | CochlearV1       |            24|               45|
+| Eyetracking: RWL | CochlearV2       |            10|               20|
+| Eyetracking: RWL | DialectDensity   |            13|               26|
+| Eyetracking: RWL | DialectSwitch    |            44|              173|
+| Eyetracking: RWL | LateTalker       |             9|               16|
+| Eyetracking: RWL | MaternalEd       |            21|               41|
 | Eyetracking: RWL | TimePoint1       |           205|              384|
 | Eyetracking: RWL | TimePoint2       |           180|              347|
 | Eyetracking: RWL | TimePoint3       |           163|              322|

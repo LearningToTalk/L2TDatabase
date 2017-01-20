@@ -79,7 +79,7 @@ create or replace algorithm = undefined view backend.q_Household_Max_Maternal_Ed
 
 
 -- User-facing query: Maternal education per child-study
-create or replace algorithm = undefined view l2t.Maternal_Education_Levels as
+create or replace algorithm = undefined view l2t.Maternal_Education as
   select
     study.Study,
     childstudy.ShortResearchID as `ResearchID`,

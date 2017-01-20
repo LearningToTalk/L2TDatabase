@@ -9,7 +9,9 @@ output: github_document
 library("knitr")
 opts_chunk$set(echo = FALSE)
 opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
-opts_knit$set(root.dir = "../../")
+
+wd <- rprojroot::find_rstudio_root_file()
+opts_knit$set(root.dir = wd)
 ```
 
 ```{r gather data, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
@@ -19,9 +21,10 @@ library("tidyr")
 library("stringr")
 
 # Load external dependencies
-source("inst/paths.R")
+wd <- rprojroot::find_rstudio_root_file()
+source(file.path(wd, "inst/paths.R"))
 source(paths$GetSiteInfo, chdir = TRUE)
-source("inst/migrations/dates.R")
+source(file.path(wd, "inst/migrations/dates.R"))
 
 # Collect dates/scores
 df_dates <- collect_dates(paths$score_dates, recursive = TRUE) %>% 
@@ -82,8 +85,9 @@ get_scores_from_info <- function(df) {
            CTOPPMemory_Date = maybe_matches("CTOPP_MemoryforDigits_COMPLETION|CTOPPMemory_Date"),
            CTOPPMemory_Raw = maybe_matches("CTOPP_MemoryforDigits_raw|CTOPPMemory_Raw"),
            CTOPPMemory_Scaled = maybe_matches("CTOPP_MemoryforDigits_scaled|CTOPPMemory_Scaled"),
-           KBIT_Raw = maybe_starts_with("Kbit_nonverbalraw"),
-           KBIT_Standard = maybe_starts_with("Kbit_nonverbalstandard"),
+           KBIT_Date = maybe_starts_with("KBIT_Date"),
+           KBIT_Nonverbal_Raw = maybe_starts_with("KBIT_Nonverbal_Raw"),
+           KBIT_Nonverbal_Standard = maybe_starts_with("KBIT_Nonverbal_Standard"),
            GFTA_Date = maybe_matches("GFTA_COMPLETION_DATE|GFTA_Date"),
            DELV_Date = maybe_starts_with("DELV_Date"),
            DELV_LanguageVar_ColumnAScore = maybe_starts_with("DELV_LanguageVar_ColumnAScore"),

@@ -425,7 +425,7 @@ The following table summarizes how many scores/administrations of each task
 were collected for each study. It is included here to show which tasks and which
 studies have been migrated into the database.
 
-```{r, echo = FALSE, warning = FALSE}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 tbls_to_check <- c(
   BRIEF = "BRIEF", 
   Blending = "Blending_Summary", 

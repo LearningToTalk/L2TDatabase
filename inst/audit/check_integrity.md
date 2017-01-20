@@ -1,7 +1,7 @@
 Data Integrity Check
 ================
 Tristan Mahr
-2017-01-17
+2017-01-20
 
 In Spring 2016, we had our data-entry team re-enter test scores gathered in our studies, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 
@@ -216,8 +216,9 @@ This table lists all the fields that were checked and whether any discrepancies 
 | TimePoint2       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | TimePoint2       | FruitStroop\_Date                        | TRUE    | :white\_check\_mark: |
 | TimePoint2       | FruitStroop\_Score                       | TRUE    | :white\_check\_mark: |
-| TimePoint2       | KBIT\_Raw                                | TRUE    | :white\_check\_mark: |
-| TimePoint2       | KBIT\_Standard                           | TRUE    | :white\_check\_mark: |
+| TimePoint2       | KBIT\_Date                               | TRUE    | :white\_check\_mark: |
+| TimePoint2       | KBIT\_Nonverbal\_Raw                     | TRUE    | :white\_check\_mark: |
+| TimePoint2       | KBIT\_Nonverbal\_Standard                | TRUE    | :white\_check\_mark: |
 | TimePoint2       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | TimePoint2       | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | TimePoint2       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
@@ -247,8 +248,9 @@ This table lists all the fields that were checked and whether any discrepancies 
 | TimePoint3       | EVT\_Raw                                 | TRUE    | :white\_check\_mark: |
 | TimePoint3       | EVT\_Standard                            | TRUE    | :white\_check\_mark: |
 | TimePoint3       | GFTA\_Date                               | TRUE    | :white\_check\_mark: |
-| TimePoint3       | KBIT\_Raw                                | TRUE    | :white\_check\_mark: |
-| TimePoint3       | KBIT\_Standard                           | TRUE    | :white\_check\_mark: |
+| TimePoint3       | KBIT\_Date                               | TRUE    | :white\_check\_mark: |
+| TimePoint3       | KBIT\_Nonverbal\_Raw                     | TRUE    | :white\_check\_mark: |
+| TimePoint3       | KBIT\_Nonverbal\_Standard                | TRUE    | :white\_check\_mark: |
 | TimePoint3       | PPVT\_Date                               | TRUE    | :white\_check\_mark: |
 | TimePoint3       | PPVT\_Form                               | TRUE    | :white\_check\_mark: |
 | TimePoint3       | PPVT\_GSV                                | TRUE    | :white\_check\_mark: |
@@ -274,8 +276,6 @@ The following columns in DIRT were not checked because there is not a matching c
 | MaternalEd       | CDI\_Extension\_Date | :grey\_question: |
 | TimePoint1       | MBCDI\_Date          | :grey\_question: |
 | TimePoint1       | CDI\_Extension\_Date | :grey\_question: |
-| TimePoint2       | KBIT\_Date           | :grey\_question: |
-| TimePoint3       | KBIT\_Date           | :grey\_question: |
 | LateTalker       | MBCDI\_Date          | :grey\_question: |
 | LateTalker       | CDI\_Extension\_Date | :grey\_question: |
 | CochlearV1       | CDI\_Extension\_Date | :grey\_question: |
