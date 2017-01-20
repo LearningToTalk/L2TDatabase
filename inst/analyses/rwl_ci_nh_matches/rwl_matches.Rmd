@@ -458,3 +458,36 @@ readr::write_csv(
   file.path(dir_here, "wide_num_looks_to_each_aoi.csv"))
 ```
 
+
+## Some modeling
+
+Here is some code to do some light modeling. Read in the wide table of counts.
+
+```{r}
+library(lme4)
+df <- readr::read_csv(file.path(dir_here, "wide_num_looks_to_each_aoi.csv"))
+
+df$elog <- lookr::empirical_logit(df$LooksToTarget, df$LooksToFoils)
+df$elog_wt <- lookr::empirical_logit_weight(df$LooksToTarget, df$LooksToFoils)
+
+# For now let's ignore the fact that there are multiple growth curves for some
+# children (e.g., children who contribute data in CochlearV1 and CochlearV2). We
+# will pretend that those curves are from entirely different children, for the
+# sake of model convergence.
+df$ChildStudy <- paste0(df$Study, "_", df$ShortResearchID)
+
+# The elogit model
+m <- lmer(
+  elog ~ poly(Time, 3) * Group + (poly(Time, 3) | ChildStudy),
+  data = df,
+  weights = 1 / elog_wt)
+summary(m)
+
+df$fitted <- fitted(m)
+
+ggplot(df) + 
+  aes(x = Time, y = elog, color = Group) + 
+  stat_summary() + 
+  stat_summary(aes(y = fitted), fun.y = mean, geom = "line")
+```
+

@@ -528,3 +528,78 @@ readr::write_csv(
   df_look_counts, 
   file.path(dir_here, "wide_num_looks_to_each_aoi.csv"))
 ```
+
+Some modeling
+-------------
+
+Here is some code to do some light modeling. Read in the wide table of counts.
+
+``` r
+library(lme4)
+df <- readr::read_csv(file.path(dir_here, "wide_num_looks_to_each_aoi.csv"))
+
+df$elog <- lookr::empirical_logit(df$LooksToTarget, df$LooksToFoils)
+df$elog_wt <- lookr::empirical_logit_weight(df$LooksToTarget, df$LooksToFoils)
+
+# For now let's ignore the fact that there are multiple growth curves for some
+# children (e.g., children who contribute data in CochlearV1 and CochlearV2). We
+# will pretend that those curves are from entirely different children, for the
+# sake of model convergence.
+df$ChildStudy <- paste0(df$Study, "_", df$ShortResearchID)
+
+# The elogit model
+m <- lmer(
+  elog ~ poly(Time, 3) * Group + (poly(Time, 3) | ChildStudy),
+  data = df,
+  weights = 1 / elog_wt)
+summary(m)
+#> Linear mixed model fit by REML ['lmerMod']
+#> Formula: elog ~ poly(Time, 3) * Group + (poly(Time, 3) | ChildStudy)
+#>    Data: df
+#> Weights: 1/elog_wt
+#> 
+#> REML criterion at convergence: -63.5
+#> 
+#> Scaled residuals: 
+#>     Min      1Q  Median      3Q     Max 
+#> -3.2732 -0.6111  0.0177  0.6345  3.4412 
+#> 
+#> Random effects:
+#>  Groups     Name           Variance Std.Dev. Corr             
+#>  ChildStudy (Intercept)      0.2664  0.5161                   
+#>             poly(Time, 3)1 172.4078 13.1304   0.66            
+#>             poly(Time, 3)2  52.7700  7.2643  -0.46 -0.21      
+#>             poly(Time, 3)3  23.9678  4.8957  -0.06 -0.20 -0.05
+#>  Residual                    0.6977  0.8353                   
+#> Number of obs: 2201, groups:  ChildStudy, 71
+#> 
+#> Fixed effects:
+#>                        Estimate Std. Error t value
+#> (Intercept)            -0.18956    0.08747  -2.167
+#> poly(Time, 3)1         22.98889    2.24050  10.261
+#> poly(Time, 3)2         -5.99255    1.26352  -4.743
+#> poly(Time, 3)3         -2.10193    0.87869  -2.392
+#> GroupNH                 0.50461    0.12283   4.108
+#> poly(Time, 3)1:GroupNH 11.64654    3.14467   3.704
+#> poly(Time, 3)2:GroupNH -2.41455    1.77077  -1.364
+#> poly(Time, 3)3:GroupNH -3.15556    1.22911  -2.567
+#> 
+#> Correlation of Fixed Effects:
+#>             (Intr) pl(T,3)1 pl(T,3)2 pl(T,3)3 GropNH p(T,3)1: p(T,3)2:
+#> poly(Tm,3)1  0.651                                                    
+#> poly(Tm,3)2 -0.442 -0.201                                             
+#> poly(Tm,3)3 -0.055 -0.187   -0.043                                    
+#> GroupNH     -0.712 -0.464    0.315    0.039                           
+#> p(T,3)1:GNH -0.464 -0.712    0.143    0.133    0.652                  
+#> p(T,3)2:GNH  0.315  0.143   -0.714    0.031   -0.443 -0.201           
+#> p(T,3)3:GNH  0.040  0.134    0.031   -0.715   -0.056 -0.189   -0.041
+
+df$fitted <- fitted(m)
+
+ggplot(df) + 
+  aes(x = Time, y = elog, color = Group) + 
+  stat_summary() + 
+  stat_summary(aes(y = fitted), fun.y = mean, geom = "line")
+```
+
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-19-1.png" width="80%" />
