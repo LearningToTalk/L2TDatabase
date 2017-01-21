@@ -39,6 +39,10 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
     ctopp_elision.CTOPP_Elision_Age,
     ctopp_elision.CTOPP_Elision_Raw,
     ctopp_elision.CTOPP_Elision_Scaled,
+    kbit.KBIT_Completion,
+    kbit.KBIT_Age,
+    kbit.KBIT_Nonverbal_Raw,
+    kbit.KBIT_Nonverbal_Standard,
     minpair.MinPair_Completion,
     minpair.MinPair_Age,
     minpair.MinPair_NumTestTrials,
@@ -108,6 +112,8 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
     left join backend.CTOPP_Blending ctopp_blending
       using (ChildStudyID)
     left join backend.CTOPP_Elision ctopp_elision
+      using (ChildStudyID)
+    left join backend.KBIT kbit
       using (ChildStudyID)
   where
     study.Study = "TimePoint2"

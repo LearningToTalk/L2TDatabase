@@ -68,6 +68,26 @@ create or replace algorithm = undefined view l2t.GFTA as
     childstudy.ShortResearchID;
 
 
+-- KBIT
+create or replace algorithm = undefined view l2t.KBIT as
+  select
+    study.Study,
+    childstudy.ShortResearchID as ResearchID,
+    kbit.KBIT_Completion,
+    kbit.KBIT_Age,
+    kbit.KBIT_Nonverbal_Raw,
+    kbit.KBIT_Nonverbal_Standard
+  from
+    backend.KBIT kbit
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Study study
+      using (StudyID)
+  order by
+    study.Study,
+    childstudy.ShortResearchID;
+
+
 -- FruitStroop
 create or replace algorithm = undefined view l2t.FruitStroop as
   select

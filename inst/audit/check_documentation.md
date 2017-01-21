@@ -1,7 +1,7 @@
 Documentation Check
 ================
 Tristan Mahr
-2017-01-18
+2017-01-21
 
 MySQL allows users to write short documentation comments for database tables (up to 80 characters) and for database fields (up to 255 characters). These documentation comments can be queried and retrieved like other data, so they provide a handy way to store descriptive metadata.
 

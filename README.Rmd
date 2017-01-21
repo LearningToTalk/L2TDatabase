@@ -435,6 +435,7 @@ tbls_to_check <- c(
   EVT = "EVT", 
   FruitStroop = "FruitStroop", 
   GFTA = "GFTA", 
+  KBIT = "KBIT",
   LENA = "LENA_Averages", 
   MinPair = "MinPair_Aggregate", 
   PPVT = "PPVT", 
