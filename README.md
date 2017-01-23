@@ -170,16 +170,17 @@ Information about our participants and their testing data are stored in two sepa
 src_tbls(l2t)
 #>  [1] "BRIEF"                   "Blending_Summary"       
 #>  [3] "CTOPP_Blending"          "CTOPP_Elision"          
-#>  [5] "CTOPP_Memory"            "EVT"                    
-#>  [7] "FruitStroop"             "GFTA"                   
-#>  [9] "KBIT"                    "LENA_Averages"          
-#> [11] "Maternal_Education"      "MinPair_Aggregate"      
-#> [13] "MinPair_Trials"          "PPVT"                   
-#> [15] "Rhyming_Aggregate"       "SAILS_Aggregate"        
-#> [17] "SAILS_Module_Aggregate"  "Scores_CochlearMatching"
-#> [19] "Scores_CochlearV1"       "Scores_CochlearV2"      
-#> [21] "Scores_TimePoint1"       "Scores_TimePoint2"      
-#> [23] "Scores_TimePoint3"       "VerbalFluency"
+#>  [5] "CTOPP_Memory"            "DELV_Risk"              
+#>  [7] "DELV_Variation"          "EVT"                    
+#>  [9] "FruitStroop"             "GFTA"                   
+#> [11] "KBIT"                    "LENA_Averages"          
+#> [13] "Maternal_Education"      "MinPair_Aggregate"      
+#> [15] "MinPair_Trials"          "PPVT"                   
+#> [17] "Rhyming_Aggregate"       "SAILS_Aggregate"        
+#> [19] "SAILS_Module_Aggregate"  "Scores_CochlearMatching"
+#> [21] "Scores_CochlearV1"       "Scores_CochlearV2"      
+#> [23] "Scores_TimePoint1"       "Scores_TimePoint2"      
+#> [25] "Scores_TimePoint3"       "VerbalFluency"
 ```
 
 The tables here are *queries*: Tables that are computed on-the-fly whenever the data is requested. For example, `MinPair_Aggregate` shows the proportion correct of non-practice trials in the minimal pairs task by participant and by study. (I `select()` a subset of columns to exclude unnecessary columns like the name of the Eprime file containing the raw data.) The `Study` and `ResearchID` are the conventional identifiers for studies and participants.
@@ -225,39 +226,41 @@ src_tbls(l2t_backend)
 #>  [8] "Caregiver_Entry"                   
 #>  [9] "Child"                             
 #> [10] "ChildStudy"                        
-#> [11] "EVT"                               
-#> [12] "FruitStroop"                       
-#> [13] "GFTA"                              
-#> [14] "Household"                         
-#> [15] "KBIT"                              
-#> [16] "LENA_Admin"                        
-#> [17] "LENA_Hours"                        
-#> [18] "Literacy"                          
-#> [19] "MinPair_Admin"                     
-#> [20] "MinPair_Responses"                 
-#> [21] "PPVT"                              
-#> [22] "RealWordRep_Admin"                 
-#> [23] "Rhyming_Admin"                     
-#> [24] "Rhyming_Responses"                 
-#> [25] "SAILS_Admin"                       
-#> [26] "SAILS_Responses"                   
-#> [27] "SES"                               
-#> [28] "SES_Entry"                         
-#> [29] "Study"                             
-#> [30] "VerbalFluency"                     
-#> [31] "q_Blending_ModulePropCorrect"      
-#> [32] "q_Blending_PropCorrect"            
-#> [33] "q_Blending_Summary"                
-#> [34] "q_Blending_SupportPropCorrect"     
-#> [35] "q_Household_Education"             
-#> [36] "q_Household_Maternal_Caregiver"    
-#> [37] "q_Household_Max_Maternal_Education"
-#> [38] "q_LENA_Averages"                   
-#> [39] "q_MinPair_Aggregate"               
-#> [40] "q_Rhyming_Aggregate"               
-#> [41] "q_Rhyming_PropCorrect"             
-#> [42] "q_SAILS_Aggregate"                 
-#> [43] "q_SAILS_PropCorrect"
+#> [11] "DELV_Risk"                         
+#> [12] "DELV_Variation"                    
+#> [13] "EVT"                               
+#> [14] "FruitStroop"                       
+#> [15] "GFTA"                              
+#> [16] "Household"                         
+#> [17] "KBIT"                              
+#> [18] "LENA_Admin"                        
+#> [19] "LENA_Hours"                        
+#> [20] "Literacy"                          
+#> [21] "MinPair_Admin"                     
+#> [22] "MinPair_Responses"                 
+#> [23] "PPVT"                              
+#> [24] "RealWordRep_Admin"                 
+#> [25] "Rhyming_Admin"                     
+#> [26] "Rhyming_Responses"                 
+#> [27] "SAILS_Admin"                       
+#> [28] "SAILS_Responses"                   
+#> [29] "SES"                               
+#> [30] "SES_Entry"                         
+#> [31] "Study"                             
+#> [32] "VerbalFluency"                     
+#> [33] "q_Blending_ModulePropCorrect"      
+#> [34] "q_Blending_PropCorrect"            
+#> [35] "q_Blending_Summary"                
+#> [36] "q_Blending_SupportPropCorrect"     
+#> [37] "q_Household_Education"             
+#> [38] "q_Household_Maternal_Caregiver"    
+#> [39] "q_Household_Max_Maternal_Education"
+#> [40] "q_LENA_Averages"                   
+#> [41] "q_MinPair_Aggregate"               
+#> [42] "q_Rhyming_Aggregate"               
+#> [43] "q_Rhyming_PropCorrect"             
+#> [44] "q_SAILS_Aggregate"                 
+#> [45] "q_SAILS_PropCorrect"
 ```
 
 Some of the tables in the backend are not tables of raw data but intermediate, helper queries that are used in the main database. These helpers queries are prefixed with `q_`. For example, `q_Household_Education`, `q_Household_Maternal_Caregiver`, and `q_Household_Max_Maternal_Education` are a pipeline of calculations that determine the highest maternal education level in each household.
@@ -353,51 +356,53 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-01-21_09-18/BRIEF.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Blending_Admin.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Blending_Responses.csv
-#> Writing ./inst/backup/2017-01-21_09-18/CTOPP_Blending.csv
-#> Writing ./inst/backup/2017-01-21_09-18/CTOPP_Elision.csv
-#> Writing ./inst/backup/2017-01-21_09-18/CTOPP_Memory.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Caregiver.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Child.csv
-#> Writing ./inst/backup/2017-01-21_09-18/ChildStudy.csv
-#> Writing ./inst/backup/2017-01-21_09-18/EVT.csv
-#> Writing ./inst/backup/2017-01-21_09-18/FruitStroop.csv
-#> Writing ./inst/backup/2017-01-21_09-18/GFTA.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Household.csv
-#> Writing ./inst/backup/2017-01-21_09-18/KBIT.csv
-#> Writing ./inst/backup/2017-01-21_09-18/LENA_Admin.csv
-#> Writing ./inst/backup/2017-01-21_09-18/LENA_Hours.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Literacy.csv
-#> Writing ./inst/backup/2017-01-21_09-18/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-01-21_09-18/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-01-21_09-18/PPVT.csv
-#> Writing ./inst/backup/2017-01-21_09-18/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Rhyming_Admin.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Rhyming_Responses.csv
-#> Writing ./inst/backup/2017-01-21_09-18/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-01-21_09-18/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-01-21_09-18/SES.csv
-#> Writing ./inst/backup/2017-01-21_09-18/SES_Entry.csv
-#> Writing ./inst/backup/2017-01-21_09-18/Study.csv
-#> Writing ./inst/backup/2017-01-21_09-18/VerbalFluency.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Household_Education.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Rhyming_Aggregate.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_Rhyming_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-01-21_09-18/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-01-21_09-18/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-01-21_09-18/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-01-23_09-33/BRIEF.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Blending_Admin.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Blending_Responses.csv
+#> Writing ./inst/backup/2017-01-23_09-33/CTOPP_Blending.csv
+#> Writing ./inst/backup/2017-01-23_09-33/CTOPP_Elision.csv
+#> Writing ./inst/backup/2017-01-23_09-33/CTOPP_Memory.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Caregiver.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Child.csv
+#> Writing ./inst/backup/2017-01-23_09-33/ChildStudy.csv
+#> Writing ./inst/backup/2017-01-23_09-33/DELV_Risk.csv
+#> Writing ./inst/backup/2017-01-23_09-33/DELV_Variation.csv
+#> Writing ./inst/backup/2017-01-23_09-33/EVT.csv
+#> Writing ./inst/backup/2017-01-23_09-33/FruitStroop.csv
+#> Writing ./inst/backup/2017-01-23_09-33/GFTA.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Household.csv
+#> Writing ./inst/backup/2017-01-23_09-33/KBIT.csv
+#> Writing ./inst/backup/2017-01-23_09-33/LENA_Admin.csv
+#> Writing ./inst/backup/2017-01-23_09-33/LENA_Hours.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Literacy.csv
+#> Writing ./inst/backup/2017-01-23_09-33/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-01-23_09-33/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-01-23_09-33/PPVT.csv
+#> Writing ./inst/backup/2017-01-23_09-33/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Rhyming_Admin.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Rhyming_Responses.csv
+#> Writing ./inst/backup/2017-01-23_09-33/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-01-23_09-33/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-01-23_09-33/SES.csv
+#> Writing ./inst/backup/2017-01-23_09-33/SES_Entry.csv
+#> Writing ./inst/backup/2017-01-23_09-33/Study.csv
+#> Writing ./inst/backup/2017-01-23_09-33/VerbalFluency.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Household_Education.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Rhyming_Aggregate.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_Rhyming_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-01-23_09-33/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-01-23_09-33/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-01-23_09-33/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
@@ -466,7 +471,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1           30  Hello!  2017-01-21 09:19:57
+#> 1           31  Hello!  2017-01-23 09:34:53
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.
@@ -547,6 +552,11 @@ The following table summarizes how many scores/administrations of each task were
 | CTOPP\_Memory    | CochlearV2       |             4|                4|
 | CTOPP\_Memory    | MaternalEd       |             4|                4|
 | CTOPP\_Memory    | TimePoint3       |           162|              162|
+| DELV\_Risk       | LateTalker       |             1|                1|
+| DELV\_Risk       | MaternalEd       |             1|                1|
+| DELV\_Risk       | TimePoint3       |            29|               29|
+| DELV\_Variation  | MaternalEd       |             6|                6|
+| DELV\_Variation  | TimePoint3       |             7|                7|
 | EVT              | CochlearMatching |             4|                4|
 | EVT              | CochlearV1       |            24|               24|
 | EVT              | CochlearV2       |            10|               10|

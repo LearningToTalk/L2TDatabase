@@ -191,8 +191,6 @@ create or replace algorithm = undefined view l2t.CTOPP_Memory as
     childstudy.ShortResearchID;
 
 
-
-
 -- BRIEF
 create or replace algorithm = undefined view l2t.BRIEF as
   select
@@ -230,6 +228,49 @@ create or replace algorithm = undefined view l2t.BRIEF as
     brief.BRIEF_Note
   from
     backend.BRIEF brief
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Study study
+      using (StudyID)
+  order by
+    study.Study,
+    childstudy.ShortResearchID;
+
+
+-- DELV_Risk
+create or replace algorithm = undefined view l2t.DELV_Risk as
+  select
+    study.Study,
+    childstudy.ShortResearchID as ResearchID,
+    delv_risk.DELV_Risk_Completion,
+    delv_risk.DELV_Risk_Age,
+    delv_risk.DELV_Risk_Score,
+    delv_risk.DELV_Risk_Degree,
+    delv_risk.DELV_Risk_Result
+  from
+    backend.DELV_Risk delv_risk
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Study study
+      using (StudyID)
+  order by
+    study.Study,
+    childstudy.ShortResearchID;
+
+
+-- DELV_Variation
+create or replace algorithm = undefined view l2t.DELV_Variation as
+  select
+    study.Study,
+    childstudy.ShortResearchID as ResearchID,
+    delv_var.DELV_Variation_Completion,
+    delv_var.DELV_Variation_Age,
+    delv_var.DELV_Variation_ColumnA,
+    delv_var.DELV_Variation_ColumnB,
+    delv_var.DELV_Variation_Degree,
+    delv_var.DELV_Variation_Result
+  from
+    backend.DELV_Variation delv_var
     left join backend.ChildStudy childstudy
       using (ChildStudyID)
     left join backend.Study study

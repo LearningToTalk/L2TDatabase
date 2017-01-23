@@ -432,6 +432,8 @@ tbls_to_check <- c(
   CTOPP_Memory = "CTOPP_Memory",
   CTOPP_Blending = "CTOPP_Blending",
   CTOPP_Elision = "CTOPP_Elision",
+  DELV_Risk = "DELV_Risk",
+  DELV_Variation = "DELV_Variation",
   EVT = "EVT", 
   FruitStroop = "FruitStroop", 
   GFTA = "GFTA", 
