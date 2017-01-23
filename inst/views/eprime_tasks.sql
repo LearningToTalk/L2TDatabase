@@ -248,8 +248,54 @@ create or replace algorithm = undefined view l2t.MinPair_Trials as
 
 
 
+-- Combine information from other views into a wide table
+create or replace algorithm = undefined view backend.q_MinPair_Dialect_Summary as
+  select
+    minp_agg.ChildStudyID,
+    minp_agg.Study,
+    minp_agg.ResearchID,
+    (case when child.AAE = 1 then 'AAE' when child.AAE = 0 then 'SAE' else null end) as Child_Dialect,
+    max(case when minp_agg.MinPair_Dialect = 'AAE' then minp_agg.MinPair_Completion else null end) as MinPair_AAE_Completion,
+    max(case when minp_agg.MinPair_Dialect = 'SAE' then minp_agg.MinPair_Completion else null end) as MinPair_SAE_Completion,
+    max(case when minp_agg.MinPair_Dialect = 'AAE' then minp_agg.MinPair_Age else null end) as MinPair_AAE_Age,
+    max(case when minp_agg.MinPair_Dialect = 'SAE' then minp_agg.MinPair_Age else null end) as MinPair_SAE_Age,
+    max(case when minp_agg.MinPair_Dialect = 'AAE' then minp_agg.MinPair_NumTestTrials else null end) as MinPair_AAE_NumTestTrials,
+    max(case when minp_agg.MinPair_Dialect = 'SAE' then minp_agg.MinPair_NumTestTrials else null end) as MinPair_SAE_NumTestTrials,
+    max(case when minp_agg.MinPair_Dialect = 'AAE' then minp_agg.MinPair_ProportionCorrect else null end) as MinPair_AAE_ProportionCorrect,
+    max(case when minp_agg.MinPair_Dialect = 'SAE' then minp_agg.MinPair_ProportionCorrect else null end) as MinPair_SAE_ProportionCorrect
+  from
+    backend.q_MinPair_Aggregate minp_agg
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Child child
+      using (ChildID)
+  where
+    Study in ("DialectSwitch", "MaternalEd")
+  group by
+    minp_agg.ChildStudyID
+  order by
+    minp_agg.Study,
+    minp_agg.ResearchID;
 
 
+create or replace algorithm = undefined view l2t.MinPair_Dialect_Summary as
+  select
+    minp_dialect.Study,
+    minp_dialect.ResearchID,
+    minp_dialect.Child_Dialect,
+    minp_dialect.MinPair_AAE_Completion,
+    minp_dialect.MinPair_SAE_Completion,
+    minp_dialect.MinPair_AAE_Age,
+    minp_dialect.MinPair_SAE_Age,
+    minp_dialect.MinPair_AAE_NumTestTrials,
+    minp_dialect.MinPair_SAE_NumTestTrials,
+    minp_dialect.MinPair_AAE_ProportionCorrect,
+    minp_dialect.MinPair_SAE_ProportionCorrect
+  from
+    backend.q_MinPair_Dialect_Summary minp_dialect
+  order by
+    minp_dialect.Study,
+    minp_dialect.ResearchID;
 
 
 -- Create views to summarize the SAILS experiment
