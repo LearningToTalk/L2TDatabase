@@ -1,7 +1,7 @@
 Comparison of Children with Cochlear Implants and Matched Normal Hearing Peers on Four-Image Word Recognition Task
 ================
 Tristan Mahr
-2017-01-20
+2017-01-25
 
 The Request
 -----------
@@ -128,14 +128,65 @@ df_kids %>%
     N_PPVT = sum(!is.na(PPVT_Age)),
     PPVT_Age = mean(PPVT_Age, na.rm = TRUE),
     N_GFTA = sum(!is.na(GFTA_Age)),
-    GFTA_Age = mean(GFTA_Age, na.rm = TRUE))
-#> # A tibble: 2 × 11
-#>   Group     N    CI N_Female N_Male N_EVT  EVT_Age N_PPVT PPVT_Age N_GFTA
-#>   <chr> <int> <int>    <int>  <int> <int>    <dbl>  <int>    <dbl>  <int>
-#> 1    CI    36    36       21     15    36 52.63889     36    52.50     33
-#> 2    NH    36     0       19     17    36 51.86111     20    45.75     20
-#> # ... with 1 more variables: GFTA_Age <dbl>
+    GFTA_Age = mean(GFTA_Age, na.rm = TRUE)) %>% 
+  knitr::kable()
 ```
+
+| Group |    N|   CI|  N\_Female|  N\_Male|  N\_EVT|  EVT\_Age|  N\_PPVT|  PPVT\_Age|  N\_GFTA|  GFTA\_Age|
+|:------|----:|----:|----------:|--------:|-------:|---------:|--------:|----------:|--------:|----------:|
+| CI    |   36|   36|         21|       15|      36|  52.63889|       36|      52.50|       33|   52.72727|
+| NH    |   36|    0|         19|       17|      36|  51.86111|       20|      45.75|       20|   53.50000|
+
+We can also compute summary statistics.
+
+``` r
+df_kids %>% 
+  select(Group, EVT_Age, EVT_Standard, PPVT_Standard, GFTA_Standard) %>% 
+  # Convert to long format to compute summaries by group by score type
+  tidyr::gather(Variable, Value, -Group) %>% 
+  tidyr::drop_na(Value) %>% 
+  group_by(Variable, Group) %>% 
+  summarise(N_Values = n(), Mean = mean(Value), SD = sd(Value), 
+            Min = min(Value), Max = max(Value)) %>% 
+  # Round off decimals
+  mutate_each_(funs(round), vars = vars(Mean, SD, Min, Max)) %>% 
+  ungroup() %>% 
+  knitr::kable()
+```
+
+| Variable       | Group |  N\_Values|  Mean|   SD|  Min|  Max|
+|:---------------|:------|----------:|-----:|----:|----:|----:|
+| EVT\_Age       | CI    |         36|    53|   11|   34|   69|
+| EVT\_Age       | NH    |         36|    52|   10|   36|   69|
+| EVT\_Standard  | CI    |         36|    96|   19|   46|  131|
+| EVT\_Standard  | NH    |         36|   114|   13|   91|  137|
+| GFTA\_Standard | CI    |         33|    74|   20|   39|  107|
+| GFTA\_Standard | NH    |         20|    91|   10|   72|  104|
+| PPVT\_Standard | CI    |         35|    92|   22|   40|  139|
+| PPVT\_Standard | NH    |         20|   116|   16|   82|  139|
+
+``` r
+
+df_kids %>% 
+  count(Group, Maternal_Education) %>% 
+  ungroup() %>% 
+  knitr::kable()
+```
+
+| Group | Maternal\_Education          |    n|
+|:------|:-----------------------------|----:|
+| CI    | College Degree               |   17|
+| CI    | Graduate Degree              |    8|
+| CI    | High School Diploma          |    2|
+| CI    | Some College (2+ years)      |    2|
+| CI    | Technical/Associate's Degree |    5|
+| CI    | NA                           |    2|
+| NH    | College Degree               |   14|
+| NH    | Graduate Degree              |   11|
+| NH    | High School Diploma          |    1|
+| NH    | Some College (&lt;2 years)   |    2|
+| NH    | Some College (2+ years)      |    4|
+| NH    | Technical/Associate's Degree |    4|
 
 Let's also get the children's database IDs from the backend database so that we can pull their data from the eyetracking database.
 
@@ -167,7 +218,7 @@ tbl_blocks <- tbl(l2t_eyetracking, "Blocks") %>%
   filter(Block_Task == "RWL", 
          ChildStudyID %in% df_cds$ChildStudyID) %>% 
   select(BlockID, ChildStudyID, Block_Basename, 
-         Block_DateTime, Block_Task, Block_Version)
+         Block_DateTime, Block_Task, Block_Version, Block_Age)
 
 # Get the attributes for these blocks
 tbl_blocks_attrs <- tbl(l2t_eyetracking, "BlockAttributes") %>% 
@@ -204,15 +255,12 @@ if (!refresh) {
     distinct()
 } else {
   df_blocks <- collect(tbl_blocks) %>% 
-    left_join(df_cds) %>% 
-    # Compute child's age in months when they did eyetracking block
-    mutate(Block_Date = as.Date(Block_DateTime),
-           Block_Age = chrono_age(Birthdate, Block_Date)) %>% 
-    group_by(ChildStudyID) %>% 
-    # We want one age per child, so use earliest. This might be dubious. 
-    mutate(Block_Age = min(Block_Age)) %>% 
+    left_join(df_cds) %>%
+    group_by(ChildStudyID) %>%
+    # We want one age per child, so use earliest. This might be dubious.
+    mutate(Block_Age = min(Block_Age)) %>%
     ungroup()
-  
+     
   # Get the dialect
   df_blocks_attrs <- collect(tbl_blocks_attrs) %>% 
     # Pivot from long to wide so have the attributes we want
@@ -225,38 +273,17 @@ if (!refresh) {
     left_join(df_blocks_attrs) 
   
   df_trials <- collect(tbl_trials)
-  df_trials_attrs <- collect(tbl_trials_attrs)
-  
-  # I just noticed I spelt stimulus wrong when I uploaded the trial
-  # info to the database. Make attribute names a bit cleaner.
-  clean_attr_names <- function(xs) {
-    xs %>% 
-      stringr::str_replace("Stimlulus", "Stimulus") %>% 
-      stringr::str_replace("^(Stimulus|Image)(Lower|Upper)", "\\1_\\2")
-  }
+  df_trials_attrs <- collect(tbl_trials_attrs, n = Inf)
   
   df_trials_attrs <- df_trials_attrs %>% 
-    mutate(TrialAttribute_Name = clean_attr_names(TrialAttribute_Name)) %>% 
     # Pivot from long to wide so have the attributes we want
     tidyr::spread(TrialAttribute_Name, TrialAttribute_Value) %>% 
     select(ChildStudyID, BlockID, TrialID, TargetImage,
            # Where they were looking the most during 0-250ms
-           Bias_ImageAOI, starts_with("Image_"), starts_with("Stimulus_"))
-  
-  # Do a little work unpacking which word was where onscreen and what kind of
-  # foil it was
-  df_words <- df_trials_attrs %>% 
-    select(TrialID, starts_with("Image_"), starts_with("Stimulus_")) %>% 
-    # Back to long format and split underscore into two columns
-    tidyr::gather(Key, Value, -TrialID) %>% 
-    tidyr::separate(Key, c("Property", "Location")) %>% 
-    tidyr::spread(Property, Value) %>% 
-    mutate(Word = stringr::str_extract(Image, "[A-z]+")) %>% 
-    select(-Image, -Location) %>% 
-    tidyr::spread(Stimulus, Word)
-    
+           Bias_ImageAOI, 
+           starts_with("Image"), starts_with("Stimulus"), starts_with("Word"))
+
   df_trials <- df_trials_attrs %>% 
-    left_join(df_words) %>% 
     left_join(df_trials)
   
   df_looks <- collect(tbl_looks, n = Inf)
@@ -404,12 +431,13 @@ p1 <- ggplot(df_looks_to_aois) +
   aes(x = Time, y = Proportion, color = AOI, group = LineGroup) + 
   geom_hline(yintercept = .25, size = 2, color = "white") + 
   geom_line() + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "inferno", end = .9) +
   facet_wrap("Group") +
   p_theme + curr_labs
 p1  
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-11-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-12-1.png" width="80%" />
 
 Replace data-set in last plot with one with a narrow time window.
 
@@ -420,7 +448,7 @@ df_looks_to_aois_window <- df_looks_to_aois %>%
 p1 %+% df_looks_to_aois_window
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-12-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-13-1.png" width="80%" />
 
 Show average of each participant's lines.
 
@@ -430,11 +458,12 @@ p2 <- ggplot(df_looks_to_aois) +
   geom_hline(yintercept = .25, size = 2, color = "white") + 
   stat_summary(fun.data = mean_se, geom = "pointrange") +
   facet_wrap("Group") +
-  p_theme + curr_labs
+  p_theme + curr_labs + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "inferno", end = .9)
 p2  
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-13-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-14-1.png" width="80%" />
 
 ``` r
 p2b <- ggplot(df_looks_to_aois_window) + 
@@ -442,11 +471,12 @@ p2b <- ggplot(df_looks_to_aois_window) +
   geom_hline(yintercept = .25, size = 2, color = "white") + 
   stat_summary(fun.data = mean_se, geom = "pointrange") +
   facet_wrap("Group") +
-  p_theme + curr_labs
+  p_theme + curr_labs + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "inferno", end = .9)
 p2b 
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-14-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-15-1.png" width="80%" />
 
 Actually, we don't need to facet them.
 
@@ -455,11 +485,12 @@ p3 <- ggplot(df_looks_to_aois) +
   aes(x = Time, y = Proportion, color = AOI, shape = Group) + 
   geom_hline(yintercept = .25, size = 2, color = "white") + 
   stat_summary(fun.data = mean_se, geom = "pointrange") +
-  p_theme + curr_labs
+  p_theme + curr_labs + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "inferno", end = .9)
 p3
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-15-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-16-1.png" width="80%" />
 
 And zoom in.
 
@@ -468,11 +499,12 @@ p4 <- ggplot(df_looks_to_aois_window) +
   aes(x = Time, y = Proportion, color = AOI, shape = Group) + 
   geom_hline(yintercept = .25, size = 2, color = "white") + 
   stat_summary(fun.data = mean_se, geom = "pointrange") +
-  p_theme + curr_labs
+  p_theme + curr_labs + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "inferno", end = .9)
 p4
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-16-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-17-1.png" width="80%" />
 
 Compare each mean of curve.
 
@@ -486,7 +518,7 @@ p5 <- ggplot(df_looks_to_aois_window) +
 p5
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-17-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-18-1.png" width="80%" />
 
 Save a final data-set.
 
@@ -602,4 +634,4 @@ ggplot(df) +
   stat_summary(aes(y = fitted), fun.y = mean, geom = "line")
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-19-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-20-1.png" width="80%" />

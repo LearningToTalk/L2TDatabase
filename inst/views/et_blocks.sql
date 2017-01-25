@@ -10,6 +10,7 @@ create or replace algorithm = undefined view eyetracking.q_BlocksByStudy as
     a.Block_Version as Version,
     a.Block_Basename as Basename,
     a.Block_DateTime as DateTime,
+    a.Block_Age as Block_Age,
     a.BlockID as BlockID
   from
     eyetracking.Blocks a
