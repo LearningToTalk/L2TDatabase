@@ -26,4 +26,3 @@ of mysqldump}.
 The command-line call uses the \code{--single-transaction} flag because it
 doesn't need LOCKED TABLES privilege.
 }
-

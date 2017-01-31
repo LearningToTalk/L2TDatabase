@@ -9,4 +9,3 @@ tbl_name \%from\% db_con
 \description{
 Grab a table from a source
 }
-

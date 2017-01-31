@@ -13,12 +13,11 @@ l2t_backup(src, backup_dir)
 }
 \value{
 Each table in the database is downloaded and saved via
-  \code{backup_tbl}. The downloaded tables are returned in a list of
-  dataframes. The csvs are saved together in a timestamped folder inside of
-  the \code{backup_dir} folder, so the path to a particular's table's csv
-  file would be \code{[backup_dir]/[timestamp]/[table_name].csv}.
+\code{backup_tbl}. The downloaded tables are returned in a list of
+dataframes. The csvs are saved together in a timestamped folder inside of
+the \code{backup_dir} folder, so the path to a particular's table's csv
+file would be \code{[backup_dir]/[timestamp]/[table_name].csv}.
 }
 \description{
 Download each tbl in a database and write to csv
 }
-

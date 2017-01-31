@@ -11,7 +11,7 @@ chrono_age(t1, t2)
 }
 \value{
 the chronological ages in months. NA is returned if the age cannot be
-  computed.
+computed.
 }
 \description{
 Ages are rounded down to the nearest month. A difference of 20 months, 29
@@ -52,4 +52,3 @@ t2 <- c("2014-01-20", "2014-05-10", "2014-11-10")
 chrono_age(t1, t2)
 #> [1] 24  3 49
 }
-

@@ -15,11 +15,10 @@ create_diff_table(data, ref_data, primary_key)
 in the data}
 }
 \value{
-a data-frame with the primary key column(s), and the columns Field,
-  OldVersion and NewVersion showing the differences between the two
-  data-frames
+a data-frame with the primary key column(s), and the columns \code{Field},
+\code{OldVersion} and \code{NewVersion} showing the differences between the two
+data-frames
 }
 \description{
 Summarize the changes between two data-frames
 }
-

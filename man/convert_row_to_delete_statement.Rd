@@ -2,11 +2,10 @@
 % Please edit documentation in R/write.R
 \name{convert_row_to_delete_statement}
 \alias{convert_row_to_delete_statement}
-\title{Create a SQL DELETE query from a row of dataframe}
+\title{Create a SQL DELETE query from a row of a dataframe}
 \usage{
 convert_row_to_delete_statement(src, tbl_name, primary_key, tbl_row)
 }
 \description{
-Create a SQL DELETE query from a row of dataframe
+Create a SQL DELETE query from a row of a dataframe
 }
-

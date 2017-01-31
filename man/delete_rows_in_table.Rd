@@ -7,21 +7,22 @@
 delete_rows_in_table(src, tbl_name, rows, guard = TRUE, preview = TRUE)
 }
 \arguments{
-\item{src}{a dplyr-managed database connection or a MySQLConnection}
+\item{src}{a dplyr-managed database connection or a \code{MySQLConnection}}
 
-\item{tbl_name}{name of the table to modify}
+\item{tbl_name}{the name of the table to modify}
 
 \item{rows}{a data-frame of rows to remove}
 
 \item{guard}{whether to prevent the delete statement (the default) if it
 would delete all rows in the table}
 
-\item{preview}{whether the delete should be performed or just previewed}
+\item{preview}{whether the table-modifying query should be performed or just
+previewed}
 }
 \value{
-TRUE if the delete succeeded.
+\code{TRUE} if the query succeeded or if the preview worked without
+errors.
 }
 \description{
 Remove records in a table
 }
-

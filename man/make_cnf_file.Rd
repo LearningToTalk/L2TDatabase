@@ -22,10 +22,9 @@ make_cnf_file(dest = "./db.cnf", user = "", password = "", host = "",
 }
 \value{
 the lines of the populated .cnf template file are returned. These
-  lines are also written to the file named in \code{dest} and printed to the
-  console.
+lines are also written to the file named in \code{dest} and printed to the
+console.
 }
 \description{
 Create a MySQL config file
 }
-

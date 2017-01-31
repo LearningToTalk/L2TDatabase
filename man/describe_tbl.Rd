@@ -13,11 +13,10 @@ describe_tbl(src, tbl_name)
 }
 \value{
 A dataframe describing each column of a database table. Columns in
-  the dataframe: Table, Field, Index (type of database index), (storage)
-  DataType, DefaultValue, NullAllowed (whether blanks are allowed),
-  Description (the comment field from the table structure).
+the dataframe: Table, Field, Index (type of database index), (storage)
+DataType, DefaultValue, NullAllowed (whether blanks are allowed),
+Description (the comment field from the table structure).
 }
 \description{
 Download a codebook for a database table
 }
-

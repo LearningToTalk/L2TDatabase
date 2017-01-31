@@ -8,4 +8,3 @@
 \description{
 Helper functions for working with L2T's MySQL database
 }
-

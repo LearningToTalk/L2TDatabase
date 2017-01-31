@@ -7,16 +7,15 @@
 append_rows_to_table(src, tbl_name, rows)
 }
 \arguments{
-\item{src}{a dplyr-managed database connection or a MySQLConnection}
+\item{src}{a dplyr-managed database connection or a \code{MySQLConnection}}
 
-\item{tbl_name}{name of the table to update}
+\item{tbl_name}{the name of the table to modify}
 
-\item{rows}{a data-frame of new rows}
+\item{rows}{a data-frame of rows with new data}
 }
 \value{
-TRUE if the update succeeded
+\code{TRUE} if the update succeeded
 }
 \description{
 Append rows to a database table
 }
-

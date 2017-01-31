@@ -13,15 +13,14 @@ find_new_rows_in_table(data, ref_data, required_cols,
 \item{ref_data}{a reference data-frame}
 
 \item{required_cols}{the names of columns that both tables to need to have
-and should only have non-NA values for.}
+and which should only contain non-\code{NA} values.}
 
 \item{extra_cols}{the names of additional columns which should have the same
 values in each table}
 }
 \value{
-a data-frame of rows of rows that are in `data` but not in `ref_data`
+a data-frame of rows of rows that are in \code{data} but not in \code{ref_data}
 }
 \description{
 Compare two tables to find new records
 }
-

@@ -26,12 +26,12 @@ maybe_matches <- function(...) {
 
 #' A stronger element-wise equality operators
 #'
-#' These operators work like \code{==} or \code{!=} but they handle comparison
-#' with NA values. \code{1 \%===\% NA} is false and \code{NA \%===\% NA}.
+#' These operators work like `==` or `!=` but they handle comparison with `NA`
+#' values. \code{1 \%===\% NA} is `FALSE` and \code{NA \%===\% NA} is `TRUE`.
 #'
 #' @param x,y vectors to be compared. They must have the same length.
-#' @return \code{\%===\%} returns TRUE wherever is x[i] the same as y[i] and
-#'   \code{\%!==\%} returns FALSE wherever is x[i] the same as y[i].
+#' @return \code{\%===\%} returns `TRUE` wherever is `x[i]` the same as `y[i]`
+#'   and \code{\%!==\%} returns `FALSE` wherever is `x[i]` the same as `y[i]`.
 #' @export
 #' @rdname equality
 #' @examples
@@ -92,11 +92,12 @@ match_columns <- function(df1, df2) {
 #' http://www.exceltactics.com/definitive-guide-using-dates-times-excel/
 #'
 #' @note This function is only valid for years 1901 and beyond. Excel wrongly
-#'   assumes 1900 was a leap year. See ?format.Date for more information.
+#'   assumes 1900 was a leap year. See [base::format.Date()] for more
+#'   information.
 #'
-#' @param dates a vector of dates (either numeric or character) originating
-#'   from an Excel spreadsheet.
-#' @return the dates converted to POSIXct objects (see ?DateTimeClasses)
+#' @param dates a vector of dates (either numeric or character) originating from
+#'   an Excel spreadsheet.
+#' @return the dates converted to POSIXct objects (see [base::DateTimeClasses])
 #' @export
 #' @examples
 #' undo_excel_date("41659")

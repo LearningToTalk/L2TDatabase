@@ -20,4 +20,3 @@ Connect to the L2T database using a MySQL config file
 \details{
 http://svitsrv25.epfl.ch/R-doc/library/RMySQL/html/RMySQL-package.html
 }
-

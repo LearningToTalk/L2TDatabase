@@ -7,18 +7,19 @@
 overwrite_rows_in_table(src, tbl_name, rows, preview = TRUE)
 }
 \arguments{
-\item{src}{a dplyr-managed database connection or a MySQLConnection}
+\item{src}{a dplyr-managed database connection or a \code{MySQLConnection}}
 
-\item{tbl_name}{name of the table to update}
+\item{tbl_name}{the name of the table to modify}
 
 \item{rows}{a data-frame of rows with new data}
 
-\item{preview}{whether the update should be performed or just previewed}
+\item{preview}{whether the table-modifying query should be performed or just
+previewed}
 }
 \value{
-TRUE if the update succeeded.
+\code{TRUE} if the query succeeded or if the preview worked without
+errors.
 }
 \description{
 Update records in a table
 }
-

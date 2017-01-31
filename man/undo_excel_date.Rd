@@ -7,11 +7,11 @@
 undo_excel_date(dates)
 }
 \arguments{
-\item{dates}{a vector of dates (either numeric or character) originating
-from an Excel spreadsheet.}
+\item{dates}{a vector of dates (either numeric or character) originating from
+an Excel spreadsheet.}
 }
 \value{
-the dates converted to POSIXct objects (see ?DateTimeClasses)
+the dates converted to POSIXct objects (see \link[base:DateTimeClasses]{base::DateTimeClasses})
 }
 \description{
 Excel stores dates as an integer representing the number of days since
@@ -20,7 +20,8 @@ http://www.exceltactics.com/definitive-guide-using-dates-times-excel/
 }
 \note{
 This function is only valid for years 1901 and beyond. Excel wrongly
-  assumes 1900 was a leap year. See ?format.Date for more information.
+assumes 1900 was a leap year. See \code{\link[base:format.Date]{base::format.Date()}} for more
+information.
 }
 \examples{
 undo_excel_date("41659")
@@ -28,4 +29,3 @@ undo_excel_date("41659")
 undo_excel_date(41534)
 #> "2013-09-17 UTC"
 }
-

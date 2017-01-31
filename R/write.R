@@ -1,9 +1,10 @@
 
 #' Append rows to a database table
-#' @param src a dplyr-managed database connection or a MySQLConnection
-#' @param tbl_name name of the table to update
-#' @param rows a data-frame of new rows
-#' @return TRUE if the update succeeded
+#'
+#' @param src a dplyr-managed database connection or a `MySQLConnection`
+#' @param tbl_name the name of the table to modify
+#' @param rows a data-frame of rows with new data
+#' @return `TRUE` if the update succeeded
 #' @export
 append_rows_to_table <- function(src, tbl_name, rows) {
   # Unpack dplyr connection
@@ -38,7 +39,7 @@ append_rows_to_table <- function(src, tbl_name, rows) {
 #' @param data data-frame to check for changes
 #' @param ref_data a reference data-frame
 #' @param required_cols the names of columns that both tables to need to have
-#'   and should only have non-NA values for.
+#'   and which should only contain non-`NA` values.
 #' @param extra_cols the names of additional columns which should have the same
 #'   values in each table
 #' @return a data-frame of rows of rows that are in `data` but not in `ref_data`
@@ -83,11 +84,11 @@ find_new_rows_in_table <- function(data, ref_data, required_cols, extra_cols = c
 
 
 #' Update records in a table
-#' @param src a dplyr-managed database connection or a MySQLConnection
-#' @param tbl_name name of the table to update
-#' @param rows a data-frame of rows with new data
-#' @param preview whether the update should be performed or just previewed
-#' @return TRUE if the update succeeded.
+#' @inheritParams append_rows_to_table
+#' @param preview whether the table-modifying query should be performed or just
+#'   previewed
+#' @return `TRUE` if the query succeeded or if the preview worked without
+#'   errors.
 #' @export
 overwrite_rows_in_table <- function(src, tbl_name, rows, preview = TRUE) {
   # Unpack dplyr connection
@@ -203,12 +204,13 @@ convert_diff_to_update_statement <- function(src, tbl_name, primary_key, tbl_dif
 
 
 #' Summarize the changes between two data-frames
+#'
 #' @param data a data-frame
 #' @param ref_data a reference version of the data-frame
 #' @param primary_key the name of a column which is used to unique identify rows
 #'   in the data
-#' @return a data-frame with the primary key column(s), and the columns Field,
-#'   OldVersion and NewVersion showing the differences between the two
+#' @return a data-frame with the primary key column(s), and the columns `Field`,
+#'   `OldVersion` and `NewVersion` showing the differences between the two
 #'   data-frames
 #' @export
 create_diff_table <- function(data, ref_data, primary_key) {
@@ -290,14 +292,12 @@ find_updates_in_daff <- function(ref_data, new_data) {
 
 
 #' Remove records in a table
-#' @param src a dplyr-managed database connection or a MySQLConnection
-#' @param tbl_name name of the table to modify
+#'
+#' @inheritParams overwrite_rows_in_table
 #' @param rows a data-frame of rows to remove
 #' @param guard whether to prevent the delete statement (the default) if it
 #'   would delete all rows in the table
-#' @param preview whether the delete should be performed or just previewed
-#' @return TRUE if the delete succeeded.
-#' @export
+#' @inherit overwrite_rows_in_table return
 delete_rows_in_table <- function(src, tbl_name, rows, guard = TRUE, preview = TRUE) {
   # Unpack dplyr connection
   if (inherits(src, "src_mysql")) {

@@ -9,4 +9,3 @@ convert_diff_to_update_statement(src, tbl_name, primary_key, tbl_diff)
 \description{
 Convert a summary of diffs into a SQL UPDATE query
 }
-

@@ -11,10 +11,9 @@ describe_db(src)
 }
 \value{
 A dataframe describing each table in a database. Columns in the
-  dataframe: Database, Table, (number of) Rows, Description (comment field
-  for the table)
+dataframe: Database, Table, (number of) Rows, Description (comment field
+for the table)
 }
 \description{
 Download a codebook for a database
 }
-

@@ -9,4 +9,3 @@ match_columns(df1, df2)
 \description{
 Make columns in one data-frame match those in a second data-frame
 }
-
