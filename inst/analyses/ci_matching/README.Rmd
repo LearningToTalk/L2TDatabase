@@ -1,0 +1,104 @@
+---
+title: "Finding normal-hearing matches for children with cochlear implants"
+author: "Tristan Mahr"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("knitr")
+opts_chunk$set(
+  warning = FALSE,
+  collapse = TRUE, 
+  comment = "#>", 
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6,
+  dpi = 300,
+  out.width = "80%")
+
+wd <- rprojroot::find_rstudio_root_file()
+opts_knit$set(root.dir = wd)
+```
+
+
+```{r}
+library(dplyr)
+library(L2TDatabase)
+
+# Work relative to RStudio project
+wd <- rprojroot::find_rstudio_root_file()
+dir_here <- file.path(wd, "inst", "analyses", "ci_matching")
+cnf_file <- file.path(wd, "inst", "l2t_db.cnf")
+```
+
+Starting pool for matching, the children at TimePoint1 without cochlear
+implants, who are not late talkers and who speak mainstream American-English.
+
+```{r}
+l2t_main <- l2t_connect(cnf_file, "l2t")
+
+nh_set1 <- tbl(l2t_main, "Scores_TimePoint1") %>% 
+  filter(!AAE, !LateTalker, !CImplant, 
+         !is.na(Maternal_Education), 
+         !is.na(EVT_Standard)) %>% 
+  collect()
+
+
+nh_set2 <- tbl(l2t_main, "Scores_CochlearMatching") %>% 
+  filter(!AAE, !LateTalker, !CImplant, 
+         !is.na(Maternal_Education), 
+         !is.na(EVT_Standard)) %>% 
+  collect()
+
+nh_set <- bind_rows(nh_set1, nh_set2)
+```
+
+Post-stratify by maternal education. First, define low-mid-high medu groups.
+
+```{r}
+medu_scheme <- data_frame(
+  Maternal_Education_Level = c(NA, 1:7),
+  Maternal_Education_Group = c(NA, "Low", "Low", "Low", "Low", 
+                               "Mid", "Mid", "High")
+)
+
+nh_set %>% 
+  left_join(medu_scheme) %>% 
+  count(Maternal_Education, Maternal_Education_Level, 
+           Maternal_Education_Group) %>% 
+  arrange(Maternal_Education_Level)
+```
+
+Find the vocabulary scores that would define the 10-90% range for each maternal
+education group.
+
+```{r}
+nh_vocab_limits <- nh_set %>% 
+  left_join(medu_scheme) %>% 
+  group_by(Maternal_Education_Group) %>% 
+  summarise(
+    n = n(),
+    EVT_Mean = mean(EVT_Standard),
+    EVT_Min = min(EVT_Standard), 
+    EVT_Max = max(EVT_Standard),
+    EVT_10 = quantile(EVT_Standard, .1),
+    EVT_90 = quantile(EVT_Standard, .9),
+    nInRange = sum(between(EVT_Standard, EVT_10, EVT_90))) %>% 
+  ungroup()
+
+nh_vocab_limits
+```
+
+Restrict pool to just children with scores in their range.
+
+```{r}
+nh_set %>% 
+  left_join(medu_scheme) %>% 
+  left_join(nh_vocab_limits) %>% 
+  rowwise() %>% 
+  mutate(InRange = between(EVT_Standard, EVT_10, EVT_90)) %>% 
+  ungroup() %>% 
+  filter(InRange)
+```
+
