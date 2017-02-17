@@ -1,13 +1,14 @@
 -- Create a view to display the test scores of TimePoint2 participants
 create or replace algorithm = undefined view  l2t.Scores_TimePoint2 as
   select
-    childstudy.ChildStudyID,
     study.Study,
     childstudy.ShortResearchID as `ResearchID`,
     child.Female,
     child.AAE,
     child.LateTalker,
     child.CImplant,
+    child.ChildID,
+    childstudy.ChildStudyID,
     child.HouseholdID,
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,

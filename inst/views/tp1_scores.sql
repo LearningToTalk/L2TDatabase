@@ -7,6 +7,8 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint1 as
     child.AAE,
     child.LateTalker,
     child.CImplant,
+    child.ChildID,
+    childstudy.ChildStudyID,
     child.HouseholdID,
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,
