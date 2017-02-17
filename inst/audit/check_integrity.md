@@ -1,7 +1,7 @@
 Data Integrity Check
 ================
 Tristan Mahr
-2017-01-20
+2017-02-01
 
 In Spring 2016, we had our data-entry team re-enter test scores gathered in our studies, so that we could find data-entry discrepancies. This script compares the original to the re-entered scores.
 

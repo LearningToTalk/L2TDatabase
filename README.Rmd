@@ -402,9 +402,9 @@ printed here.
 
 ```{r, echo = FALSE, message = FALSE}
 evt <- readr::read_csv("./inst/audit/results_evt.csv") %>% 
-  mutate(Link = "[EVT](inst/audit/audit-evt.md)")
+  mutate(Link = "[EVT](inst/audit/audit_evt.md)")
 ppvt <- readr::read_csv("./inst/audit/results_ppvt.csv") %>% 
-  mutate(Link = "[PPVT](inst/audit/audit-ppvt.md)")
+  mutate(Link = "[PPVT](inst/audit/audit_ppvt.md)")
 integrity <- readr::read_csv("./inst/audit/results_integrity.csv") %>% 
   mutate(Link = "[Data entry discrepancies](inst/audit/check_integrity.md)")
 docs <- readr::read_csv("./inst/audit/results_metadata.csv") %>% 

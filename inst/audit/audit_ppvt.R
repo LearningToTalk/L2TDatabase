@@ -6,7 +6,8 @@
 #+ setup, include = FALSE
 library("knitr")
 opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
-opts_knit$set(root.dir = "../../")
+wd <- rprojroot::find_rstudio_root_file()
+opts_knit$set(root.dir = wd)
 
 
 #' Script to check for inconsistencies in the PPVT scores in the database.

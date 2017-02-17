@@ -1,7 +1,7 @@
 Documentation Check
 ================
 Tristan Mahr
-2017-01-21
+2017-02-01
 
 MySQL allows users to write short documentation comments for database tables (up to 80 characters) and for database fields (up to 255 characters). These documentation comments can be queried and retrieved like other data, so they provide a handy way to store descriptive metadata.
 
@@ -37,10 +37,11 @@ describe_db(l2t) %>%
 #> 7   backend q_Household_Max_Maternal_Education   NA        VIEW
 #> 8   backend                    q_LENA_Averages   NA        VIEW
 #> 9   backend                q_MinPair_Aggregate   NA        VIEW
-#> 10  backend                q_Rhyming_Aggregate   NA        VIEW
-#> 11  backend              q_Rhyming_PropCorrect   NA        VIEW
-#> 12  backend                  q_SAILS_Aggregate   NA        VIEW
-#> 13  backend                q_SAILS_PropCorrect   NA        VIEW
+#> 10  backend          q_MinPair_Dialect_Summary   NA        VIEW
+#> 11  backend                q_Rhyming_Aggregate   NA        VIEW
+#> 12  backend              q_Rhyming_PropCorrect   NA        VIEW
+#> 13  backend                  q_SAILS_Aggregate   NA        VIEW
+#> 14  backend                q_SAILS_PropCorrect   NA        VIEW
 ```
 
 In the `q_MinPair_Aggregate` view, the proportion correct for non-training trials is a derived value. The field `MinPair_ProportionCorrect` is created and computed as the query is executed. Therefore, there is no documentation available for it.
@@ -94,11 +95,47 @@ undocumented_fields <- all_descriptions %>%
   filter(Description == "", !IsEntryTable) %>% 
   select(Table, Field, Description) %>% 
   print(n = Inf)
-#> # A tibble: 0 × 3
-#> # ... with 3 variables: Table <chr>, Field <chr>, Description <chr>
+#> # A tibble: 17 × 3
+#>             Table                     Field Description
+#>             <chr>                     <chr>       <chr>
+#> 1       DELV_Risk              ChildStudyID            
+#> 2       DELV_Risk               DELV_RiskID            
+#> 3       DELV_Risk      DELV_Risk_Completion            
+#> 4       DELV_Risk             DELV_Risk_Age            
+#> 5       DELV_Risk           DELV_Risk_Score            
+#> 6       DELV_Risk          DELV_Risk_Degree            
+#> 7       DELV_Risk          DELV_Risk_Result            
+#> 8       DELV_Risk       DELV_Risk_Timestamp            
+#> 9  DELV_Variation              ChildStudyID            
+#> 10 DELV_Variation          DELV_VariationID            
+#> 11 DELV_Variation DELV_Variation_Completion            
+#> 12 DELV_Variation        DELV_Variation_Age            
+#> 13 DELV_Variation    DELV_Variation_ColumnA            
+#> 14 DELV_Variation    DELV_Variation_ColumnB            
+#> 15 DELV_Variation     DELV_Variation_Degree            
+#> 16 DELV_Variation     DELV_Variation_Result            
+#> 17 DELV_Variation  DELV_Variation_Timestamp
 undocumented_fields
-#> # A tibble: 0 × 3
-#> # ... with 3 variables: Table <chr>, Field <chr>, Description <chr>
+#> # A tibble: 17 × 3
+#>             Table                     Field Description
+#>             <chr>                     <chr>       <chr>
+#> 1       DELV_Risk              ChildStudyID            
+#> 2       DELV_Risk               DELV_RiskID            
+#> 3       DELV_Risk      DELV_Risk_Completion            
+#> 4       DELV_Risk             DELV_Risk_Age            
+#> 5       DELV_Risk           DELV_Risk_Score            
+#> 6       DELV_Risk          DELV_Risk_Degree            
+#> 7       DELV_Risk          DELV_Risk_Result            
+#> 8       DELV_Risk       DELV_Risk_Timestamp            
+#> 9  DELV_Variation              ChildStudyID            
+#> 10 DELV_Variation          DELV_VariationID            
+#> 11 DELV_Variation DELV_Variation_Completion            
+#> 12 DELV_Variation        DELV_Variation_Age            
+#> 13 DELV_Variation    DELV_Variation_ColumnA            
+#> 14 DELV_Variation    DELV_Variation_ColumnB            
+#> 15 DELV_Variation     DELV_Variation_Degree            
+#> 16 DELV_Variation     DELV_Variation_Result            
+#> 17 DELV_Variation  DELV_Variation_Timestamp
 ```
 
 Name checks
