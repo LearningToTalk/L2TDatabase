@@ -213,6 +213,11 @@ recordings in households?
 
 ```{r}
 library(lme4)
+
+df_plotting$Maternal_Education_Group <- factor(
+  df_plotting$Maternal_Education_Group, 
+  levels = c("MidPlus", "Low", "Mid", "Top"))
+
 m <- lmer(
   LENA_Prop_Meaningful ~ Maternal_Education_Group + 
     (1 | HouseholdID), df_plotting)

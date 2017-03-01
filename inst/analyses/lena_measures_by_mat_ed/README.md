@@ -267,6 +267,11 @@ Is the low group different from the other groups, accounting for nesting of reco
 
 ``` r
 library(lme4)
+
+df_plotting$Maternal_Education_Group <- factor(
+  df_plotting$Maternal_Education_Group, 
+  levels = c("MidPlus", "Low", "Mid", "Top"))
+
 m <- lmer(
   LENA_Prop_Meaningful ~ Maternal_Education_Group + 
     (1 | HouseholdID), df_plotting)
@@ -289,17 +294,17 @@ summary(m)
 #> Number of obs: 391, groups:  HouseholdID, 221
 #> 
 #> Fixed effects:
-#>                                 Estimate Std. Error t value
-#> (Intercept)                      0.18229    0.01151  15.836
-#> Maternal_Education_GroupMid      0.01810    0.01446   1.252
-#> Maternal_Education_GroupMidPlus  0.03812    0.01287   2.963
-#> Maternal_Education_GroupTop      0.04124    0.01273   3.239
+#>                              Estimate Std. Error t value
+#> (Intercept)                  0.220414   0.005750   38.33
+#> Maternal_Education_GroupLow -0.038123   0.012867   -2.96
+#> Maternal_Education_GroupMid -0.020026   0.010469   -1.91
+#> Maternal_Education_GroupTop  0.003116   0.007919    0.39
 #> 
 #> Correlation of Fixed Effects:
-#>             (Intr) Mt_E_GM M_E_GMP
-#> Mtrnl_Ed_GM -0.796                
-#> Mtrnl_E_GMP -0.895  0.712         
-#> Mtrnl_Ed_GT -0.904  0.720   0.809
+#>             (Intr) M_E_GL M_E_GM
+#> Mtrnl_Ed_GL -0.447              
+#> Mtrnl_Ed_GM -0.549  0.245       
+#> Mtrnl_Ed_GT -0.726  0.325  0.399
 
 m2 <- lmer(
   LENA_AWC_Hourly ~ Maternal_Education_Group + 
@@ -322,17 +327,17 @@ summary(m2)
 #> Number of obs: 391, groups:  HouseholdID, 221
 #> 
 #> Fixed effects:
-#>                                 Estimate Std. Error t value
-#> (Intercept)                        913.3       94.7   9.644
-#> Maternal_Education_GroupMid        163.8      119.1   1.376
-#> Maternal_Education_GroupMidPlus    289.8      105.9   2.735
-#> Maternal_Education_GroupTop        468.9      104.8   4.473
+#>                             Estimate Std. Error t value
+#> (Intercept)                  1203.02      47.46  25.346
+#> Maternal_Education_GroupLow  -289.76     105.93  -2.735
+#> Maternal_Education_GroupMid  -125.95      86.39  -1.458
+#> Maternal_Education_GroupTop   179.11      65.35   2.741
 #> 
 #> Correlation of Fixed Effects:
-#>             (Intr) Mt_E_GM M_E_GMP
-#> Mtrnl_Ed_GM -0.795                
-#> Mtrnl_E_GMP -0.894  0.711         
-#> Mtrnl_Ed_GT -0.903  0.719   0.808
+#>             (Intr) M_E_GL M_E_GM
+#> Mtrnl_Ed_GL -0.448              
+#> Mtrnl_Ed_GM -0.549  0.246       
+#> Mtrnl_Ed_GT -0.726  0.325  0.399
 ```
 
 Multiple imputation
@@ -362,16 +367,16 @@ imputation_vars <- c("LENA_Prop_Meaningful", "LENA_AWC_Hourly",
 mice_results <- mice(df_impute[imputation_vars], printFlag = FALSE, m = 10)
 
 mice_results$imp$Maternal_Education_Group 
-#>       1       2       3       4       5       6       7   8       9
-#> 135 Mid     Mid MidPlus MidPlus     Top     Mid     Top Top MidPlus
-#> 248 Low     Mid MidPlus     Mid     Mid     Mid MidPlus Mid MidPlus
-#> 350 Top MidPlus MidPlus MidPlus MidPlus     Top     Top Mid MidPlus
-#> 395 Top MidPlus     Mid MidPlus     Mid MidPlus     Top Mid     Top
-#>          10
-#> 135     Top
-#> 248     Top
-#> 350 MidPlus
-#> 395     Top
+#>           1       2       3       4       5       6       7   8       9
+#> 135     Mid     Top     Top MidPlus     Top MidPlus     Mid Top     Mid
+#> 248 MidPlus MidPlus MidPlus MidPlus     Top     Mid MidPlus Low MidPlus
+#> 350 MidPlus     Top MidPlus     Mid     Top     Top     Top Top     Top
+#> 395     Top MidPlus     Mid MidPlus MidPlus MidPlus     Top Mid     Low
+#>      10
+#> 135 Mid
+#> 248 Mid
+#> 350 Top
+#> 395 Top
 
 ## Add IDs to imputation results
 
@@ -400,15 +405,16 @@ imputations %>%
 | Study         | ResearchID |  LENA\_Prop\_Meaningful|  LENA\_AWC\_Hourly| GroupGuess |  nGuesses|
 |:--------------|:-----------|-----------------------:|------------------:|:-----------|---------:|
 | DialectSwitch | 457D       |                  0.2092|          1442.1947| Mid        |         1|
-| DialectSwitch | 457D       |                  0.2092|          1442.1947| MidPlus    |         6|
-| DialectSwitch | 457D       |                  0.2092|          1442.1947| Top        |         3|
-| TimePoint1    | 036L       |                  0.0298|           120.3259| Mid        |         3|
-| TimePoint1    | 036L       |                  0.0298|           120.3259| MidPlus    |         3|
-| TimePoint1    | 036L       |                  0.0298|           120.3259| Top        |         4|
-| TimePoint1    | 131L       |                  0.1092|           742.5027| Mid        |         3|
-| TimePoint1    | 131L       |                  0.1092|           742.5027| MidPlus    |         3|
+| DialectSwitch | 457D       |                  0.2092|          1442.1947| MidPlus    |         2|
+| DialectSwitch | 457D       |                  0.2092|          1442.1947| Top        |         7|
+| TimePoint1    | 036L       |                  0.0298|           120.3259| Low        |         1|
+| TimePoint1    | 036L       |                  0.0298|           120.3259| Mid        |         2|
+| TimePoint1    | 036L       |                  0.0298|           120.3259| MidPlus    |         4|
+| TimePoint1    | 036L       |                  0.0298|           120.3259| Top        |         3|
+| TimePoint1    | 131L       |                  0.1092|           742.5027| Mid        |         4|
+| TimePoint1    | 131L       |                  0.1092|           742.5027| MidPlus    |         2|
 | TimePoint1    | 131L       |                  0.1092|           742.5027| Top        |         4|
 | TimePoint1    | 688L       |                  0.1441|           593.9271| Low        |         1|
-| TimePoint1    | 688L       |                  0.1441|           593.9271| Mid        |         5|
-| TimePoint1    | 688L       |                  0.1441|           593.9271| MidPlus    |         3|
+| TimePoint1    | 688L       |                  0.1441|           593.9271| Mid        |         2|
+| TimePoint1    | 688L       |                  0.1441|           593.9271| MidPlus    |         6|
 | TimePoint1    | 688L       |                  0.1441|           593.9271| Top        |         1|
