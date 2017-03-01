@@ -1,0 +1,227 @@
+---
+title: "How does language input vary with maternal education level"
+author: "Tristan Mahr"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("knitr")
+opts_chunk$set(
+  warning = FALSE,
+  collapse = TRUE, 
+  comment = "#>", 
+  message = FALSE,
+  fig.width = 8,
+  fig.asp = 0.618,
+  dpi = 300,
+  out.width = "80%")
+
+wd <- rprojroot::find_rstudio_root_file()
+opts_knit$set(root.dir = wd)
+```
+
+JRE asks whether we should put the "less than two years of college" maternal 
+education households with the "high school or less" households  or with the 
+"some college" and "technical/associate's degree" households. We are going to
+look at how the LENA measurements vary with maternal education level.
+
+
+
+## Data munging
+
+Connect to database.
+
+```{r connect}
+library(dplyr)
+library(L2TDatabase)
+
+# Work relative to RStudio project
+wd <- rprojroot::find_rstudio_root_file()
+dir_here <- file.path(wd, "inst", "analyses", "ci_matching")
+cnf_file <- file.path(wd, "inst", "l2t_db.cnf")
+
+l2t_main <- l2t_connect(cnf_file, "l2t")
+```
+
+Get the maternal education codes from the database.
+
+```{r medu-levels}
+medu_scales <- tbl(l2t_main, "Maternal_Education") %>% 
+  distinct(Maternal_Education, Maternal_Education_Level) %>% 
+  collect() %>% 
+  arrange(Maternal_Education_Level)
+
+knitr::kable(medu_scales)
+```
+
+Simplify to a low-mid-mid-high scale.
+
+```{r medu-groups}
+medu_groups <- tibble::tribble(
+  ~ Maternal_Education_Level, ~ Maternal_Education_Group,
+  1, "Low", 
+  2, "Low", 
+  3, "Low", 
+  4, "[skip]", 
+  # Kind of awkward names but alphabetical order matches original order
+  5, "Mid", 
+  6, "MidPlus", 
+  7, "Top", 
+  NA, "[missing]")
+
+medu_scales <- medu_scales %>% 
+  left_join(medu_groups, by = "Maternal_Education_Level")
+
+knitr::kable(medu_scales)
+```
+
+
+
+Combine LENA data with the maternal education codes.
+
+```{r combine-lena-and-medu, warning =FALSE}
+medu <- tbl(l2t_main, "Maternal_Education") %>% 
+  select(Study, ResearchID, HouseholdID, 
+         Maternal_Education, Maternal_Education_Level) %>% 
+  collect()
+  
+# These LENAs may or may not have problems based on the LENA notes, so let's
+# ignore them for this analysis
+lenas_to_exclude <- tibble::tribble(
+  ~ Study, ~ ResearchID,
+  "TimePoint1", "053L",
+  "TimePoint1", "102L",
+  "TimePoint1", "116L"
+)
+
+lena <- tbl(l2t_main, "LENA_Averages") %>% 
+  select(Study, ResearchID, 
+         LENA_Age, LENA_Hours, 
+         LENA_Prop_Meaningful, LENA_AWC_Hourly) %>% 
+  collect() %>% 
+  anti_join(lenas_to_exclude, by = c("Study", "ResearchID"))
+
+# Combine the tables
+medu_lena <- lena %>% 
+  left_join(medu, by = c("Study", "ResearchID")) %>% 
+  left_join(medu_scales, 
+            by = c("Maternal_Education", "Maternal_Education_Level"))
+medu_lena
+```
+
+How much LENA data we have in the different groups
+
+```{r}
+# Households with LENA recordings
+medu_lena %>% 
+  group_by(Maternal_Education_Group) %>% 
+  summarise(nRecordings = n(), 
+            nChildren = n_distinct(ResearchID),
+            nHouseholds = n_distinct(HouseholdID)) %>% 
+  knitr::kable()
+```
+
+## Density of outcome measures
+
+Visualize the data by group
+
+```{r}
+library(ggplot2)
+
+right_aligned <- theme(
+  axis.title.x = element_text(hjust = 1), 
+  axis.title.y = element_text(hjust = 1))
+
+density_y_axis <-   theme(
+  axis.text.y = element_blank(), 
+  axis.ticks.y = element_blank())
+
+df_plotting <- medu_lena %>% 
+  filter(Maternal_Education_Group != "[skip]", 
+         Maternal_Education_Group != "[missing]")
+
+df_less_than_two <- medu_lena %>% 
+  filter(Maternal_Education_Group == "[skip]")
+
+
+ggplot(df_plotting) + 
+  aes(x = LENA_Prop_Meaningful) + 
+  geom_density(aes(color = Maternal_Education_Group)) + 
+  geom_rug(data = df_less_than_two, size = 1) +
+  xlim(0, .5) +
+  labs(x = "Proportion of meaningful speech (hourly average)",
+       y = "Density",
+       color = NULL,
+       title = "Language input by maternal education",
+       caption = "Rug marks: Households with <2 years of college") +
+  right_aligned + 
+  density_y_axis
+
+
+ggplot(df_plotting) + 
+  aes(x = LENA_AWC_Hourly) + 
+  geom_density(aes(color = Maternal_Education_Group)) + 
+  geom_rug(data = df_less_than_two, size = 1) +
+  labs(x = "Adult word count (hourly average)",
+       y = "Density",
+       color = NULL,
+       title = "Language input by maternal education",
+       caption = "Rug marks: Households with <2 years of college") +
+  right_aligned + 
+  density_y_axis
+```
+
+## Multiple imputation
+
+Multiple imputation suggest that we assign these households to larger groups on
+a case-by-case basis.
+
+```{r}
+library(mice)
+
+# Create a data-frame where the [skip] group has NA for group. Code the group as
+# an ordered categorical variable
+df_impute <- medu_lena %>% 
+  filter(Maternal_Education_Group != "[missing]") %>% 
+  mutate(Maternal_Education_Group = 
+           ifelse(Maternal_Education_Group == "[skip]", 
+                  NA, Maternal_Education_Group), 
+         Maternal_Education_Group = as.ordered(Maternal_Education_Group)) %>% 
+  select(Study, ResearchID, LENA_Age, HouseholdID, 
+         LENA_Prop_Meaningful, LENA_AWC_Hourly, Maternal_Education_Group)
+
+
+imputation_vars <- c("LENA_Prop_Meaningful", "LENA_AWC_Hourly", 
+                     "Maternal_Education_Group")
+
+# Perform ten imputations
+mice_results <- mice(df_impute[imputation_vars], printFlag = FALSE, m = 10)
+
+mice_results$imp$Maternal_Education_Group 
+
+## Add IDs to imputation results
+
+imputed_rows <- mice_results$imp$Maternal_Education_Group %>% 
+  row.names() %>% 
+  as.numeric()
+
+
+ids <- df_impute[imputed_rows, c("Study", "ResearchID", 
+                                 "LENA_Prop_Meaningful", "LENA_AWC_Hourly")]
+
+imputations <- bind_cols(ids, mice_results$imp$Maternal_Education_Group) %>% 
+  # Convert from wide to long format
+  tidyr::gather(Imputation, Maternal_Education_Group, -one_of(names(ids)))
+
+imputations %>% 
+  count(Study, ResearchID,
+        LENA_Prop_Meaningful, LENA_AWC_Hourly, 
+        Maternal_Education_Group) %>% 
+  ungroup() %>% 
+  rename(GroupGuess = Maternal_Education_Group, 
+         nGuesses = n) %>% 
+  knitr::kable()
+```
+
+
