@@ -206,6 +206,24 @@ ggplot(medu_lena) +
 
 ```
 
+## Mixed effects models
+
+Is the low group different from the other groups, accounting for nesting of
+recordings in households?
+
+```{r}
+library(lme4)
+m <- lmer(
+  LENA_Prop_Meaningful ~ Maternal_Education_Group + 
+    (1 | HouseholdID), df_plotting)
+summary(m)
+
+m2 <- lmer(
+  LENA_AWC_Hourly ~ Maternal_Education_Group + 
+    (1 | HouseholdID), df_plotting)
+summary(m2)
+```
+
 
 
 ## Multiple imputation
