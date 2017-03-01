@@ -149,6 +149,27 @@ medu_lena %>%
 | MidPlus                    |          147|         97|           78|
 | Top                        |          154|         93|           87|
 
+``` r
+
+medu_lena %>% 
+  group_by(Maternal_Education_Group) %>% 
+  summarise(nRecordings = n(), 
+            AWC_Mean = mean(LENA_AWC_Hourly) %>% round(),
+            AWC_SD = sd(LENA_AWC_Hourly) %>% round(),
+            Prop_Mean = mean(LENA_Prop_Meaningful),
+            Prop_SD = sd(LENA_Prop_Meaningful)) %>% 
+  knitr::kable(digits = 4)
+```
+
+| Maternal\_Education\_Group |  nRecordings|  AWC\_Mean|  AWC\_SD|  Prop\_Mean|  Prop\_SD|
+|:---------------------------|------------:|----------:|--------:|-----------:|---------:|
+| \[missing\]                |            3|        903|      299|      0.1853|    0.0399|
+| \[skip\]                   |            4|        725|      547|      0.1231|    0.0747|
+| Low                        |           30|        927|      541|      0.1850|    0.0633|
+| Mid                        |           60|       1109|      434|      0.2025|    0.0630|
+| MidPlus                    |          147|       1192|      524|      0.2223|    0.0613|
+| Top                        |          154|       1367|      445|      0.2225|    0.0530|
+
 Density of outcome measures
 ---------------------------
 
@@ -207,6 +228,38 @@ ggplot(df_plotting) +
 
 <img src="README_files/figure-markdown_github/unnamed-chunk-2-2.png" width="80%" />
 
+Means by group
+--------------
+
+``` r
+ggplot(medu_lena) + 
+  aes(x = Maternal_Education_Group, y = LENA_Prop_Meaningful) + 
+  geom_point(color = "grey60", position = position_jitter(width = .1)) + 
+  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), size = 1) +
+  labs(x = "Maternal education group",
+       y = "Proportion of meaningful speech (hourly average)",
+       title = "Language input by maternal education",
+       caption = "Point-range: Group Mean ± SD") +
+  right_aligned
+```
+
+<img src="README_files/figure-markdown_github/unnamed-chunk-3-1.png" width="80%" />
+
+``` r
+
+ggplot(medu_lena) + 
+  aes(x = Maternal_Education_Group, y = LENA_AWC_Hourly) + 
+  geom_point(color = "grey60", position = position_jitter(width = .1)) + 
+  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), size = 1) +
+  labs(x = "Maternal education group",
+       y = "Adult word count (hourly average)",
+       title = "Language input by maternal education",
+       caption = "Point-range: Group Mean ± SD") +
+  right_aligned
+```
+
+<img src="README_files/figure-markdown_github/unnamed-chunk-3-2.png" width="80%" />
+
 Multiple imputation
 -------------------
 
@@ -234,16 +287,16 @@ imputation_vars <- c("LENA_Prop_Meaningful", "LENA_AWC_Hourly",
 mice_results <- mice(df_impute[imputation_vars], printFlag = FALSE, m = 10)
 
 mice_results$imp$Maternal_Education_Group 
-#>       1       2       3       4       5       6       7       8   9
-#> 135 Top     Top MidPlus MidPlus MidPlus MidPlus     Low     Low Low
-#> 248 Top MidPlus     Mid     Top MidPlus     Mid     Top MidPlus Low
-#> 350 Top     Low MidPlus MidPlus MidPlus MidPlus MidPlus     Top Mid
-#> 395 Top     Mid     Top     Low     Low     Mid     Mid     Low Mid
-#>          10
-#> 135 MidPlus
-#> 248     Top
-#> 350     Top
-#> 395 MidPlus
+#>           1       2       3       4       5       6       7       8
+#> 135     Top MidPlus     Low     Top MidPlus MidPlus MidPlus     Low
+#> 248     Top     Mid MidPlus MidPlus MidPlus     Mid MidPlus MidPlus
+#> 350 MidPlus     Mid     Top     Top     Mid     Low     Top MidPlus
+#> 395     Top MidPlus MidPlus MidPlus MidPlus MidPlus MidPlus     Mid
+#>           9      10
+#> 135     Low     Mid
+#> 248     Mid     Low
+#> 350     Mid MidPlus
+#> 395 MidPlus MidPlus
 
 ## Add IDs to imputation results
 
@@ -272,17 +325,17 @@ imputations %>%
 | Study         | ResearchID |  LENA\_Prop\_Meaningful|  LENA\_AWC\_Hourly| GroupGuess |  nGuesses|
 |:--------------|:-----------|-----------------------:|------------------:|:-----------|---------:|
 | DialectSwitch | 457D       |                  0.2092|          1442.1947| Low        |         1|
-| DialectSwitch | 457D       |                  0.2092|          1442.1947| Mid        |         1|
-| DialectSwitch | 457D       |                  0.2092|          1442.1947| MidPlus    |         5|
+| DialectSwitch | 457D       |                  0.2092|          1442.1947| Mid        |         3|
+| DialectSwitch | 457D       |                  0.2092|          1442.1947| MidPlus    |         3|
 | DialectSwitch | 457D       |                  0.2092|          1442.1947| Top        |         3|
-| TimePoint1    | 036L       |                  0.0298|           120.3259| Low        |         3|
-| TimePoint1    | 036L       |                  0.0298|           120.3259| Mid        |         4|
-| TimePoint1    | 036L       |                  0.0298|           120.3259| MidPlus    |         1|
-| TimePoint1    | 036L       |                  0.0298|           120.3259| Top        |         2|
+| TimePoint1    | 036L       |                  0.0298|           120.3259| Mid        |         1|
+| TimePoint1    | 036L       |                  0.0298|           120.3259| MidPlus    |         8|
+| TimePoint1    | 036L       |                  0.0298|           120.3259| Top        |         1|
 | TimePoint1    | 131L       |                  0.1092|           742.5027| Low        |         3|
-| TimePoint1    | 131L       |                  0.1092|           742.5027| MidPlus    |         5|
+| TimePoint1    | 131L       |                  0.1092|           742.5027| Mid        |         1|
+| TimePoint1    | 131L       |                  0.1092|           742.5027| MidPlus    |         4|
 | TimePoint1    | 131L       |                  0.1092|           742.5027| Top        |         2|
 | TimePoint1    | 688L       |                  0.1441|           593.9271| Low        |         1|
-| TimePoint1    | 688L       |                  0.1441|           593.9271| Mid        |         2|
-| TimePoint1    | 688L       |                  0.1441|           593.9271| MidPlus    |         3|
-| TimePoint1    | 688L       |                  0.1441|           593.9271| Top        |         4|
+| TimePoint1    | 688L       |                  0.1441|           593.9271| Mid        |         3|
+| TimePoint1    | 688L       |                  0.1441|           593.9271| MidPlus    |         5|
+| TimePoint1    | 688L       |                  0.1441|           593.9271| Top        |         1|

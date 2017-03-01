@@ -120,6 +120,15 @@ medu_lena %>%
             nChildren = n_distinct(ResearchID),
             nHouseholds = n_distinct(HouseholdID)) %>% 
   knitr::kable()
+
+medu_lena %>% 
+  group_by(Maternal_Education_Group) %>% 
+  summarise(nRecordings = n(), 
+            AWC_Mean = mean(LENA_AWC_Hourly) %>% round(),
+            AWC_SD = sd(LENA_AWC_Hourly) %>% round(),
+            Prop_Mean = mean(LENA_Prop_Meaningful),
+            Prop_SD = sd(LENA_Prop_Meaningful)) %>% 
+  knitr::kable(digits = 4)
 ```
 
 ## Density of outcome measures
@@ -171,6 +180,33 @@ ggplot(df_plotting) +
   right_aligned + 
   density_y_axis
 ```
+
+## Means by group
+
+```{r}
+ggplot(medu_lena) + 
+  aes(x = Maternal_Education_Group, y = LENA_Prop_Meaningful) + 
+  geom_point(color = "grey60", position = position_jitter(width = .1)) + 
+  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), size = 1) +
+  labs(x = "Maternal education group",
+       y = "Proportion of meaningful speech (hourly average)",
+       title = "Language input by maternal education",
+       caption = "Point-range: Group Mean ± SD") +
+  right_aligned
+
+ggplot(medu_lena) + 
+  aes(x = Maternal_Education_Group, y = LENA_AWC_Hourly) + 
+  geom_point(color = "grey60", position = position_jitter(width = .1)) + 
+  stat_summary(fun.data = mean_sdl, fun.args = list(mult = 1), size = 1) +
+  labs(x = "Maternal education group",
+       y = "Adult word count (hourly average)",
+       title = "Language input by maternal education",
+       caption = "Point-range: Group Mean ± SD") +
+  right_aligned
+
+```
+
+
 
 ## Multiple imputation
 
