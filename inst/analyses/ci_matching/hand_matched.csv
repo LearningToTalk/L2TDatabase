@@ -1,0 +1,75 @@
+MatchingDate,Hearing,MatchID,ResearchID,Study,Age,Female,Maternal_Education,Maternal_Education_Level,Maternal_Education_Group,MP_NUseableBlocks,RWL_NUseableBlocks
+2017-03-08,CochlearImplant,1,300E,CochlearV1,57,0,College Degree,6,Mid,2,1
+2017-03-08,CochlearImplant,2,301E,CochlearV1,53,1,Technical/Associate's Degree,5,Mid,2,1
+2017-03-08,CochlearImplant,3,302E,CochlearV1,37,1,Some College (2+ years),5,Mid,2,2
+2017-03-08,CochlearImplant,4,302E,CochlearV2,49,1,Some College (2+ years),5,Mid,2,2
+2017-03-08,CochlearImplant,5,304E,CochlearV1,48,1,College Degree,6,Mid,2,0
+2017-03-08,CochlearImplant,6,304E,CochlearV2,59,1,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,7,305E,CochlearV1,44,1,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,8,305E,CochlearV2,56,1,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,9,306E,CochlearV1,49,1,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,10,306E,CochlearV2,64,1,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,11,312E,CochlearV1,44,1,High School Diploma,3,Low,2,1
+2017-03-08,CochlearImplant,12,312E,CochlearV2,57,1,High School Diploma,3,Low,2,1
+2017-03-08,CochlearImplant,13,314E,CochlearV1,38,1,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,14,314E,CochlearV2,50,1,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,15,605L,TimePoint1,31,0,Graduate Degree,7,High,NA,NA
+2017-03-08,CochlearImplant,16,605L,TimePoint2,43,0,Graduate Degree,7,High,0,0
+2017-03-08,CochlearImplant,17,605L,TimePoint3,55,0,Graduate Degree,7,High,0,0
+2017-03-08,CochlearImplant,18,608L,TimePoint1,39,1,Graduate Degree,7,High,NA,NA
+2017-03-08,CochlearImplant,19,608L,TimePoint2,55,1,Graduate Degree,7,High,2,2
+2017-03-08,CochlearImplant,20,608L,TimePoint3,64,1,Graduate Degree,7,High,2,2
+2017-03-08,CochlearImplant,21,665L,TimePoint1,40,1,College Degree,6,Mid,2,1
+2017-03-08,CochlearImplant,22,665L,TimePoint2,52,1,College Degree,6,Mid,1,0
+2017-03-08,CochlearImplant,23,665L,TimePoint3,66,1,College Degree,6,Mid,1,1
+2017-03-08,CochlearImplant,24,679L,TimePoint1,34,0,Technical/Associate's Degree,5,Mid,1,2
+2017-03-08,CochlearImplant,25,679L,TimePoint2,47,0,Technical/Associate's Degree,5,Mid,1,2
+2017-03-08,CochlearImplant,26,679L,TimePoint3,58,0,Technical/Associate's Degree,5,Mid,1,2
+2017-03-08,CochlearImplant,27,801E,CochlearV1,39,0,Graduate Degree,7,High,2,1
+2017-03-08,CochlearImplant,28,801E,CochlearV2,51,0,Graduate Degree,7,High,2,2
+2017-03-08,CochlearImplant,29,307E,CochlearV1,44,0,Graduate Degree,7,High,2,2
+2017-03-08,CochlearImplant,30,308E,CochlearV1,37,1,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,31,309E,CochlearV1,59,0,Graduate Degree,7,High,2,2
+2017-03-08,CochlearImplant,32,310E,CochlearV1,52,1,Some College (2+ years),5,Mid,2,2
+2017-03-08,CochlearImplant,33,311E,CochlearV1,62,0,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,34,804E,CochlearV1,56,1,Graduate Degree,7,High,2,1
+2017-03-08,CochlearImplant,35,806E,CochlearV1,42,0,College Degree,6,Mid,2,2
+2017-03-08,CochlearImplant,36,807E,CochlearV1,51,0,Graduate Degree,7,High,2,2
+2017-03-08,CochlearImplant,37,808E,CochlearV1,37,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,1,076L,TimePoint3,57,0,College Degree,6,Mid,2,2
+2017-03-08,Normal,2,612L,TimePoint3,55,1,Technical/Associate's Degree,5,Mid,2,2
+2017-03-08,Normal,3,058L,TimePoint1,36,1,Some College (2+ years),5,Mid,2,2
+2017-03-08,Normal,4,058L,TimePoint2,48,1,Some College (2+ years),5,Mid,2,2
+2017-03-08,Normal,5,063L,TimePoint2,47,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,6,063L,TimePoint3,59,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,7,044L,TimePoint2,44,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,8,044L,TimePoint3,56,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,9,002L,TimePoint2,51,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,10,002L,TimePoint3,63,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,11,640L,TimePoint2,49,1,High School Diploma,3,Low,2,2
+2017-03-08,Normal,12,640L,TimePoint3,60,1,High School Diploma,3,Low,2,2
+2017-03-08,Normal,13,030L,TimePoint1,38,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,14,030L,TimePoint2,50,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,15,052L,TimePoint1,32,0,Graduate Degree,7,High,2,2
+2017-03-08,Normal,16,052L,TimePoint2,43,0,Graduate Degree,7,High,2,2
+2017-03-08,Normal,17,052L,TimePoint3,55,0,Graduate Degree,7,High,2,2
+2017-03-08,Normal,18,078L,TimePoint1,36,1,Graduate Degree,7,High,2,2
+2017-03-08,Normal,19,078L,TimePoint2,52,1,Graduate Degree,7,High,2,2
+2017-03-08,Normal,20,078L,TimePoint3,63,1,Graduate Degree,7,High,2,2
+2017-03-08,Normal,21,099L,TimePoint1,39,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,22,099L,TimePoint2,51,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,23,099L,TimePoint3,64,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,24,053L,TimePoint1,36,0,Technical/Associate's Degree,5,Mid,2,2
+2017-03-08,Normal,25,053L,TimePoint2,47,0,Technical/Associate's Degree,5,Mid,2,2
+2017-03-08,Normal,26,053L,TimePoint3,59,0,Technical/Associate's Degree,5,Mid,2,2
+2017-03-08,Normal,27,014L,TimePoint1,39,0,Graduate Degree,7,High,2,2
+2017-03-08,Normal,28,014L,TimePoint2,51,0,Graduate Degree,7,High,2,2
+2017-03-08,Normal,29,010L,TimePoint2,44,0,Graduate Degree,7,High,2,2
+2017-03-08,Normal,30,050L,TimePoint1,36,1,College Degree,6,Mid,2,2
+2017-03-08,Normal,31,057L,TimePoint3,58,0,Graduate Degree,7,High,2,2
+2017-03-08,Normal,32,051L,TimePoint3,53,1,Some College (2+ years),5,Mid,2,2
+2017-03-08,Normal,33,037L,TimePoint3,62,0,College Degree,6,Mid,2,2
+2017-03-08,Normal,34,072L,TimePoint3,55,1,Graduate Degree,7,High,2,2
+2017-03-08,Normal,35,095L,TimePoint2,43,0,College Degree,6,Mid,2,2
+2017-03-08,Normal,36,126L,TimePoint3,51,0,Graduate Degree,7,High,2,2
+2017-03-08,Normal,37,064L,TimePoint1,36,1,College Degree,6,Mid,2,2

@@ -1,0 +1,121 @@
+---
+title: "Using genetic matching to pair normal-hearing children and children with cochlear implants"
+author: "Tristan Mahr"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("knitr")
+opts_chunk$set(
+  warning = FALSE,
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6,
+  dpi = 300,
+  out.width = "80%")
+
+wd <- rprojroot::find_rstudio_root_file()
+opts_knit$set(root.dir = wd)
+```
+
+AJ hand-matched the children who participated in multiple lab-visits.
+
+```{r, message = FALSE}
+library(tidyverse)
+
+# Load matching information
+ci_pool <- read_csv("./inst/analyses/ci_matching/ci_matching_info.csv")
+nh_pool <- read_csv("./inst/analyses/ci_matching/nh_matching_info.csv")
+
+child_ids <- bind_rows(ci_pool, nh_pool) %>% 
+  select(ChildID, ResearchID, Study)
+
+matching_results <- list()
+
+# Load hand-matched children
+d <- read_csv("./inst/analyses/ci_matching/hand_matched.csv") %>% 
+  inner_join(child_ids)
+
+matching_results$manual <- d
+
+d %>% 
+  group_by(Hearing) %>% 
+  summarise(
+    nLabVisits = n(), 
+    nFemaleVisits = sum(Female),
+    nChildren = n_distinct(ChildID),
+    MeanAge = mean(Age) %>% round(),
+    MeanMedu = mean(Maternal_Education_Level) %>% round()) %>% 
+  knitr::kable()
+```
+
+Find out who still needs a match.
+
+```{r}
+nh_leftover <- anti_join(nh_pool, d, by = "ChildID")
+ci_leftover <- anti_join(ci_pool, d, by = "ChildID")
+
+# Need matches
+ci_leftover %>% select(ResearchID, Study, Age)
+
+# Ignore 800E for now
+ci_leftover <- ci_leftover %>% filter(ResearchID != "800E")
+
+matching_pool <- bind_rows(nh_leftover, ci_leftover)
+```
+
+```{r}
+# Make a better interface for Matching::GenMatch
+gen_match <- function(data, formula, ...) {
+  tr <- lazyeval::f_eval_lhs(formula, data)
+  x <- modelr::model_matrix(data, formula)
+  Matching::GenMatch(Tr = tr, X = x, ...)
+}
+
+# GenMatch() returns a matrix with row-numbers. This helper gets those rows from
+# a data-frame, and adds a MatchID column to include which observations were
+# matched.
+augment_genmatch <- function(data, genmatch) {
+  long_matches <- genmatch$matches %>% 
+    tibble::as_tibble() %>% 
+    tibble::add_column(MatchID = seq_len(nrow(.)), .before = "V1") %>% 
+    select(1:3) %>% 
+    tidyr::gather(Group, RowNum, -MatchID) %>% 
+    select(-Group)
+  
+  matched_data <- data %>% 
+    tibble::rownames_to_column("RowNum") %>% 
+    filter(RowNum %in% long_matches$RowNum) %>% 
+    mutate(RowNum = as.numeric(RowNum)) %>% 
+    left_join(long_matches) %>% 
+    select(-RowNum) %>% 
+    select(MatchID, everything())
+  
+  matched_data
+}
+
+matching_pool$Medu_LMMH <- case_when(
+    matching_pool$Maternal_Education_Level %in% 1:3 ~ "Low",
+    matching_pool$Maternal_Education_Level %in% 4:5 ~ "MidLow",
+    matching_pool$Maternal_Education_Level %in% 6 ~ "MidPlus",
+    matching_pool$Maternal_Education_Level %in% 7 ~ "Top"
+)
+
+# Do the matching
+matched <- gen_match(
+  data = matching_pool, 
+  formula = CImplant ~ Age + Female + Medu_LMMH,
+  ties = FALSE,
+  replace = FALSE,
+  pop.size = 1000)
+
+
+augment_genmatch(matching_pool, matched) %>% 
+  arrange(MatchID, CImplant) %>% 
+  select(Study, ResearchID, CImplant, MatchID, Age, 
+         Female, Medu = Maternal_Education_Level) %>% 
+  knitr::kable()
+```
