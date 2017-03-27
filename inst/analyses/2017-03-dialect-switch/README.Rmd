@@ -54,6 +54,55 @@ l2t_eyetracking <- l2t_connect(cnf_file, "eyetracking")
 JE says that we should only use the experiments that used the re-recorded
 stimuli for TimePoint2.
 
+```{r}
+# Get the audio information from trial attributes
+rwl_trials_attrs <- tbl(l2t_eyetracking, "q_TrialAttributesByStudy") %>% 
+  filter(Task == "RWL", TrialAttribute_Name %in% c("Audio", "TargetEnd")) %>% 
+  collect(n = Inf)
+
+# Figure out the stimuli used for TP1, TP2, TP3
+target_lengths <- rwl_trials_attrs %>% 
+  tidyr::spread(TrialAttribute_Name, TrialAttribute_Value) %>% 
+  select(Study, Audio, TargetEnd) %>% 
+  distinct() %>% 
+  na.omit() %>% 
+  mutate(Dialect = substr(Audio, 1, 3)) %>% 
+  select(Study, Dialect, Audio, TargetEnd) %>% 
+  filter(Study %in% c("TimePoint1", "TimePoint2", "TimePoint3"))
+
+# It looks like TP1 SAE was uniformly 816 ms and 567 ms in AAE. Label blocks by
+# the StimSet used
+block_stim <- rwl_trials_attrs %>% 
+  tidyr::spread(TrialAttribute_Name, TrialAttribute_Value) %>% 
+  select(BlockID, TrialID, Study, Audio, TargetEnd) %>% 
+  na.omit() %>% 
+  mutate(Dialect = substr(Audio, 1, 3)) %>% 
+  group_by(BlockID) %>% 
+  mutate(StimSet = ifelse(Dialect == "SAE" & all(TargetEnd == 816), 
+                          "TP1", "Not TP1"), 
+         StimSet = ifelse(Dialect == "AAE" & all(TargetEnd == 567), 
+                          "TP1", StimSet)) %>% 
+  ungroup() %>% 
+  select(BlockID, Study, Dialect, StimSet) %>% 
+  distinct()
+
+# Check that dialect switch got 2 different sets of stimuli
+block_stim %>% 
+  filter(Study == "DialectSwitch") %>% 
+  count(Dialect, StimSet) %>% 
+  rename(nBlocks = n) %>% 
+  ungroup()
+
+trial_stim %>% 
+  filter(Study == "MaternalEd") %>% 
+  count(Dialect, StimSet) %>% 
+  rename(nBlocks = n) %>% 
+  ungroup()
+```
+
+
+Now we can identify which blocks got TP2 versions of the RWL experiment.
+
 
 Download the records for the blocks of the RWL experiment.
 
@@ -71,7 +120,8 @@ rwl_blocks <- tbl(l2t_eyetracking, "Blocks") %>%
   select(-Block_Timestamp) %>% 
   filter(Block_Task == "RWL") %>% 
   collect() %>% 
-  inner_join(block_dialects)
+  inner_join(block_dialects) %>% 
+  left_join(block_stim)
 rwl_blocks
 ```
 
@@ -85,10 +135,25 @@ child_info <- tbl(l2t_backend, "Child") %>%
          Female, AAE, LateTalker, CImplant) %>% 
   collect()
 child_info
-
-rwl_blocks %>% left_join(child_info)
 ```
 
+```{r}
+rwl_blocks %>% left_join(child_info)
+
+
+
+
+rwl_looks <- tbl(l2t_eyetracking, "Looks") %>% 
+  select(TrialID, Time, GazeByImageAOI) %>% 
+  collect(n = Inf)
+
+
+# Get trials
+
+# Get trial attributes
+
+# Get blocks
+```
 
 
 
