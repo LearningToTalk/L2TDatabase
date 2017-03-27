@@ -93,20 +93,19 @@ block_stim %>%
   rename(nBlocks = n) %>% 
   ungroup()
 
-trial_stim %>% 
+block_stim %>% 
   filter(Study == "MaternalEd") %>% 
   count(Dialect, StimSet) %>% 
   rename(nBlocks = n) %>% 
   ungroup()
 ```
 
-
 Now we can identify which blocks got TP2 versions of the RWL experiment.
 
 
 Download the records for the blocks of the RWL experiment.
 
-```{r, eval = FALSE}
+```{r, eval = TRUE}
 # Get the dialects of each block from the table of block attributes
 block_dialects <- tbl(l2t_eyetracking, "BlockAttributes") %>% 
   select(-BlockAttributeID, -BlockAttribute_Timestamp) %>% 
@@ -137,27 +136,182 @@ child_info <- tbl(l2t_backend, "Child") %>%
 child_info
 ```
 
+Now we count the number of dialects presented to each child to find out who
+received more than one version of the experiment.
+
 ```{r}
-rwl_blocks %>% left_join(child_info)
+tp2_stim_rwl_blocks <- rwl_blocks %>% 
+  left_join(child_info) %>% 
+  filter(StimSet == "Not TP1") %>% 
+  rename(BlockDialect = Dialect)
 
+children_who_got_multiple_dialects <- tp2_stim_rwl_blocks %>% 
+  select(ChildID, AAE, BlockDialect) %>% 
+  distinct() %>% 
+  # Count the dialects presented to each child
+  count(AAE, ChildID) %>% 
+  filter(n > 1) %>% 
+  ungroup() %>% 
+  select(ChildID)
 
-
-
-rwl_looks <- tbl(l2t_eyetracking, "Looks") %>% 
-  select(TrialID, Time, GazeByImageAOI) %>% 
-  collect(n = Inf)
-
-
-# Get trials
-
-# Get trial attributes
-
-# Get blocks
+blocks_to_keep <- tp2_stim_rwl_blocks %>% 
+  inner_join(children_who_got_multiple_dialects) %>% 
+  filter(Study %in% c("DialectSwitch", "MaternalEd")) %>% 
+  select(Study, ResearchID = ShortResearchID, BlockDialect, Block_Age,
+         BlockID, ChildID:CImplant)
 ```
 
 
+Now, we need to get the eyetracking data.
 
 ```{r}
+# Download the trial id's
+rwl_trials <- tbl(l2t_eyetracking, "q_TrialsByStudy") %>% 
+  filter(Task == "RWL") %>% 
+  collect()
+
+# Download the gazes
+rwl_looks <- tbl(l2t_eyetracking, "Looks") %>% 
+  select(TrialID, Time, GazeByImageAOI) %>% 
+  collect(n = Inf) %>% 
+  inner_join(rwl_trials)
+
+rwl_looks <- rwl_looks %>% 
+  inner_join(blocks_to_keep) 
+
+rwl_looks <- rwl_looks %>% 
+    select(Study, ResearchID, BlockDialect, Block_Age,
+         BlockID, ChildID:CImplant, TrialID, TrialNo, Time, GazeByImageAOI)
+```
+
+
+## Work with the gaze data
+
+First peek at the data.
+
+
+```{r}
+library(lookr)
+library(ggplot2)
+
+rwl_looks <- rwl_looks %>% 
+  mutate(Dialect = ifelse(AAE, "AAE", "MAE"), 
+         BlockDialect = ifelse(BlockDialect == "AAE", "AAE", "MAE"),
+         HearsNativeDialect = Dialect == BlockDialect)
+
+participants_to_drop <- rwl_looks %>% 
+  filter(between(Time, 0, 2005)) %>% 
+  AggregateLooks(BlockID + ResearchID ~ GazeByImageAOI) %>%
+  tibble::as_tibble() %>% 
+  filter(PropNA > .5) %>% 
+  select(ResearchID)
+
+trials_to_drop  <- rwl_looks %>% 
+  anti_join(participants_to_drop) %>% 
+  filter(between(Time, 0, 2005)) %>%
+  AggregateLooks(TrialID + ResearchID ~ GazeByImageAOI) %>% 
+  tibble::as_tibble() %>% 
+  filter(PropNA > .5) %>% 
+  select(TrialID)
+
+
+looks <- rwl_looks %>%
+  anti_join(participants_to_drop) %>% 
+  anti_join(trials_to_drop) %>% 
+  filter(between(Time, -505, 2005)) %>% 
+  AggregateLooks(Study + Dialect + BlockDialect + HearsNativeDialect + ResearchID + Time ~ GazeByImageAOI) %>% 
+  tibble::as_tibble() %>% 
+  mutate(Looks_Images = Target + Others,
+       Prop_Target = Target / Looks_Images,
+       Prop_PhonologicalFoil = PhonologicalFoil / Looks_Images,
+       Prop_SemanticFoil = SemanticFoil / Looks_Images,
+       Prop_Unrelated = Unrelated / Looks_Images)
+
+
+
+
+
+
+ggplot(looks) + 
+  aes(x = Time, y = Proportion) +   
+  geom_hline(yintercept = .25, size = 2, color = "white") + 
+  stat_summary()
+
+ggplot(looks) + 
+  aes(x = Time, y = Proportion, color = HearsNativeDialect) + 
+  geom_hline(yintercept = .25, size = 2, color = "white") + 
+  stat_summary()
+
+ggplot(looks) + 
+  aes(x = Time, y = Proportion, color = HearsNativeDialect) + 
+  geom_hline(yintercept = .25, size = 2, color = "white") + 
+  stat_summary() + 
+  facet_wrap("Dialect") + 
+  xlim(0, 2000)
+
+
+by_dialect_acc <- rwl_looks %>%
+  anti_join(participants_to_drop) %>% 
+  anti_join(trials_to_drop) %>% 
+  filter(between(Time, 0, 2005)) %>% 
+  AggregateLooks(Study + Dialect + BlockDialect + HearsNativeDialect + ResearchID ~ GazeByImageAOI) %>% 
+  tibble::as_tibble() %>% 
+  select(Study, ResearchID, HearsNativeDialect, Proportion) %>% 
+  tidyr::spread(HearsNativeDialect, Proportion) %>% 
+  mutate(NativeAdvantage = `TRUE` - `FALSE`) %>% 
+  arrange(desc(NativeAdvantage)
+
+bot6 <- by_dialect_acc$ResearchID %>% head(6)
+top6 <- by_dialect_acc$ResearchID %>% tail(6)
+
+ggplot(looks %>% filter(ResearchID %in% bot6)) + 
+  aes(x = Time, y = Proportion, color = HearsNativeDialect) +
+  geom_hline(yintercept = .25, size = 2, color = "white") +
+  geom_line() +
+  facet_wrap("ResearchID") +
+  xlim(0, 2000)
+
+ggplot(looks %>% filter(ResearchID %in% top6)) + 
+  aes(x = Time, y = Proportion, color = HearsNativeDialect) +
+  geom_hline(yintercept = .25, size = 2, color = "white") +
+  geom_line() +
+  facet_wrap("ResearchID") +
+  xlim(0, 2000)
+
+
+
+
+df_looks_to_aois <- looks %>% 
+  select(Study, Dialect, HearsNativeDialect, ResearchID, Time, starts_with("Prop_")) %>% 
+  tidyr::gather(AOI, Proportion, -Study, -ResearchID, -Time, -HearsNativeDialect, -Dialect) %>% 
+  mutate(AOI = AOI %>% 
+           stringr::str_replace("Prop_", "") %>% 
+           stringr::str_replace("Foil", "")) 
+
+df_looks_to_aois$AOI <- factor(
+  df_looks_to_aois$AOI, 
+  levels = c("Target", "Phonological", "Semantic", "Unrelated"))
+
+curr_labs <- labs(
+  x = "Time after target onset (ms.)", 
+  y = "Proportion of looks", 
+  color = "Image") 
+
+p_theme <- theme_grey(base_size = 11) + 
+  theme(legend.position = "bottom")
+
+ggplot(df_looks_to_aois) + 
+  aes(x = Time, y = Proportion, shape = AOI, color = HearsNativeDialect) + 
+  geom_hline(yintercept = .25, size = 2, color = "white") + 
+  stat_summary(fun.y = mean, geom = "line") + 
+  facet_grid(Dialect ~ AOI) +
+  p_theme
+
+
+
+
+
+
 
 ```
 
