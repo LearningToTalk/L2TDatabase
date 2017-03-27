@@ -1,0 +1,111 @@
+---
+title: "Comparison of word recognition performance in native versus unfamiliar dialects for preschool age children"
+author: "Tristan Mahr"
+date: "`r Sys.Date()`"
+output: github_document
+---
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("knitr")
+opts_chunk$set(
+  warning = FALSE,
+  collapse = TRUE, 
+  comment = "#>", 
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6,
+  dpi = 300,
+  out.width = "80%")
+
+wd <- rprojroot::find_rstudio_root_file()
+opts_knit$set(root.dir = wd)
+```
+
+## Problem statement
+
+ME would like to look at the data for the RWL task for participants in the
+Dialect Switch study. I will wrangle and reduce the eyetracking data from these
+studies.
+
+
+## Find the eyetracking blocks
+
+Connect to database:
+
+```{r, eval = FALSE}
+library(dplyr)
+library(L2TDatabase)
+
+# Work relative to RStudio project
+wd <- rprojroot::find_rstudio_root_file()
+dir_here <- file.path(wd, "inst", "analyses", "ci_matching")
+cnf_file <- file.path(wd, "inst", "l2t_db.cnf")
+
+# Connect to the individual databases
+l2t_main <- l2t_connect(cnf_file, "l2t")
+l2t_backend <- l2t_connect(cnf_file, "backend")
+l2t_eyetracking <- l2t_connect(cnf_file, "eyetracking")
+```
+
+
+
+### Sidetracked: Figure out a way to tell which blocks used the re-recorded stimuli
+
+JE says that we should only use the experiments that used the re-recorded
+stimuli for TimePoint2.
+
+
+Download the records for the blocks of the RWL experiment.
+
+```{r, eval = FALSE}
+# Get the dialects of each block from the table of block attributes
+block_dialects <- tbl(l2t_eyetracking, "BlockAttributes") %>% 
+  select(-BlockAttributeID, -BlockAttribute_Timestamp) %>% 
+  collect() %>% 
+  # Convert from long to wide format
+  tidyr::spread(BlockAttribute_Name, BlockAttribute_Value) %>% 
+  select(BlockID, Dialect)
+
+# Get the block information (child, date, filename) for the RWL task
+rwl_blocks <- tbl(l2t_eyetracking, "Blocks") %>% 
+  select(-Block_Timestamp) %>% 
+  filter(Block_Task == "RWL") %>% 
+  collect() %>% 
+  inner_join(block_dialects)
+rwl_blocks
+```
+
+Attach research IDs and study names to the blocks.
+
+```{r, eval = FALSE}
+child_info <- tbl(l2t_backend, "Child") %>% 
+  left_join(tbl(l2t_backend, "ChildStudy")) %>% 
+  left_join(tbl(l2t_backend, "Study")) %>% 
+  select(Study, ShortResearchID, ChildID, HouseholdID, ChildStudyID, 
+         Female, AAE, LateTalker, CImplant) %>% 
+  collect()
+child_info
+
+rwl_blocks %>% left_join(child_info)
+```
+
+
+
+
+```{r}
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
