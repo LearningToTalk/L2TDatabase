@@ -1,7 +1,7 @@
 Comparison of word recognition performance in native versus unfamiliar dialects for preschool age children
 ================
 Tristan Mahr
-2017-03-28
+2017-03-29
 
 Problem statement
 -----------------
@@ -574,11 +574,18 @@ looks <- rwl_looks %>%
        Prop_SemanticFoil = SemanticFoil / Looks_Images,
        Prop_Unrelated = Unrelated / Looks_Images)
 
+evt <- child_vars %>% 
+  mutate(Vocab3tile = ntile(EVT_Standard, 3), 
+         `Exp. vocab.` = factor(Vocab3tile, 1:3, 
+                                c("Lower third", "Middle third", "Upper third"))) %>% 
+  select(Study, ResearchID, Vocab3tile, `Exp. vocab.`)
+
 looks <- looks %>% 
   mutate(`Child hears` = ifelse(HearsNativeDialect, "Native dialect", 
                                 "Non-native dialect"),
          `Native dialect` = Dialect,
-         `Maternal edu.` = Maternal_Education_Group)
+         `Maternal edu.` = Maternal_Education_Group) %>% 
+  left_join(evt)
 ```
 
 ``` r
@@ -586,6 +593,7 @@ library(hrbrthemes)
 plot_text <- list(
   x_time = "Time (ms) after target noun onset", 
   y_target = "Proportion of looks to named image",
+  y_image = "Proportion of looks to image",
   caption_mean_se = "Mean ± SE"
 )
 
@@ -634,6 +642,7 @@ ggplot(looks) +
 <img src="README_files/figure-markdown_github/gca-plots-3.png" width="80%" />
 
 ``` r
+
 ggplot(looks %>% filter(!is.na(Maternal_Education_Group))) + 
   aes(x = Time, y = Proportion, color = `Child hears`) + 
   geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
@@ -646,4 +655,255 @@ ggplot(looks %>% filter(!is.na(Maternal_Education_Group))) +
   xlim(0, 2000)
 ```
 
-<img src="README_files/figure-markdown_github/unnamed-chunk-20-1.png" width="80%" />
+<img src="README_files/figure-markdown_github/gca-plots-4.png" width="80%" />
+
+``` r
+
+ggplot(looks %>% filter(!is.na(`Exp. vocab.`))) + 
+  aes(x = Time, y = Proportion, color = `Child hears`) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary() + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_target) +
+  facet_wrap("`Exp. vocab.`", labeller = label_both) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/gca-plots-5.png" width="80%" />
+
+Plot looks to each competitor type.
+-----------------------------------
+
+``` r
+df_looks_to_aois <- looks %>% 
+  select(Study, ResearchID, `Child hears`:`Maternal edu.`, `Exp. vocab.`,
+         Time, starts_with("Prop_")) %>% 
+  tidyr::gather(AOI, Proportion, starts_with("Prop_")) %>% 
+  mutate(AOI = AOI %>% 
+           stringr::str_replace("Prop_", "") %>% 
+           stringr::str_replace("Foil", "")) 
+
+df_looks_to_aois$AOI <- factor(
+  df_looks_to_aois$AOI, 
+  levels = c("Target", "Phonological", "Semantic", "Unrelated"))
+
+df_looks_to_aois$Image <- factor(
+  df_looks_to_aois$AOI, 
+  labels = c("Target word", "Phonological foil", "Semantic foil", "Unrelated word"),
+  levels = c("Target", "Phonological", "Semantic", "Unrelated"))
+
+
+ggplot(df_looks_to_aois) + 
+  aes(x = Time, y = Proportion, color = Image) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary() + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_image) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/aoi-plots-1.png" width="80%" />
+
+``` r
+
+ggplot(df_looks_to_aois) + 
+  aes(x = Time, y = Proportion, color = Image) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary() + 
+  facet_wrap("`Child hears`", labeller = label_both) + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_image) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/aoi-plots-2.png" width="80%" />
+
+By AOI
+
+``` r
+ggplot(df_looks_to_aois %>% filter(Image == "Phonological foil")) + 
+  aes(x = Time, y = Proportion, color = `Child hears`) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary() + 
+  facet_wrap("Image") + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_image) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/by-aoi-1.png" width="80%" />
+
+``` r
+
+# Use %+% to replace the data-set used in a plot
+last_plot() %+% 
+  filter(df_looks_to_aois, Image == "Semantic foil")
+```
+
+<img src="README_files/figure-markdown_github/by-aoi-2.png" width="80%" />
+
+``` r
+
+last_plot() %+% 
+  filter(df_looks_to_aois, Image == "Unrelated word")
+```
+
+<img src="README_files/figure-markdown_github/by-aoi-3.png" width="80%" />
+
+``` r
+
+last_plot() %+% 
+  filter(df_looks_to_aois, Image == "Target word")
+```
+
+<img src="README_files/figure-markdown_github/by-aoi-4.png" width="80%" />
+
+AOI by maternal edu
+
+``` r
+ggplot(df_looks_to_aois %>% 
+         filter(Image == "Phonological foil", !is.na(`Maternal edu.`))) + 
+  aes(x = Time, y = Proportion, color = `Maternal edu.`) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary() + 
+  facet_wrap("Image") + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "inferno", end = .9) +
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_image) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/aoi-by-medu-1.png" width="80%" />
+
+``` r
+
+last_plot() %+% 
+  filter(df_looks_to_aois, 
+         Image == "Semantic foil", !is.na(`Maternal edu.`))
+```
+
+<img src="README_files/figure-markdown_github/aoi-by-medu-2.png" width="80%" />
+
+``` r
+
+last_plot() %+% 
+  filter(df_looks_to_aois, 
+         Image == "Unrelated word", !is.na(`Maternal edu.`))
+```
+
+<img src="README_files/figure-markdown_github/aoi-by-medu-3.png" width="80%" />
+
+``` r
+
+last_plot() %+% 
+  filter(df_looks_to_aois, 
+         Image == "Target word", !is.na(`Maternal edu.`))
+```
+
+<img src="README_files/figure-markdown_github/aoi-by-medu-4.png" width="80%" />
+
+``` r
+
+
+ggplot(df_looks_to_aois %>% filter(!is.na(`Maternal edu.`))) + 
+  aes(x = Time, y = Proportion, color = `Maternal edu.`) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary(fun.y = "mean", geom = "line", size = 1.5) + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "inferno", end = .9) +
+  facet_wrap("Image") + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_image) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/aoi-by-medu-5.png" width="80%" />
+
+``` r
+
+
+ggplot(df_looks_to_aois) + 
+  aes(x = Time, y = Proportion, color = `Native dialect`) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary(fun.y = "mean", geom = "line", size = 1.5) + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "viridis", end = .9) +
+  facet_wrap("Image") + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_image) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/aoi-by-medu-6.png" width="80%" />
+
+``` r
+
+ggplot(df_looks_to_aois) + 
+  aes(x = Time, y = Proportion, color = `Child hears`) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary() + 
+  facet_wrap("AOI", labeller = label_both) + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_target) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/aoi-by-medu-7.png" width="80%" />
+
+``` r
+ggplot(df_looks_to_aois %>% 
+         filter(Image == "Phonological foil", !is.na(`Exp. vocab.`))) + 
+  aes(x = Time, y = Proportion, color = `Exp. vocab.`) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary() + 
+  facet_wrap("Image") + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "plasma", end = .9) +
+  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_image) + 
+  xlim(0, 2000)
+```
+
+<img src="README_files/figure-markdown_github/by-vocabulary-1.png" width="80%" />
+
+``` r
+
+last_plot() %+% 
+  filter(df_looks_to_aois, 
+         Image == "Semantic foil", !is.na(`Exp. vocab.`))
+```
+
+<img src="README_files/figure-markdown_github/by-vocabulary-2.png" width="80%" />
+
+``` r
+
+last_plot() %+% 
+  filter(df_looks_to_aois, 
+         Image == "Unrelated word", !is.na(`Exp. vocab.`))
+```
+
+<img src="README_files/figure-markdown_github/by-vocabulary-3.png" width="80%" />
+
+``` r
+
+last_plot() %+% 
+  filter(df_looks_to_aois, 
+         Image == "Target word", !is.na(`Exp. vocab.`)) 
+```
+
+<img src="README_files/figure-markdown_github/by-vocabulary-4.png" width="80%" />
