@@ -268,6 +268,9 @@ create or replace algorithm = undefined view l2t.DELV_Variation as
     delv_var.DELV_Variation_ColumnA,
     delv_var.DELV_Variation_ColumnB,
     delv_var.DELV_Variation_Degree,
+    round((delv_var.DELV_Variation_ColumnA / (delv_var.DELV_Variation_ColumnA +
+          delv_var.DELV_Variation_ColumnB) * 100), 0)
+      as DELV_Variation_Dialect_Density,
     delv_var.DELV_Variation_Result
   from
     backend.DELV_Variation delv_var
