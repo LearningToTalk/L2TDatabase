@@ -39,3 +39,4 @@ run_queries("./inst/views/tp3_scores.sql")
 
 run_queries("./inst/views/ci_scores.sql")
 
+run_queries("./inst/views/ages.sql")
