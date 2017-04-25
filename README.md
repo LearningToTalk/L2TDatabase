@@ -181,7 +181,8 @@ src_tbls(l2t)
 #> [21] "Scores_CochlearMatching" "Scores_CochlearV1"      
 #> [23] "Scores_CochlearV2"       "Scores_TimePoint1"      
 #> [25] "Scores_TimePoint2"       "Scores_TimePoint3"      
-#> [27] "VerbalFluency"
+#> [27] "Task_Ages"               "Task_Ages_Summary"      
+#> [29] "VerbalFluency"
 ```
 
 The tables here are *queries*: Tables that are computed on-the-fly whenever the data is requested. For example, `MinPair_Aggregate` shows the proportion correct of non-practice trials in the minimal pairs task by participant and by study. (I `select()` a subset of columns to exclude unnecessary columns like the name of the Eprime file containing the raw data.) The `Study` and `ResearchID` are the conventional identifiers for studies and participants.
@@ -262,7 +263,9 @@ src_tbls(l2t_backend)
 #> [43] "q_Rhyming_Aggregate"               
 #> [44] "q_Rhyming_PropCorrect"             
 #> [45] "q_SAILS_Aggregate"                 
-#> [46] "q_SAILS_PropCorrect"
+#> [46] "q_SAILS_PropCorrect"               
+#> [47] "q_Task_Ages"                       
+#> [48] "q_Task_Ages_Summary"
 ```
 
 Some of the tables in the backend are not tables of raw data but intermediate, helper queries that are used in the main database. These helpers queries are prefixed with `q_`. For example, `q_Household_Education`, `q_Household_Maternal_Caregiver`, and `q_Household_Max_Maternal_Education` are a pipeline of calculations that determine the highest maternal education level in each household.
@@ -358,54 +361,56 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-02-17_08-29/BRIEF.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Blending_Admin.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Blending_Responses.csv
-#> Writing ./inst/backup/2017-02-17_08-29/CTOPP_Blending.csv
-#> Writing ./inst/backup/2017-02-17_08-29/CTOPP_Elision.csv
-#> Writing ./inst/backup/2017-02-17_08-29/CTOPP_Memory.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Caregiver.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Child.csv
-#> Writing ./inst/backup/2017-02-17_08-29/ChildStudy.csv
-#> Writing ./inst/backup/2017-02-17_08-29/DELV_Risk.csv
-#> Writing ./inst/backup/2017-02-17_08-29/DELV_Variation.csv
-#> Writing ./inst/backup/2017-02-17_08-29/EVT.csv
-#> Writing ./inst/backup/2017-02-17_08-29/FruitStroop.csv
-#> Writing ./inst/backup/2017-02-17_08-29/GFTA.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Household.csv
-#> Writing ./inst/backup/2017-02-17_08-29/KBIT.csv
-#> Writing ./inst/backup/2017-02-17_08-29/LENA_Admin.csv
-#> Writing ./inst/backup/2017-02-17_08-29/LENA_Hours.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Literacy.csv
-#> Writing ./inst/backup/2017-02-17_08-29/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-02-17_08-29/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-02-17_08-29/PPVT.csv
-#> Writing ./inst/backup/2017-02-17_08-29/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Rhyming_Admin.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Rhyming_Responses.csv
-#> Writing ./inst/backup/2017-02-17_08-29/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-02-17_08-29/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-02-17_08-29/SES.csv
-#> Writing ./inst/backup/2017-02-17_08-29/SES_Entry.csv
-#> Writing ./inst/backup/2017-02-17_08-29/Study.csv
-#> Writing ./inst/backup/2017-02-17_08-29/VerbalFluency.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Household_Education.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_MinPair_Dialect_Summary.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Rhyming_Aggregate.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_Rhyming_PropCorrect.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-02-17_08-29/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-02-17_08-29/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-02-17_08-29/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-04-25_09-21/BRIEF.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Blending_Admin.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Blending_Responses.csv
+#> Writing ./inst/backup/2017-04-25_09-21/CTOPP_Blending.csv
+#> Writing ./inst/backup/2017-04-25_09-21/CTOPP_Elision.csv
+#> Writing ./inst/backup/2017-04-25_09-21/CTOPP_Memory.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Caregiver.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Child.csv
+#> Writing ./inst/backup/2017-04-25_09-21/ChildStudy.csv
+#> Writing ./inst/backup/2017-04-25_09-21/DELV_Risk.csv
+#> Writing ./inst/backup/2017-04-25_09-21/DELV_Variation.csv
+#> Writing ./inst/backup/2017-04-25_09-21/EVT.csv
+#> Writing ./inst/backup/2017-04-25_09-21/FruitStroop.csv
+#> Writing ./inst/backup/2017-04-25_09-21/GFTA.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Household.csv
+#> Writing ./inst/backup/2017-04-25_09-21/KBIT.csv
+#> Writing ./inst/backup/2017-04-25_09-21/LENA_Admin.csv
+#> Writing ./inst/backup/2017-04-25_09-21/LENA_Hours.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Literacy.csv
+#> Writing ./inst/backup/2017-04-25_09-21/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-04-25_09-21/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-04-25_09-21/PPVT.csv
+#> Writing ./inst/backup/2017-04-25_09-21/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Rhyming_Admin.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Rhyming_Responses.csv
+#> Writing ./inst/backup/2017-04-25_09-21/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-04-25_09-21/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-04-25_09-21/SES.csv
+#> Writing ./inst/backup/2017-04-25_09-21/SES_Entry.csv
+#> Writing ./inst/backup/2017-04-25_09-21/Study.csv
+#> Writing ./inst/backup/2017-04-25_09-21/VerbalFluency.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Household_Education.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_MinPair_Dialect_Summary.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Rhyming_Aggregate.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Rhyming_PropCorrect.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Task_Ages.csv
+#> Writing ./inst/backup/2017-04-25_09-21/q_Task_Ages_Summary.csv
+#> Writing ./inst/backup/2017-04-25_09-21/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-04-25_09-21/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
@@ -474,7 +479,7 @@ tbl(l2t_test, "TestWrites")
 #> 
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1            1  Hello!  2017-02-17 08:29:34
+#> 1            1  Hello!  2017-04-25 09:22:02
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.
