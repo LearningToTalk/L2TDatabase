@@ -12,6 +12,9 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV1 as
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,
     medu.Caregiver_EduScale as `Maternal_Education_Level`,
+    ages.Task_Age_Min,
+    ages.Task_Age_Max,
+    ages.Task_Age_Range,
     evt.EVT_Completion,
     evt.EVT_Form,
     evt.EVT_Raw,
@@ -88,6 +91,8 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV1 as
     left join backend.q_LENA_Averages lena
       using (ChildStudyID)
     left join backend.CTOPP_Memory ctopp_memory
+      using (ChildStudyID)
+    left join backend.q_Task_Ages_Summary ages
       using (ChildStudyID)
   where
     study.Study = "CochlearV1"
@@ -108,6 +113,9 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV2 as
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,
     medu.Caregiver_EduScale as `Maternal_Education_Level`,
+    ages.Task_Age_Min,
+    ages.Task_Age_Max,
+    ages.Task_Age_Range,
     evt.EVT_Completion,
     evt.EVT_Form,
     evt.EVT_Raw,
@@ -184,6 +192,8 @@ create or replace algorithm = undefined view l2t.Scores_CochlearV2 as
     left join backend.q_LENA_Averages lena
       using (ChildStudyID)
     left join backend.CTOPP_Memory ctopp_memory
+      using (ChildStudyID)
+    left join backend.q_Task_Ages_Summary ages
       using (ChildStudyID)
   where
     study.Study = "CochlearV2"
@@ -205,6 +215,9 @@ create or replace algorithm = undefined view l2t.Scores_CochlearMatching as
     medu.Caregiver_Relation as `Maternal_Caregiver`,
     medu.Caregiver_EduCategory as `Maternal_Education`,
     medu.Caregiver_EduScale as `Maternal_Education_Level`,
+    ages.Task_Age_Min,
+    ages.Task_Age_Max,
+    ages.Task_Age_Range,
     evt.EVT_Completion,
     evt.EVT_Form,
     evt.EVT_Raw,
@@ -281,6 +294,8 @@ create or replace algorithm = undefined view l2t.Scores_CochlearMatching as
     left join backend.q_LENA_Averages lena
       using (ChildStudyID)
     left join backend.CTOPP_Memory ctopp_memory
+      using (ChildStudyID)
+    left join backend.q_Task_Ages_Summary ages
       using (ChildStudyID)
   where
     study.Study = "CochlearMatching"

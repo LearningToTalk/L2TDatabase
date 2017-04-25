@@ -39,4 +39,6 @@ run_queries("./inst/views/tp3_scores.sql")
 
 run_queries("./inst/views/ci_scores.sql")
 
+source("./inst/views/create_age_query.R", local = new.env())
 run_queries("./inst/views/ages.sql")
+run_queries("./inst/views/age_ranges.sql")
