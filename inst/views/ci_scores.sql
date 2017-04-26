@@ -301,3 +301,35 @@ create or replace algorithm = undefined view l2t.Scores_CochlearMatching as
     study.Study = "CochlearMatching"
   order by
     childstudy.ShortResearchID;
+
+-- Query to show information about matched CI and NH participants
+create or replace algorithm = undefined view l2t.CIMatching as
+  select
+    study.Study,
+    childstudy.ShortResearchID as `ResearchID`,
+    matching.CIMatching_Group as `Matching_Group`,
+    matching.CIMatchingPairID as `Matching_PairNumber`,
+    matching.ChildID,
+    childstudy.ChildStudyID,
+    child.HouseholdID,
+    child.Female,
+    child.CImplant,
+    medu.Caregiver_Relation as `Maternal_Caregiver`,
+    medu.Caregiver_EduCategory as `Maternal_Education`,
+    medu.Caregiver_EduScale as `Maternal_Education_Level`,
+    evt.EVT_Age
+  from
+    backend.CIMatching matching
+    left join backend.Child child
+      using (ChildID)
+    left join backend.ChildStudy childstudy
+      using (ChildStudyID)
+    left join backend.Study study
+      using (StudyID)
+    left join backend.q_Household_Max_Maternal_Education medu
+      using (HouseholdID)
+    left join backend.EVT evt
+      using (ChildStudyID)
+  order by
+   matching.CIMatching_Group,
+   matching.CIMatchingPairID;

@@ -1,0 +1,60 @@
+---
+title: "CI Matching table demo"
+author: "TJ Mahr"
+date: "April 26, 2017"
+output: github_document
+---
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("knitr")
+opts_chunk$set(
+  warning = FALSE,
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  fig.width = 8,
+  fig.height = 6,
+  dpi = 300,
+  out.width = "80%")
+
+wd <- rprojroot::find_rstudio_root_file()
+opts_knit$set(root.dir = wd)
+```
+
+Data lives in `CIMatching` table in `l2t` database.
+
+```{r}
+library(dplyr, warn.conflicts = FALSE)
+library(L2TDatabase)
+
+# Connect to db
+config_file <- "./inst/l2t_db.cnf"
+l2t <- l2t_connect(config_file, "l2t")
+
+# Download matches
+matches <- collect(tbl(l2t, "CIMatching"))
+glimpse(matches)
+```
+
+Confirm some matching:
+
+```{r}
+matches %>% 
+  group_by(Matching_Group) %>% 
+  summarise(
+    N_Children = n_distinct(ChildID),
+    N_StudyParticipations = n_distinct(ChildStudyID), 
+    Mean_Age = mean(EVT_Age)) %>% 
+  knitr::kable()
+
+# Keep distinct ChildIDs so children are not counted twice when counting male
+# and female
+matches %>% 
+  distinct(Matching_Group, Female, ChildID) %>% 
+  count(Matching_Group, Female) %>% 
+  ungroup() %>% 
+  mutate(Female = ifelse(Female, "Female", "Male")) %>% 
+  rename(Gender = Female) %>% 
+  kable()
+```
+
