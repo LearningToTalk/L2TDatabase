@@ -1,111 +1,55 @@
 Comparison of Children with Cochlear Implants and Matched Normal Hearing Peers on Four-Image Word Recognition Task
 ================
 Tristan Mahr
-2017-01-25
+2017-05-03
 
-The Request
------------
+Download the matches
+--------------------
 
-> I also wanted to ask you if you would have the time to help me get the data ready for the analysis of the CI data for the RWL task. Here's what I've done so far:
->
-> 1.  Put together the CI particpants
->
-> <!-- -->
->
-> 1.  Omitted those tested before 1/15 (2 longitudinal participants)
-> 2.  Omitted those with more than 50% missing data across two blocks. I did include participants who had only 1 block with a low percentage of missing data.
->
-> <!-- -->
->
-> 1.  Matched these to NH participants.
->
-> <!-- -->
->
-> 1.  Group matched for age, maternal education, sex.
-> 2.  Group matched for number of test visits (the same number of participants in each group have 1 visit, 2 visits \[1 year apart\], 3 visits \[1 year apart\]).
-> 3.  Made sure that none of the NH matches have excessive missing data or were tested before 1/15.
->
-> Could you do the following for me:
->
-> 1.  Make a data frame that has the RWL eye-tracking data along with the usual subject-level information of interest (PPVT\_GSV \[if available\], EVT\_GSV, age, medu, GFTA \[if available\]).
-> 2.  Exclude blocks with more than 50% missing data and trials with more than 50% missing data.
-> 3.  Plot the data for the two groups (looks to the four images) for the time frame 300 to 1800 ms?
-
-Load in the list of participants.
+Load in the list of participants. The table of matches is stored in a table called `CIMatching` in the database. We connect to the database, grab that table and the test scores for the children in that table.
 
 ``` r
 library(dplyr)
 library(L2TDatabase)
 
-# Work relative to RStudio project
+# We use the main RStudio project directory as the working folder 
+# for this session.
 wd <- rprojroot::find_rstudio_root_file()
 dir_here <- file.path(wd, "inst", "analyses", "rwl_ci_nh_matches")
 cnf_file <- file.path(wd, "inst", "l2t_db.cnf")
 
-# Load in the matches
-df_kids <- file.path(dir_here, "ci_matches.csv") %>% 
-  readr::read_csv(col_types = "ccic") %>% 
-  print()
-#> # A tibble: 72 × 4
-#>    Group ShortResearchID   Age      Study
-#>    <chr>           <chr> <int>      <chr>
-#> 1     CI            300E    57 CochlearV1
-#> 2     CI            300E    69 CochlearV2
-#> 3     CI            301E    53 CochlearV1
-#> 4     CI            301E    69 CochlearV2
-#> 5     CI            302E    37 CochlearV1
-#> 6     CI            302E    49 CochlearV2
-#> 7     CI            303E    65 CochlearV1
-#> 8     CI            304E    59 CochlearV2
-#> 9     CI            305E    44 CochlearV1
-#> 10    CI            305E    56 CochlearV2
-#> # ... with 62 more rows
-```
-
-We need to get scores from the following studies.
-
-``` r
-unique(df_kids$Study)
-#> [1] "CochlearV1"       "CochlearV2"       "TimePoint2"      
-#> [4] "TimePoint3"       "TimePoint1"       "CochlearMatching"
-```
-
-We have queries that combine the various scores together for each study in the main database. They have the pattern `Scores_[study-name]`. Download them all, combine and select the requested columns.
-
-``` r
+# Connect to database
 l2t_main <- l2t_connect(cnf_file, "l2t")
-query_names <- paste0("Scores_", unique(df_kids$Study))
 
-df_scores <- query_names %>% 
-  # Download the each study's query
-  lapply(function(tbl_name) tbl(l2t_main, tbl_name)) %>% 
-  lapply(collect) %>% 
-  # Combine into a single data-frame
-  bind_rows() %>% 
-  select(Study, ShortResearchID = ResearchID, 
+# Download matches and scores from various tests
+df_matches <- tbl(l2t_main, "CIMatching") %>% 
+  left_join(tbl(l2t_main, "EVT")) %>% 
+  left_join(tbl(l2t_main, "PPVT")) %>% 
+  left_join(tbl(l2t_main, "GFTA")) %>% 
+  select(Group = Matching_Group, Matching_PairNumber, ChildStudyID, 
+         Study, ResearchID, 
          Female, AAE, LateTalker, CImplant, 
          Maternal_Education, Maternal_Education_Level, 
          EVT_Age, EVT_Raw, EVT_GSV, EVT_Standard,
          PPVT_Age, PPVT_Raw, PPVT_GSV, PPVT_Standard, 
-         GFTA_Age:GFTA_Standard)
-
-# Add the scores to the participants for analysis.
-df_kids <- inner_join(df_kids, df_scores)
-df_kids
-#> # A tibble: 72 × 23
-#>    Group ShortResearchID   Age      Study Female   AAE LateTalker CImplant
-#>    <chr>           <chr> <int>      <chr>  <int> <int>      <int>    <int>
-#> 1     CI            300E    57 CochlearV1      0     0          0        1
-#> 2     CI            300E    69 CochlearV2      0     0          0        1
-#> 3     CI            301E    53 CochlearV1      1     0          0        1
-#> 4     CI            301E    69 CochlearV2      1     0          0        1
-#> 5     CI            302E    37 CochlearV1      1     0          0        1
-#> 6     CI            302E    49 CochlearV2      1     0          0        1
-#> 7     CI            303E    65 CochlearV1      1     0          0        1
-#> 8     CI            304E    59 CochlearV2      1     0          0        1
-#> 9     CI            305E    44 CochlearV1      1     0          0        1
-#> 10    CI            305E    56 CochlearV2      1     0          0        1
-#> # ... with 62 more rows, and 15 more variables: Maternal_Education <chr>,
+         GFTA_Age:GFTA_Standard) %>% 
+  collect()
+df_matches
+#> # A tibble: 82 × 24
+#>              Group Matching_PairNumber ChildStudyID      Study ResearchID
+#>              <chr>               <int>        <int>      <chr>      <chr>
+#> 1    NormalHearing                  36          287 TimePoint2       630L
+#> 2    NormalHearing                  17          294 TimePoint2       640L
+#> 3  CochlearImplant                  28          308 TimePoint2       665L
+#> 4  CochlearImplant                  31          319 TimePoint2       679L
+#> 5    NormalHearing                  10          328 TimePoint2       002L
+#> 6    NormalHearing                  12          335 TimePoint2       010L
+#> 7    NormalHearing                  35          338 TimePoint2       014L
+#> 8    NormalHearing                  20          354 TimePoint2       030L
+#> 9    NormalHearing                   8          368 TimePoint2       044L
+#> 10   NormalHearing                  22          375 TimePoint2       052L
+#> # ... with 72 more rows, and 19 more variables: Female <int>, AAE <int>,
+#> #   LateTalker <int>, CImplant <int>, Maternal_Education <chr>,
 #> #   Maternal_Education_Level <int>, EVT_Age <int>, EVT_Raw <int>,
 #> #   EVT_GSV <int>, EVT_Standard <int>, PPVT_Age <int>, PPVT_Raw <int>,
 #> #   PPVT_GSV <int>, PPVT_Standard <int>, GFTA_Age <int>,
@@ -113,10 +57,10 @@ df_kids
 #> #   GFTA_AdjCorrect <int>, GFTA_Standard <int>
 ```
 
-We can confirm adequate matching.
+We can confirm adequate matching on (EVT) Age and sex.
 
 ``` r
-df_kids %>% 
+df_matches %>% 
   group_by(Group) %>% 
   summarise(
     N = n(),
@@ -132,15 +76,35 @@ df_kids %>%
   knitr::kable()
 ```
 
-| Group |    N|   CI|  N\_Female|  N\_Male|  N\_EVT|  EVT\_Age|  N\_PPVT|  PPVT\_Age|  N\_GFTA|  GFTA\_Age|
-|:------|----:|----:|----------:|--------:|-------:|---------:|--------:|----------:|--------:|----------:|
-| CI    |   36|   36|         21|       15|      36|  52.63889|       36|      52.50|       33|   52.72727|
-| NH    |   36|    0|         19|       17|      36|  51.86111|       20|      45.75|       20|   53.50000|
+| Group           |    N|   CI|  N\_Female|  N\_Male|  N\_EVT|  EVT\_Age|  N\_PPVT|  PPVT\_Age|  N\_GFTA|  GFTA\_Age|
+|:----------------|----:|----:|----------:|--------:|-------:|---------:|--------:|----------:|--------:|----------:|
+| CochlearImplant |   41|   41|         25|       16|      41|  50.09756|       41|   49.95122|       37|   50.27027|
+| NormalHearing   |   41|    0|         25|       16|      41|  50.09756|       23|   43.08696|       27|   51.62963|
+
+We also matched by general maternal education.
+
+``` r
+df_matches %>% 
+  count(Group, Maternal_Education) %>% 
+  ungroup() %>%
+  tidyr::spread(Group, n) %>% 
+  knitr::kable()
+```
+
+| Maternal\_Education          |  CochlearImplant|  NormalHearing|
+|:-----------------------------|----------------:|--------------:|
+| College Degree               |               18|             18|
+| Graduate Degree              |               12|             12|
+| High School Diploma          |                3|              2|
+| Less Than High School        |               NA|              1|
+| Some College (2+ years)      |                3|              3|
+| Technical/Associate's Degree |                5|              4|
+| Trade School                 |               NA|              1|
 
 We can also compute summary statistics.
 
 ``` r
-df_kids %>% 
+df_matches %>% 
   select(Group, EVT_Age, EVT_Standard, PPVT_Standard, GFTA_Standard) %>% 
   # Convert to long format to compute summaries by group by score type
   tidyr::gather(Variable, Value, -Group) %>% 
@@ -154,53 +118,19 @@ df_kids %>%
   knitr::kable()
 ```
 
-| Variable       | Group |  N\_Values|  Mean|   SD|  Min|  Max|
-|:---------------|:------|----------:|-----:|----:|----:|----:|
-| EVT\_Age       | CI    |         36|    53|   11|   34|   69|
-| EVT\_Age       | NH    |         36|    52|   10|   36|   69|
-| EVT\_Standard  | CI    |         36|    96|   19|   46|  131|
-| EVT\_Standard  | NH    |         36|   114|   13|   91|  137|
-| GFTA\_Standard | CI    |         33|    74|   20|   39|  107|
-| GFTA\_Standard | NH    |         20|    91|   10|   72|  104|
-| PPVT\_Standard | CI    |         35|    92|   22|   40|  139|
-| PPVT\_Standard | NH    |         20|   116|   16|   82|  139|
+| Variable       | Group           |  N\_Values|  Mean|   SD|  Min|  Max|
+|:---------------|:----------------|----------:|-----:|----:|----:|----:|
+| EVT\_Age       | CochlearImplant |         41|    50|   10|   31|   66|
+| EVT\_Age       | NormalHearing   |         41|    50|   10|   32|   66|
+| EVT\_Standard  | CochlearImplant |         40|    98|   19|   46|  131|
+| EVT\_Standard  | NormalHearing   |         41|   118|   11|   88|  134|
+| GFTA\_Standard | CochlearImplant |         37|    74|   19|   39|  107|
+| GFTA\_Standard | NormalHearing   |         27|    92|   12|   67|  113|
+| PPVT\_Standard | CochlearImplant |         40|    94|   21|   40|  139|
+| PPVT\_Standard | NormalHearing   |         23|   120|   11|   94|  140|
 
-``` r
-
-df_kids %>% 
-  count(Group, Maternal_Education) %>% 
-  ungroup() %>% 
-  knitr::kable()
-```
-
-| Group | Maternal\_Education          |    n|
-|:------|:-----------------------------|----:|
-| CI    | College Degree               |   17|
-| CI    | Graduate Degree              |    8|
-| CI    | High School Diploma          |    2|
-| CI    | Some College (2+ years)      |    2|
-| CI    | Technical/Associate's Degree |    5|
-| CI    | NA                           |    2|
-| NH    | College Degree               |   14|
-| NH    | Graduate Degree              |   11|
-| NH    | High School Diploma          |    1|
-| NH    | Some College (&lt;2 years)   |    2|
-| NH    | Some College (2+ years)      |    4|
-| NH    | Technical/Associate's Degree |    4|
-
-Let's also get the children's database IDs from the backend database so that we can pull their data from the eyetracking database.
-
-``` r
-l2t_be <- l2t_connect(cnf_file, "backend")
-
-df_cds <- tbl(l2t_be, "Child") %>% 
-  left_join(tbl(l2t_be, "ChildStudy")) %>% 
-  left_join(tbl(l2t_be, "Study")) %>% 
-  select(Study, ShortResearchID, ChildStudyID, Birthdate) %>% 
-  collect() %>% 
-  # Keep just the kids in the analysis
-  semi_join(df_kids)
-```
+Download the eyetracking data
+-----------------------------
 
 This is a tedious step. We need to download the eyetracking data. First, let's connect to the database and prepare some queries.
 
@@ -215,8 +145,7 @@ l2t_eyetracking <- l2t_connect(cnf_file, "eyetracking")
 
 # Find the numbers of the blocks 
 tbl_blocks <- tbl(l2t_eyetracking, "Blocks") %>% 
-  filter(Block_Task == "RWL", 
-         ChildStudyID %in% df_cds$ChildStudyID) %>% 
+  filter(ChildStudyID %in% df_matches$ChildStudyID) %>% 
   select(BlockID, ChildStudyID, Block_Basename, 
          Block_DateTime, Block_Task, Block_Version, Block_Age)
 
@@ -245,7 +174,7 @@ tbl_looks <- tbl(l2t_eyetracking, "Looks") %>%
 Downloading the data takes forever, so I'm going set a flag called `refresh`. When `refresh` is true, it will redownload the eyetracking data with those queries. Otherwise, it will load the last copy that I saved.
 
 ``` r
-refresh <- FALSE
+refresh <- TRUE
 
 if (!refresh) {
   df_looks <- readr::read_csv(file.path(dir_here, "looks.csv"))
@@ -254,38 +183,32 @@ if (!refresh) {
            Block_Basename, Block_Dialect) %>% 
     distinct()
 } else {
+  
   df_blocks <- collect(tbl_blocks) %>% 
-    left_join(df_cds) %>%
-    group_by(ChildStudyID) %>%
+    left_join(df_matches) %>%
+    group_by(Block_Task, ChildStudyID) %>%
     # We want one age per child, so use earliest. This might be dubious.
     mutate(Block_Age = min(Block_Age)) %>%
     ungroup()
      
-  # Get the dialect
+  # Get the dialect and stimulus version
   df_blocks_attrs <- collect(tbl_blocks_attrs) %>% 
     # Pivot from long to wide so have the attributes we want
     tidyr::spread(BlockAttribute_Name, BlockAttribute_Value) %>% 
-    select(ChildStudyID, BlockID, Block_Dialect = Dialect)
+    select(ChildStudyID, BlockID, 
+           Block_Dialect = Dialect, StimulusSet)
   
   # Add dialect to block info
   df_blocks <- df_blocks %>% 
-    select(Study, ShortResearchID, BlockID, Block_Age, Block_Basename) %>% 
+    select(Block_Task, Study, ResearchID, BlockID, Block_Age, 
+           Block_Basename, Block_Version) %>% 
     left_join(df_blocks_attrs) 
   
   df_trials <- collect(tbl_trials)
+  
+  
   df_trials_attrs <- collect(tbl_trials_attrs, n = Inf)
-  
-  df_trials_attrs <- df_trials_attrs %>% 
-    # Pivot from long to wide so have the attributes we want
-    tidyr::spread(TrialAttribute_Name, TrialAttribute_Value) %>% 
-    select(ChildStudyID, BlockID, TrialID, TargetImage,
-           # Where they were looking the most during 0-250ms
-           Bias_ImageAOI, 
-           starts_with("Image"), starts_with("Stimulus"), starts_with("Word"))
 
-  df_trials <- df_trials_attrs %>% 
-    left_join(df_trials)
-  
   df_looks <- collect(tbl_looks, n = Inf)
   
   df_looks <- df_blocks %>% 
@@ -293,68 +216,226 @@ if (!refresh) {
     left_join(df_looks) %>% 
     select(-BlockID, -ChildStudyID, -TrialID)
     
-  readr::write_csv(df_looks, file.path(dir_here, "looks.csv"))
+  # readr::write_csv(df_looks, file.path(dir_here, "looks.csv"))
 }
 ```
 
-Let's kick out bad trials and blocks.
+Data-screening for each eyetracking experiment
+----------------------------------------------
+
+We exclude blocks with the TimePoint1 version of the experiment stimuli.
+
+``` r
+df_bad_version <- df_blocks %>% 
+  filter(StimulusSet == "TP1") %>% 
+  select(Block_Task:ResearchID, Block_Basename, StimulusSet) %>% 
+  print()
+#> # A tibble: 51 × 5
+#>    Block_Task      Study ResearchID       Block_Basename StimulusSet
+#>         <chr>      <chr>      <chr>                <chr>       <chr>
+#> 1         RWL TimePoint1       605L RWL_Block1_605L31MS1         TP1
+#> 2         RWL TimePoint1       605L RWL_Block2_605L31MS1         TP1
+#> 3          MP TimePoint1       605L  MP_Block1_605L31MS1         TP1
+#> 4          MP TimePoint1       605L  MP_Block2_605L31MS1         TP1
+#> 5         RWL TimePoint1       608L RWL_Block1_608L39FS2         TP1
+#> 6         RWL TimePoint1       608L RWL_Block2_608L39FS2         TP1
+#> 7          MP TimePoint1       608L  MP_Block1_608L39FS2         TP1
+#> 8          MP TimePoint1       608L  MP_Block2_608L39FS2         TP1
+#> 9         RWL TimePoint1       665L RWL_Block1_665L40FS2         TP1
+#> 10         MP TimePoint1       665L  MP_Block1_665L40FS2         TP1
+#> # ... with 41 more rows
+```
+
+We identify blocks with more than 50% missing data during some analysis window (here 300--1800 ms).
 
 ``` r
 df_blocks_to_drop <- df_looks %>% 
+  anti_join(df_bad_version) %>% 
+  # Offset by 20 ms because the data binned into 50ms bins: I.e., the frame at
+  # 285ms is part of the [285, 300, 315] ms bin, so that frame needs to part of
+  # the data screening.
   filter(between(Time, 280, 1820)) %>% 
-  lookr::AggregateLooks(Study + ShortResearchID + 
+  lookr::AggregateLooks(Block_Task + Study + ResearchID + 
                           Block_Basename ~ GazeByImageAOI) %>% 
   as_data_frame() %>% 
   filter(PropNA > .5) %>% 
-  select(Study:Block_Basename, PropNA) %>% 
+  select(Block_Task:Block_Basename, PropNA) %>% 
+  mutate(PropNA = round(PropNA, 3)) %>% 
   print(n = Inf)
-#> # A tibble: 10 × 4
-#>         Study ShortResearchID       Block_Basename    PropNA
-#>         <chr>           <chr>                <chr>     <dbl>
-#> 1  CochlearV1            300E RWL_Block2_300E57MS2 0.5353943
-#> 2  CochlearV1            301E RWL_Block2_301E53FS2 0.7379032
-#> 3  CochlearV1            303E RWL_Block1_303E65FS2 0.6079749
-#> 4  CochlearV1            312E RWL_Block2_312E44FS1 0.6142473
-#> 5  CochlearV1            801E RWL_Block1_801E38MS1 0.5689964
-#> 6  TimePoint2            659L RWL_Block2_659L44FS3 0.6096307
-#> 7  TimePoint2            665L RWL_Block1_665L52FS4 0.5918459
-#> 8  TimePoint2            665L RWL_Block2_665L52FS4 0.5712366
-#> 9  TimePoint3            014L RWL_Block2_014L63MS6 0.6146953
-#> 10 TimePoint3            665L RWL_Block2_665L64FS6 0.7475456
+#> # A tibble: 20 × 5
+#>    Block_Task      Study ResearchID       Block_Basename PropNA
+#>         <chr>      <chr>      <chr>                <chr>  <dbl>
+#> 1          MP TimePoint2       605L  MP_Block1_605L43MS3  0.881
+#> 2          MP TimePoint2       665L  MP_Block2_665L52FS4  0.655
+#> 3          MP TimePoint2       679L  MP_Block1_679L46MS4  0.524
+#> 4          MP TimePoint3       605L  MP_Block1_605L55MS5  0.749
+#> 5          MP TimePoint3       605L  MP_Block2_605L55MS5  0.864
+#> 6          MP TimePoint3       665L  MP_Block1_665L64FS6  0.772
+#> 7          MP TimePoint3       679L  MP_Block1_679L58MS6  0.532
+#> 8         RWL CochlearV1       300E RWL_Block2_300E57MS2  0.535
+#> 9         RWL CochlearV1       301E RWL_Block2_301E53FS2  0.738
+#> 10        RWL CochlearV1       303E RWL_Block1_303E65FS2  0.608
+#> 11        RWL CochlearV1       304E RWL_Block1_304E48FS2  0.533
+#> 12        RWL CochlearV1       312E RWL_Block2_312E44FS1  0.614
+#> 13        RWL CochlearV1       801E RWL_Block1_801E38MS1  0.569
+#> 14        RWL CochlearV2       312E RWL_Block1_312E57FS2  0.590
+#> 15        RWL TimePoint2       605L RWL_Block2_605L43MS3  0.716
+#> 16        RWL TimePoint2       665L RWL_Block1_665L52FS4  0.592
+#> 17        RWL TimePoint2       665L RWL_Block2_665L52FS4  0.571
+#> 18        RWL TimePoint3       605L RWL_Block1_605L55MS5  0.780
+#> 19        RWL TimePoint3       605L RWL_Block2_605L55MS5  0.789
+#> 20        RWL TimePoint3       665L RWL_Block2_665L64FS6  0.748
+```
 
+Next, we drop individual trials with more than 50% missing data.
+
+``` r
 df_trials_to_drop <- df_looks %>% 
   anti_join(df_blocks_to_drop) %>% 
   filter(between(Time, 280, 1820)) %>% 
-  lookr::AggregateLooks(Study + ShortResearchID + Block_Basename + 
+  lookr::AggregateLooks(Block_Task + Study + ResearchID + Block_Basename + 
                           Trial_TrialNo ~ GazeByImageAOI) %>% 
   as_data_frame() %>% 
   filter(PropNA > .5) %>% 
-  select(Study:Trial_TrialNo, PropNA) %>% 
+  select(Block_Task:Trial_TrialNo, PropNA) %>% 
+  mutate(PropNA = round(PropNA, 3)) %>% 
   print()
-#> # A tibble: 400 × 5
-#>               Study ShortResearchID       Block_Basename Trial_TrialNo
-#>               <chr>           <chr>                <chr>         <int>
-#> 1  CochlearMatching            391A RWL_Block2_391A65MS3             4
-#> 2  CochlearMatching            391A RWL_Block2_391A65MS3            13
-#> 3  CochlearMatching            391A RWL_Block2_391A65MS3            16
-#> 4  CochlearMatching            393A RWL_Block1_393A69MS3            22
-#> 5        CochlearV1            300E RWL_Block1_300E57MS2             1
-#> 6        CochlearV1            300E RWL_Block1_300E57MS2             3
-#> 7        CochlearV1            300E RWL_Block1_300E57MS2             9
-#> 8        CochlearV1            300E RWL_Block1_300E57MS2            19
-#> 9        CochlearV1            300E RWL_Block1_300E57MS2            20
-#> 10       CochlearV1            300E RWL_Block1_300E57MS2            21
-#> # ... with 390 more rows, and 1 more variables: PropNA <dbl>
+#> # A tibble: 1,404 × 6
+#>    Block_Task      Study ResearchID      Block_Basename Trial_TrialNo
+#>         <chr>      <chr>      <chr>               <chr>         <int>
+#> 1          MP CochlearV1       300E MP_Block1_300E57MS2             2
+#> 2          MP CochlearV1       300E MP_Block1_300E57MS2            18
+#> 3          MP CochlearV1       300E MP_Block1_300E57MS2            19
+#> 4          MP CochlearV1       300E MP_Block1_300E57MS2            20
+#> 5          MP CochlearV1       300E MP_Block1_300E57MS2            22
+#> 6          MP CochlearV1       300E MP_Block1_300E57MS2            23
+#> 7          MP CochlearV1       300E MP_Block1_300E57MS2            25
+#> 8          MP CochlearV1       300E MP_Block1_300E57MS2            26
+#> 9          MP CochlearV1       300E MP_Block1_300E57MS2            35
+#> 10         MP CochlearV1       300E MP_Block2_300E57MS2             2
+#> # ... with 1,394 more rows, and 1 more variables: PropNA <dbl>
 
 df_looks <- df_looks %>% 
   anti_join(df_blocks_to_drop) %>% 
   anti_join(df_trials_to_drop)
 ```
 
+Next, we need to exclude participants who no longer have a match.
+
+``` r
+df_leftover <- df_looks %>% 
+  distinct(Block_Task, Study, ResearchID) %>% 
+  inner_join(df_matches)
+
+df_leftover %>% 
+  count(Block_Task, Group) %>% 
+  ungroup() %>% 
+  rename(NumChildren = n)
+#> # A tibble: 4 × 3
+#>   Block_Task           Group NumChildren
+#>        <chr>           <chr>       <int>
+#> 1         MP CochlearImplant          39
+#> 2         MP   NormalHearing          41
+#> 3        RWL CochlearImplant          37
+#> 4        RWL   NormalHearing          41
+
+df_singletons <- df_leftover %>% 
+  count(Block_Task, Matching_PairNumber) %>% 
+  ungroup() %>% 
+  rename(NumChildrenInPair = n) %>% 
+  filter(NumChildrenInPair == 1)
+df_singletons
+#> # A tibble: 6 × 3
+#>   Block_Task Matching_PairNumber NumChildrenInPair
+#>        <chr>               <int>             <int>
+#> 1         MP                  22                 1
+#> 2         MP                  23                 1
+#> 3        RWL                   6                 1
+#> 4        RWL                  22                 1
+#> 5        RWL                  23                 1
+#> 6        RWL                  28                 1
+
+
+df_looks <- df_looks %>% 
+  inner_join(df_matches %>% 
+               select(Group, Matching_PairNumber, Study, ResearchID)) %>% 
+  anti_join(df_singletons)
+```
+
+Now there will be the same number of children in each group x task.
+
+``` r
+df_looks %>% 
+  distinct(Block_Task, Group, Study, ResearchID) %>% 
+  count(Block_Task, Group) %>% 
+  ungroup() %>% 
+  rename(NumChildren = n)
+#> # A tibble: 4 × 3
+#>   Block_Task           Group NumChildren
+#>        <chr>           <chr>       <int>
+#> 1         MP CochlearImplant          39
+#> 2         MP   NormalHearing          39
+#> 3        RWL CochlearImplant          37
+#> 4        RWL   NormalHearing          37
+
+# Make sure there are 2 children in every matching pair
+df_looks %>% 
+  distinct(Matching_PairNumber, Block_Task, Group, Study, ResearchID) %>% 
+  count(Block_Task, Matching_PairNumber) %>% 
+  ungroup() %>% 
+  rename(NumChildrenInPair = n) %>% 
+  filter(NumChildrenInPair != 2)
+#> # A tibble: 0 × 3
+#> # ... with 3 variables: Block_Task <chr>, Matching_PairNumber <int>,
+#> #   NumChildrenInPair <int>
+```
+
+Finally, we have to separate the RWL and the MP data, so that we can attach the information about the trials to eyetracking data.
+
+``` r
+df_mp <- df_looks %>% 
+  filter(Block_Task == "MP")
+
+df_rwl <- df_looks %>% 
+  filter(Block_Task == "RWL")
+
+df_trial_info <- df_trials_attrs %>% 
+  left_join(df_trials) %>% 
+  left_join(df_blocks) %>% 
+  semi_join(df_looks)
+
+# Include the MP trial information
+df_mp_trial_info <- df_trial_info %>% 
+  filter(Block_Task == "MP") %>% 
+  tidyr::spread(TrialAttribute_Name, TrialAttribute_Value) %>% 
+  select(Study, ResearchID, Block_Basename, Trial_TrialNo, 
+         Condition = StimType, WordGroup, TargetWord, Bias_ImageAOI, 
+         DistractorImage, FamiliarImage, UnfamiliarImage, 
+         ImageL, ImageR, TargetImage)
+
+df_mp <- df_mp %>% 
+  left_join(df_mp_trial_info)
+
+
+# Do the same for the RWL data
+df_rwl_trial_info <- df_trial_info %>% 
+  filter(Block_Task == "RWL") %>% 
+  tidyr::spread(TrialAttribute_Name, TrialAttribute_Value) %>% 
+  select(Study, ResearchID, Block_Basename, Trial_TrialNo, 
+         TargetImage, Bias_ImageAOI,
+         starts_with("Image"), starts_with("Stimulus"), starts_with("Word"))
+
+df_rwl <- df_rwl %>% 
+  left_join(df_rwl_trial_info)
+```
+
+Look at the RWL data
+--------------------
+
 Let's downsample into 50ms bins, and aggregate the number of looks.
 
 ``` r
-df_bins <- df_looks %>% 
+df_bins <- df_rwl %>% 
   distinct(Time) %>%
   # Need a number of frames divisible three. Time 0 should be center of its bin
   filter(between(Time, -917, 1975)) %>% 
@@ -365,11 +446,11 @@ df_bins <- df_looks %>%
   mutate(BinTime = Time %>% median() %>% round(-1)) %>% 
   ungroup()
 
-df_binned <- df_looks %>% 
+df_binned <- df_rwl %>% 
   inner_join(df_bins) %>%
-  select(Study, ShortResearchID, Trial_TrialNo, 
+  select(Study, ResearchID, Trial_TrialNo, 
          Time, BinTime, GazeByImageAOI, GazeByAOI) %>% 
-  lookr::AggregateLooks(Study + ShortResearchID + BinTime ~ GazeByImageAOI) %>% 
+  lookr::AggregateLooks(Study + ResearchID + BinTime ~ GazeByImageAOI) %>% 
   as_data_frame() %>% 
   mutate(Looks_Images = Target + Others,
          Prop_Target = Target / Looks_Images,
@@ -377,22 +458,22 @@ df_binned <- df_looks %>%
          Prop_SemanticFoil = SemanticFoil / Looks_Images,
          Prop_Unrelated = Unrelated / Looks_Images)
 df_binned
-#> # A tibble: 4,118 × 19
-#>               Study ShortResearchID BinTime PhonologicalFoil SemanticFoil
-#>               <chr>           <chr>   <dbl>            <int>        <int>
-#> 1  CochlearMatching            390A    -900               27           27
-#> 2  CochlearMatching            390A    -850               27           25
-#> 3  CochlearMatching            390A    -800               30           22
-#> 4  CochlearMatching            390A    -750               30           21
-#> 5  CochlearMatching            390A    -700               27           21
-#> 6  CochlearMatching            390A    -650               29           22
-#> 7  CochlearMatching            390A    -600               32           24
-#> 8  CochlearMatching            390A    -550               30           30
-#> 9  CochlearMatching            390A    -500               30           30
-#> 10 CochlearMatching            390A    -450               30           30
-#> # ... with 4,108 more rows, and 14 more variables: Target <int>,
-#> #   Elsewhere <int>, Unrelated <int>, NAs <int>, Others <dbl>,
-#> #   Looks <dbl>, Proportion <dbl>, ProportionSE <dbl>, PropNA <dbl>,
+#> # A tibble: 4,292 × 19
+#>         Study ResearchID BinTime PhonologicalFoil SemanticFoil Target
+#>         <chr>      <chr>   <dbl>            <int>        <int>  <int>
+#> 1  CochlearV1       300E    -900               16            9     11
+#> 2  CochlearV1       300E    -850               15            9      9
+#> 3  CochlearV1       300E    -800               15            9      9
+#> 4  CochlearV1       300E    -750               17            9      9
+#> 5  CochlearV1       300E    -700               15            9      9
+#> 6  CochlearV1       300E    -650               13            9      9
+#> 7  CochlearV1       300E    -600               12           10      9
+#> 8  CochlearV1       300E    -550                9           11     10
+#> 9  CochlearV1       300E    -500                9           12     13
+#> 10 CochlearV1       300E    -450                9           12     12
+#> # ... with 4,282 more rows, and 13 more variables: Elsewhere <int>,
+#> #   Unrelated <int>, NAs <int>, Others <dbl>, Looks <dbl>,
+#> #   Proportion <dbl>, ProportionSE <dbl>, PropNA <dbl>,
 #> #   Looks_Images <dbl>, Prop_Target <dbl>, Prop_PhonologicalFoil <dbl>,
 #> #   Prop_SemanticFoil <dbl>, Prop_Unrelated <dbl>
 ```
@@ -401,8 +482,8 @@ If we want to plot a growth curve for image type (target, semantic foil, etc.), 
 
 ``` r
 df_looks_to_aois <- df_binned %>% 
-  select(Study, ShortResearchID, Time = BinTime, starts_with("Prop_")) %>% 
-  tidyr::gather(AOI, Proportion, -Study, -ShortResearchID, -Time) %>% 
+  select(Study, ResearchID, Time = BinTime, starts_with("Prop_")) %>% 
+  tidyr::gather(AOI, Proportion, -Study, -ResearchID, -Time) %>% 
   mutate(AOI = AOI %>% 
            stringr::str_replace("Prop_", "") %>% 
            stringr::str_replace("Foil", "")) 
@@ -416,16 +497,21 @@ Do some spaghetti plots
 
 ``` r
 library(ggplot2)
-df_looks_to_aois <- left_join(df_looks_to_aois, df_kids) %>% 
-  mutate(LineGroup = interaction(Study, ShortResearchID, AOI))
+df_looks_to_aois <- left_join(df_looks_to_aois, df_matches) %>% 
+  mutate(LineGroup = interaction(Study, ResearchID, AOI))
 
 curr_labs <- labs(
   x = "Time after target onset (ms.)", 
   y = "Proportion of looks", 
   color = "Image") 
 
+theme_aligned <- theme(
+  axis.title.x = element_text(hjust = .995), 
+  axis.title.y = element_text(hjust = .995))
+
 p_theme <- theme_grey(base_size = 11) + 
-  theme(legend.position = "bottom")
+  theme(legend.position = "bottom") + 
+  theme_aligned
 
 p1 <- ggplot(df_looks_to_aois) + 
   aes(x = Time, y = Proportion, color = AOI, group = LineGroup) + 
@@ -437,7 +523,7 @@ p1 <- ggplot(df_looks_to_aois) +
 p1  
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-12-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-15-1.png" width="80%" />
 
 Replace data-set in last plot with one with a narrow time window.
 
@@ -448,7 +534,7 @@ df_looks_to_aois_window <- df_looks_to_aois %>%
 p1 %+% df_looks_to_aois_window
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-13-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-16-1.png" width="80%" />
 
 Show average of each participant's lines.
 
@@ -463,7 +549,7 @@ p2 <- ggplot(df_looks_to_aois) +
 p2  
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-14-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-17-1.png" width="80%" />
 
 ``` r
 p2b <- ggplot(df_looks_to_aois_window) + 
@@ -476,7 +562,7 @@ p2b <- ggplot(df_looks_to_aois_window) +
 p2b 
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-15-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-18-1.png" width="80%" />
 
 Actually, we don't need to facet them.
 
@@ -490,7 +576,7 @@ p3 <- ggplot(df_looks_to_aois) +
 p3
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-16-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-19-1.png" width="80%" />
 
 And zoom in.
 
@@ -504,7 +590,7 @@ p4 <- ggplot(df_looks_to_aois_window) +
 p4
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-17-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-20-1.png" width="80%" />
 
 Compare each mean of curve.
 
@@ -518,120 +604,205 @@ p5 <- ggplot(df_looks_to_aois_window) +
 p5
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-18-1.png" width="80%" />
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-21-1.png" width="80%" />
 
-Save a final data-set.
+Look at the MP data
+-------------------
 
-``` r
-df_ages <- df_blocks %>% 
-  select(Study, ShortResearchID, Age = Block_Age) %>% 
-  distinct()
-
-df_subj_vars <- df_kids %>% 
-  select(-Age) %>% 
-  left_join(df_ages) %>% 
-  select(Group, Study, ShortResearchID, Age, Female:GFTA_Standard) %>% 
-  distinct() %>% 
-  arrange(Group, Study, ShortResearchID)
-
-df_long_props <- df_looks_to_aois_window %>% 
-  left_join(df_subj_vars) %>% 
-  select(Group, Study, ShortResearchID, Age:GFTA_Standard, 
-         Time, AOI, Proportion) %>% 
-  arrange(Group, Study, ShortResearchID, AOI, Time)
-
-df_look_counts <- df_binned %>% 
-  rename(LooksToTarget = Target, LooksToFoils = Others, 
-         ProportionToTarget = Proportion, Time = BinTime) %>% 
-  left_join(df_subj_vars) %>% 
-  select(Group, Study, ShortResearchID, Age:GFTA_Standard, 
-         Time, ProportionToTarget, LooksToTarget, LooksToFoils, 
-         PhonologicalFoil, SemanticFoil, Unrelated) %>% 
-  filter(between(Time, 300, 1800)) %>% 
-  arrange(Group, Study, ShortResearchID)
-
-readr::write_csv(df_subj_vars, file.path(dir_here, "subj_info.csv"))
-
-readr::write_csv(
-  df_long_props, 
-  file.path(dir_here, "long_prop_looks_to_each_aoi.csv"))
-
-readr::write_csv(
-  df_look_counts, 
-  file.path(dir_here, "wide_num_looks_to_each_aoi.csv"))
-```
-
-Some modeling
--------------
-
-Here is some code to do some light modeling. Read in the wide table of counts.
+Similar steps as above. Let's downsample into 50ms bins, and aggregate the number of looks.
 
 ``` r
-library(lme4)
-df <- readr::read_csv(file.path(dir_here, "wide_num_looks_to_each_aoi.csv"))
+df_bins <- df_mp %>% 
+  distinct(Time) %>%
+  # Need a number of frames divisible three. Time 0 should be center of its bin
+  filter(between(Time, -917, 1975)) %>% 
+  arrange(Time) %>% 
+  mutate(Bin = lookr::AssignBins(Time, bin_width = 3)) %>%
+  group_by(Bin) %>% 
+  # Round to nearest 50ms
+  mutate(BinTime = Time %>% median() %>% round(-1)) %>% 
+  ungroup()
 
-df$elog <- lookr::empirical_logit(df$LooksToTarget, df$LooksToFoils)
-df$elog_wt <- lookr::empirical_logit_weight(df$LooksToTarget, df$LooksToFoils)
-
-# For now let's ignore the fact that there are multiple growth curves for some
-# children (e.g., children who contribute data in CochlearV1 and CochlearV2). We
-# will pretend that those curves are from entirely different children, for the
-# sake of model convergence.
-df$ChildStudy <- paste0(df$Study, "_", df$ShortResearchID)
-
-# The elogit model
-m <- lmer(
-  elog ~ poly(Time, 3) * Group + (poly(Time, 3) | ChildStudy),
-  data = df,
-  weights = 1 / elog_wt)
-summary(m)
-#> Linear mixed model fit by REML ['lmerMod']
-#> Formula: elog ~ poly(Time, 3) * Group + (poly(Time, 3) | ChildStudy)
-#>    Data: df
-#> Weights: 1/elog_wt
-#> 
-#> REML criterion at convergence: -63.5
-#> 
-#> Scaled residuals: 
-#>     Min      1Q  Median      3Q     Max 
-#> -3.2732 -0.6111  0.0177  0.6345  3.4412 
-#> 
-#> Random effects:
-#>  Groups     Name           Variance Std.Dev. Corr             
-#>  ChildStudy (Intercept)      0.2664  0.5161                   
-#>             poly(Time, 3)1 172.4078 13.1304   0.66            
-#>             poly(Time, 3)2  52.7700  7.2643  -0.46 -0.21      
-#>             poly(Time, 3)3  23.9678  4.8957  -0.06 -0.20 -0.05
-#>  Residual                    0.6977  0.8353                   
-#> Number of obs: 2201, groups:  ChildStudy, 71
-#> 
-#> Fixed effects:
-#>                        Estimate Std. Error t value
-#> (Intercept)            -0.18956    0.08747  -2.167
-#> poly(Time, 3)1         22.98889    2.24050  10.261
-#> poly(Time, 3)2         -5.99255    1.26352  -4.743
-#> poly(Time, 3)3         -2.10193    0.87869  -2.392
-#> GroupNH                 0.50461    0.12283   4.108
-#> poly(Time, 3)1:GroupNH 11.64654    3.14467   3.704
-#> poly(Time, 3)2:GroupNH -2.41455    1.77077  -1.364
-#> poly(Time, 3)3:GroupNH -3.15556    1.22911  -2.567
-#> 
-#> Correlation of Fixed Effects:
-#>             (Intr) pl(T,3)1 pl(T,3)2 pl(T,3)3 GropNH p(T,3)1: p(T,3)2:
-#> poly(Tm,3)1  0.651                                                    
-#> poly(Tm,3)2 -0.442 -0.201                                             
-#> poly(Tm,3)3 -0.055 -0.187   -0.043                                    
-#> GroupNH     -0.712 -0.464    0.315    0.039                           
-#> p(T,3)1:GNH -0.464 -0.712    0.143    0.133    0.652                  
-#> p(T,3)2:GNH  0.315  0.143   -0.714    0.031   -0.443 -0.201           
-#> p(T,3)3:GNH  0.040  0.134    0.031   -0.715   -0.056 -0.189   -0.041
-
-df$fitted <- fitted(m)
-
-ggplot(df) + 
-  aes(x = Time, y = elog, color = Group) + 
-  stat_summary() + 
-  stat_summary(aes(y = fitted), fun.y = mean, geom = "line")
+df_binned <- df_mp %>% 
+  inner_join(df_bins) %>%
+  select(Study, ResearchID, Condition, Trial_TrialNo, 
+         Time, BinTime, GazeByImageAOI, GazeByAOI) %>% 
+  lookr::AggregateLooks(Condition + Study + 
+                          ResearchID + BinTime ~ GazeByImageAOI) %>% 
+  as_data_frame() %>% 
+  rename(Time = BinTime)
+df_binned
+#> # A tibble: 13,572 × 13
+#>    Condition      Study ResearchID  Time Distractor Target Elsewhere   NAs
+#>        <chr>      <chr>      <chr> <dbl>      <int>  <int>     <int> <int>
+#> 1         MP CochlearV1       300E  -900         14     23         2     6
+#> 2         MP CochlearV1       300E  -850         15     26         1     3
+#> 3         MP CochlearV1       300E  -800         15     27         0     3
+#> 4         MP CochlearV1       300E  -750         15     27         0     3
+#> 5         MP CochlearV1       300E  -700         15     25         0     5
+#> 6         MP CochlearV1       300E  -650         14     24         2     5
+#> 7         MP CochlearV1       300E  -600         11     23         2     9
+#> 8         MP CochlearV1       300E  -550         11     22         3     9
+#> 9         MP CochlearV1       300E  -500         12     21         1    11
+#> 10        MP CochlearV1       300E  -450         12     20         3    10
+#> # ... with 13,562 more rows, and 5 more variables: Others <dbl>,
+#> #   Looks <dbl>, Proportion <dbl>, ProportionSE <dbl>, PropNA <dbl>
 ```
 
-<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-20-1.png" width="80%" />
+Prepare for plotting.
+
+``` r
+df_plot <- df_binned %>% 
+  inner_join(df_matches) %>% 
+  mutate(PlotGroup = ifelse(Group == "NormalHearing", 
+                            "Normal hearing", "Cochlear implant")) %>% 
+  filter(between(Time, 0, 2000))
+
+condition_labels <- c(
+  "real" = "real word",
+  "MP" = "mispronunication",
+  "nonsense" = "nonword"
+)
+
+df_plot$heard <- df_plot$Condition %>% 
+  factor(levels = names(condition_labels), labels = condition_labels)
+  
+curr_labs <- labs(
+  x = "Time after target onset (ms.)", 
+  y = "Proportion of looks to familiar image", 
+  color = "Child hears") 
+
+theme_aligned <- theme(
+  axis.title.x = element_text(hjust = .995), 
+  axis.title.y = element_text(hjust = .995))
+
+p_theme <- theme_grey(base_size = 11) + 
+  theme(legend.position = "top",
+        legend.justification = "left") + 
+  theme_aligned
+```
+
+Show average of each participant's lines.
+
+``` r
+p2 <- ggplot(df_plot) + 
+  aes(x = Time, y = Proportion, color = heard) + 
+  geom_hline(yintercept = .5, size = 2, color = "white") + 
+  stat_summary(fun.data = mean_se, geom = "pointrange") +
+  facet_wrap("PlotGroup") +
+  p_theme + curr_labs + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "viridis", end = .8)
+p2  
+```
+
+<img src="rwl_matches_files/figure-markdown_github/mp-groups-1.png" width="80%" />
+
+Actually, we don't need to facet them.
+
+``` r
+p3 <- ggplot(df_plot) + 
+  aes(x = Time, y = Proportion, color = heard, shape = PlotGroup) + 
+  geom_hline(yintercept = .5, size = 2, color = "white") + 
+  stat_summary(fun.data = mean_se, geom = "pointrange") +
+  p_theme + curr_labs + 
+  viridis::scale_color_viridis(discrete = TRUE, option = "viridis", end = .8)
+  labs(shape = "Group")
+#> $shape
+#> [1] "Group"
+#> 
+#> attr(,"class")
+#> [1] "labels"
+p3
+```
+
+<img src="rwl_matches_files/figure-markdown_github/mp-groups-2-1.png" width="80%" />
+
+### Mispronunciation effects
+
+``` r
+schemes <- tibble::tribble(
+  ~ MPLabel, ~ WordGroup, ~ Contrast,
+  "rice-[w]ice", "rice", "ɹ-w",
+  "shoes-[s]oes", "shoes", "ʃ-s",
+  "girl-[d]irl", "girl", "g-d",
+  "soup-[ʃ]oup", "soup", "ʃ-s",
+  "cake-[g]ake", "cake", "k-g",
+  "duck-[g]uck", "duck", "g-d",
+  "dog-[t]og", "dog", "t-d"
+)
+
+df_items <- df_mp %>% 
+  inner_join(df_bins) %>%
+  filter(Condition != "nonsense") %>% 
+  select(WordGroup, Study, ResearchID, Condition, Trial_TrialNo, 
+         Time, BinTime, GazeByImageAOI, GazeByAOI) %>% 
+  lookr::AggregateLooks(WordGroup + Condition + Study + 
+                          ResearchID + BinTime ~ GazeByImageAOI) %>% 
+  as_data_frame() %>% 
+  rename(Time = BinTime) %>% 
+  left_join(schemes) %>% 
+  filter(Contrast != "t-d")
+df_items
+#> # A tibble: 51,098 × 16
+#>    WordGroup Condition      Study ResearchID  Time Distractor Target
+#>        <chr>     <chr>      <chr>      <chr> <dbl>      <int>  <int>
+#> 1       cake        MP CochlearV1       300E  -900          0      9
+#> 2       cake        MP CochlearV1       300E  -850          0     11
+#> 3       cake        MP CochlearV1       300E  -800          0     12
+#> 4       cake        MP CochlearV1       300E  -750          0     12
+#> 5       cake        MP CochlearV1       300E  -700          0     12
+#> 6       cake        MP CochlearV1       300E  -650          0     12
+#> 7       cake        MP CochlearV1       300E  -600          0     12
+#> 8       cake        MP CochlearV1       300E  -550          0     11
+#> 9       cake        MP CochlearV1       300E  -500          0      9
+#> 10      cake        MP CochlearV1       300E  -450          0      8
+#> # ... with 51,088 more rows, and 9 more variables: Elsewhere <int>,
+#> #   NAs <int>, Others <dbl>, Looks <dbl>, Proportion <dbl>,
+#> #   ProportionSE <dbl>, PropNA <dbl>, MPLabel <chr>, Contrast <chr>
+
+df_items %>% count(WordGroup, Contrast)
+#> Source: local data frame [6 x 3]
+#> Groups: WordGroup [?]
+#> 
+#>   WordGroup   Contrast     n
+#>       <chr>      <chr> <int>
+#> 1      cake        k-g  8758
+#> 2      duck        g-d  8758
+#> 3      girl        g-d  8816
+#> 4      rice <U+0279>-w  7250
+#> 5     shoes <U+0283>-s  8816
+#> 6      soup <U+0283>-s  8700
+```
+
+Prepare for plotting.
+
+``` r
+df_plot_items <- df_items %>% 
+  inner_join(df_matches) %>% 
+  mutate(PlotGroup = ifelse(Group == "NormalHearing", 
+                            "Normal hearing", "Cochlear implant")) %>% 
+  filter(between(Time, 0, 2000))
+
+condition_labels <- c(
+  "real" = "real word",
+  "MP" = "mispronunication",
+  "nonsense" = "nonword"
+)
+
+df_plot_items$heard <- df_plot_items$Condition %>% 
+  factor(levels = names(condition_labels), labels = condition_labels)
+```
+
+``` r
+p2 <- ggplot(df_plot_items) + 
+  aes(x = Time, y = Proportion, color = heard, linetype = PlotGroup) + 
+  geom_hline(yintercept = .5, size = 2, color = "white") + 
+  stat_summary(fun.y = mean, geom = "line", size = 1) +
+  facet_wrap("MPLabel") +
+  p_theme + curr_labs + labs(linetype = "Group") +
+  viridis::scale_color_viridis(discrete = TRUE, option = "viridis", end = .8)
+p2
+#> Warning: Removed 267 rows containing non-finite values (stat_summary).
+```
+
+<img src="rwl_matches_files/figure-markdown_github/unnamed-chunk-26-1.png" width="80%" />
