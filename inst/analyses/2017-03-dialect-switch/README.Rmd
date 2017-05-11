@@ -66,128 +66,96 @@ src_tbls(l2t_eyetracking)
 Tables with `q_` at the front are queries which contain helpful information
 (like Study and ResearchID) alongside the main data in the table. We use the
 `q_TrialAttributesByStudy` table to get information about each eyetracking 
-trial.
+trial. I use `q_` for queries that developed in these scripts as well.
 
 ```{r}
-# Get the audio information from trial attributes. TargetEnd marks the offset of
-# the wav file.
-rwl_trials_attrs <- tbl(l2t_eyetracking, "q_TrialAttributesByStudy") %>% 
-  filter(Task == "RWL", TrialAttribute_Name %in% c("Audio", "TargetEnd")) %>% 
-  collect(n = Inf)
+# Dialects used in each block
+q_block_dialects <- l2t_eyetracking %>% 
+  tbl("q_BlockAttributesByStudy") %>% 
+  filter(Task == "RWL", 
+    BlockAttribute_Name == c("Dialect"), 
+    Study %in% c("DialectSwitch", "MaternalEd")) %>% 
+  select(BlockID, Dialect = BlockAttribute_Value)
 
-# Figure out the stimuli used for TP1, TP2, TP3
-target_lengths <- rwl_trials_attrs %>% 
-  # Convert wide to long and remove duplicate rows to get one row per audio file
-  tidyr::spread(TrialAttribute_Name, TrialAttribute_Value) %>% 
-  select(Study, Audio, TargetEnd) %>% 
-  distinct() %>% 
-  na.omit() %>% 
-  # Extract dialect and keep only rows from longitudinal studies
-  mutate(Dialect = substr(Audio, 1, 3)) %>% 
-  select(Study, Dialect, Audio, TargetEnd) %>% 
-  filter(Study %in% c("TimePoint1", "TimePoint2", "TimePoint3"))
-target_lengths
+q_block_ages <- l2t_eyetracking %>% 
+  tbl("Blocks") %>% 
+  select(BlockID, Block_Age)
+
+# Find the blocks that used TP2 stimuli.
+q_blocks_to_use <- l2t_eyetracking %>% 
+  tbl("q_BlockAttributesByStudy") %>% 
+  filter(
+    Task == "RWL", 
+    BlockAttribute_Name == c("StimulusSet"), 
+    BlockAttribute_Value == c("TP2"),
+    Study %in% c("DialectSwitch", "MaternalEd")) %>% 
+  select(-BlockAttribute_Name, StimulusSet = BlockAttribute_Value) %>% 
+  left_join(q_block_dialects) %>% 
+  left_join(q_block_ages)
 ```
 
-It looks like TP1 SAE stimuli were uniformly 816 ms long and the AAE ones were
-567 ms. We can use this fact to label blocks as using TP1 stimuli or not.
+Count the number of blocks in the dialect-varying studies.
 
 ```{r}
-# Get the audio file info for each block, figure out the stimuli used
-block_stim <- rwl_trials_attrs %>% 
-  tidyr::spread(TrialAttribute_Name, TrialAttribute_Value) %>% 
-  select(BlockID, TrialID, Study, Audio, TargetEnd) %>% 
-  na.omit() %>% 
-  mutate(Dialect = substr(Audio, 1, 3)) %>% 
-  # If the durations in a block are all the same and equal to one of the TP1
-  # durations, mark it as TP1.
-  group_by(BlockID) %>% 
-  mutate(StimSet = ifelse(Dialect == "SAE" & all(TargetEnd == 816), 
-                          "TP1", "Not TP1"), 
-         StimSet = ifelse(Dialect == "AAE" & all(TargetEnd == 567), 
-                          "TP1", StimSet)) %>% 
+q_blocks_to_use %>% 
+  count(Study, Dialect, StimulusSet) %>% 
+  rename(nBlocks = n) %>% 
   ungroup() %>% 
-  select(BlockID, Study, Dialect, StimSet) %>% 
-  distinct() %>% 
-  arrange(BlockID)
-block_stim
+  collect()
 ```
 
-Count the number of blocks with each type of stimuli in the dialect-varying
-studies.
-
-```{r}
-# Check that dialect switch got 2 different sets of stimuli
-block_stim %>% 
-  filter(Study == "DialectSwitch") %>% 
-  count(Dialect, StimSet) %>% 
-  rename(nBlocks = n) %>% 
-  ungroup()
-
-block_stim %>% 
-  filter(Study == "MaternalEd") %>% 
-  count(Dialect, StimSet) %>% 
-  rename(nBlocks = n) %>% 
-  ungroup()
-```
-
-Now, we can identify which blocks got TP2 versions of the RWL experiment.
 
 
 
 ## Download block and child demographic information
 
-Download the records for the blocks of the RWL experiment.
-
-```{r}
-# Get the dialects of each block from the table of block attributes
-block_dialects <- tbl(l2t_eyetracking, "BlockAttributes") %>% 
-  select(-BlockAttributeID, -BlockAttribute_Timestamp) %>% 
-  collect() %>% 
-  # Convert from long to wide format
-  tidyr::spread(BlockAttribute_Name, BlockAttribute_Value) %>% 
-  select(BlockID, Dialect)
-
-# Get the block information (child, date, filename) for the RWL task
-rwl_blocks <- tbl(l2t_eyetracking, "Blocks") %>% 
-  select(-Block_Timestamp) %>% 
-  filter(Block_Task == "RWL") %>% 
-  collect() %>% 
-  inner_join(block_dialects) %>% 
-  left_join(block_stim)
-rwl_blocks
-```
-
 Download child-level information.
 
 ```{r}
-child_info <- tbl(l2t_backend, "Child") %>% 
+df_child_info <- tbl(l2t_backend, "Child") %>% 
   left_join(tbl(l2t_backend, "ChildStudy")) %>% 
   left_join(tbl(l2t_backend, "Study")) %>% 
+  filter(Study %in% c("DialectSwitch", "MaternalEd")) %>% 
+  rename(ResearchID = ShortResearchID) %>% 
   collect() %>% 
   left_join(collect(tbl(l2t_main, "Maternal_Education"))) %>% 
-  select(Study, ResearchID = ShortResearchID, ChildID, ChildStudyID, 
+  select(Study, ResearchID, ChildID, ChildStudyID, 
          Female, AAE, LateTalker, CImplant, 
-         Maternal_Education, Maternal_Education_Level) %>% 
-  collect()
-child_info
-```
+         Maternal_Education, Maternal_Education_Level) 
 
+# Add some helper columns
+df_medu_scheme <- data_frame(
+  Maternal_Education_Level = c(NA, 1:7),
+  Maternal_Education_Group = c(NA, "Low", "Low", "Low", "Mid", 
+                               "Mid", "High", "High")
+)
+
+df_child_info <- df_child_info %>% 
+  left_join(df_medu_scheme) %>%
+  mutate(
+    Dialect = ifelse(AAE, "AAE", "MAE"),
+    Gender = ifelse(Female, "Girl", "Boy")) 
+
+df_child_info$Maternal_Education_Group <- factor(
+  df_child_info$Maternal_Education_Group, 
+  levels = c("Low", "Mid", "High")
+)
+```
 
 Attach research IDs and study names to the non-TP1 blocks.
 
 ```{r}
-tp2_stim_rwl_blocks <- rwl_blocks %>% 
-  left_join(child_info) %>% 
-  filter(StimSet == "Not TP1") %>% 
-  rename(BlockDialect = Dialect)
+df_rwl_blocks <- q_blocks_to_use %>% 
+  rename(BlockDialect = Dialect) %>% 
+  collect() %>% 
+  left_join(df_child_info)
 ```
 
 Now we count the number of dialects presented to each child to find out who
 received more than one version of the experiment.
 
 ```{r}
-children_who_got_multiple_dialects <- tp2_stim_rwl_blocks %>% 
+df_children_who_got_multiple_dialects <- df_rwl_blocks %>% 
   select(ChildID, AAE, BlockDialect) %>% 
   distinct() %>% 
   # Count the dialects presented to each child. Find multiple dialect children
@@ -196,145 +164,32 @@ children_who_got_multiple_dialects <- tp2_stim_rwl_blocks %>%
   ungroup() %>% 
   select(ChildID)
 
-medu_scheme <- data_frame(
-  Maternal_Education_Level = c(NA, 1:7),
-  Maternal_Education_Group = c(NA, "Low", "Low", "Low", "Mid", 
-                               "Mid", "High", "High")
-)
-
-blocks_to_keep <- tp2_stim_rwl_blocks %>% 
-  inner_join(children_who_got_multiple_dialects) %>% 
-  left_join(medu_scheme) %>% 
-  filter(Study %in% c("DialectSwitch", "MaternalEd")) %>% 
-  select(Study, ResearchID, BlockDialect, Block_Age,
-         BlockID, ChildStudyID, ChildID:Maternal_Education_Group) %>% 
-  mutate(
-    Dialect = ifelse(AAE, "AAE", "MAE"),
-    Gender = ifelse(Female, "Girl", "Boy")) 
-
-blocks_to_keep$Maternal_Education_Group <- factor(
-  blocks_to_keep$Maternal_Education_Group, 
-  levels = c("Low", "Mid", "High")
-)
+df_blocks_to_keep <- df_rwl_blocks %>% 
+  inner_join(df_children_who_got_multiple_dialects)
 ```
 
 One child apparently got three blocks. Figure out which block to manually
 exclude.
 
 ```{r}
-# Download the trial id's
-rwl_trials <- tbl(l2t_eyetracking, "q_TrialsByStudy") %>% 
-  filter(Task == "RWL") %>% 
-  collect()
-
-three_blocks <- rwl_trials %>% 
-  inner_join(blocks_to_keep) %>% 
-  distinct(Study, ResearchID, BlockID, DateTime) %>% 
-  count(ResearchID) %>% 
+q_blocks_to_use %>% 
+  group_by(ResearchID) %>% 
+  tally() %>% 
+  collect() %>% 
   filter(n > 2)
 
-rwl_trials %>% 
-  inner_join(blocks_to_keep) %>% 
-  semi_join(three_blocks) %>% 
-  distinct(Study, ResearchID, BlockID, BlockDialect, DateTime)
+q_blocks_to_use %>% 
+  collect() %>% 
+  filter(ResearchID == "436D")
 
 # Skip the latest redundant plock
-blocks_to_keep <- blocks_to_keep %>% 
-  filter(BlockID != 1231)
+df_blocks_to_keep <- df_blocks_to_keep %>% 
+  filter(DateTime != "2014-04-01 09:52:14")
+
+# Update the server-side query to use the restricted subset of blocks
+q_blocks_to_use <- q_blocks_to_use %>% 
+  filter(BlockID %in% df_blocks_to_keep$BlockID)
 ```
-
-
-
-
-## Summarize child-level information
-
-Now that we know which blocks to include, we can get the vocabulary scores for
-the children who contributed those blocks.
-
-```{r}
-evt <- tbl(l2t_main, "EVT") %>% 
-  select(Study, ResearchID, EVT_Age:EVT_Standard) %>% 
-  collect()
-
-ppvt <- tbl(l2t_main, "PPVT") %>% 
-  select(Study, ResearchID, PPVT_Age:PPVT_Standard) %>% 
-  collect()
-
-child_vars <- blocks_to_keep %>% 
-  select(Study, ResearchID, ChildStudyID, Female:Gender) %>% 
-  distinct()%>% 
-  inner_join(evt) %>% 
-  inner_join(ppvt)
-```
-
-Boys/girls by native dialect.
-
-```{r}
-child_vars %>% 
-  count(Dialect, Gender) %>% 
-  ungroup() %>% 
-  rename(`N Children` = n) %>% 
-  knitr::kable()
-```
-
-Maternal education by native dialect.
-
-```{r}
-child_vars %>% 
-  count(Dialect, Maternal_Education_Group) %>% 
-  ungroup() %>% 
-  rename(`N Children` = n) %>%   
-  knitr::kable() 
-
-child_vars %>% 
-  count(Dialect, Maternal_Education_Group) %>% 
-  ungroup() %>% 
-  tidyr::spread(Dialect, n) %>% 
-  knitr::kable()
-
-child_vars %>% 
-  count(Dialect, Maternal_Education_Group, Maternal_Education) %>% 
-  ungroup() %>% 
-  tidyr::spread(Dialect, n) %>% 
-  tidyr::replace_na(list(AAE = 0, MAE = 0)) %>% 
-  knitr::kable()
-```
-
-
-Child level measures by dialect group.
-
-```{r}
-child_vars %>% 
-  group_by(Dialect) %>% 
-  summarise(
-    `N Children` = n(), 
-    `Mean Age (months)` = mean(EVT_Age),
-    `SD Age (months)` = sd(EVT_Age),
-    `N EVT` = sum(!is.na(EVT_Raw)), 
-    `Mean EVT Standard` = mean(EVT_Standard),
-    `SD EVT Standard` = sd(EVT_Standard),
-    `N PPVT` = sum(!is.na(PPVT_Raw)), 
-    `Mean PPVT Standard` = mean(PPVT_Standard),
-    `SD PPVT Standard` = sd(PPVT_Standard)) %>% 
-  knitr::kable(digits = 1)
-
-
-child_vars %>% 
-  group_by(Maternal_Education_Group) %>% 
-  summarise(
-    `N Children` = n(), 
-    `Mean Age (months)` = mean(EVT_Age),
-    `SD Age (months)` = sd(EVT_Age),
-    `N EVT` = sum(!is.na(EVT_Raw)), 
-    `Mean EVT Standard` = mean(EVT_Standard),
-    `SD EVT Standard` = sd(EVT_Standard),
-    `N PPVT` = sum(!is.na(PPVT_Raw)), 
-    `Mean PPVT Standard` = mean(PPVT_Standard),
-    `SD PPVT Standard` = sd(PPVT_Standard)) %>% 
-  knitr::kable(digits = 1)
-```
-
-
 
 
 ## Download the gaze data
@@ -342,26 +197,35 @@ child_vars %>%
 Download the eyetracking data
 
 ```{r}
-# Download the gazes
-raw_rwl_looks <- tbl(l2t_eyetracking, "Looks") %>% 
+# Keep just the trials in the blocks we want
+q_rwl_trials <- tbl(l2t_eyetracking, "Trials") %>% 
+  semi_join(q_blocks_to_use)
+
+# Download the gazes in those trials
+df_raw_rwl_looks <- tbl(l2t_eyetracking, "Looks") %>% 
+  inner_join(q_rwl_trials) %>% 
   select(TrialID, Time, GazeByImageAOI) %>% 
-  collect(n = Inf) %>% 
-  inner_join(rwl_trials)
+  collect(n = Inf) 
 
-rwl_looks <- raw_rwl_looks %>% 
-  inner_join(blocks_to_keep) 
+df_rwl_looks <- df_raw_rwl_looks %>% 
+  inner_join(collect(q_rwl_trials)) %>% 
+  inner_join(df_blocks_to_keep) %>% 
+  rename(TrialNo = Trial_TrialNo)
 
-rwl_looks <- rwl_looks %>% 
-  left_join(child_vars) %>% 
-  select(Study, ResearchID, Dialect, BlockDialect, Block_Age,
-         BlockID, ChildID:Maternal_Education_Level, 
-         Maternal_Education_Group:PPVT_Standard,
-         TrialID, TrialNo, Time, GazeByImageAOI)
 
-rwl_looks <- rwl_looks %>% 
-  mutate(
-    BlockDialect = ifelse(BlockDialect == "AAE", "AAE", "MAE"),
-    HearsNativeDialect = Dialect == BlockDialect)
+
+# rwl_looks <- rwl_looks %>% 
+#   left_join(blocks_to_keep) %>% 
+#   left_join(child_info) %>% 
+#   select(Study, ResearchID, Dialect, BlockDialect, Block_Age,
+#          BlockID, ChildID:Maternal_Education_Level, 
+#          Maternal_Education_Group:PPVT_Standard,
+#          TrialID, TrialNo, Time, GazeByImageAOI)
+# 
+# # rwl_looks %>% filter(is.na(Dialect))
+# 
+# rwl_looks <- rwl_looks %>% 
+
 ```
 
 
@@ -378,47 +242,50 @@ averaged across trials.
 library(lookr)
 library(ggplot2)
 
-participants_to_drop <- rwl_looks %>% 
-  filter(between(Time, 0, 2005)) %>% 
+df_participants_to_drop <- df_rwl_looks %>% 
+  filter(between(Time, -20, 2020)) %>% 
   AggregateLooks(Dialect + BlockID + ResearchID ~ GazeByImageAOI) %>%
   tibble::as_tibble() %>% 
   filter(PropNA > .5) %>% 
-  select(NativeDialect = Dialect, ResearchID)
-
-participants_to_drop
+  select(NativeDialect = Dialect, ResearchID) %>% 
+  print()
 ```
 
-`r nrow(participants_to_drop)` participants are dropped for excessive
+`r nrow(df_participants_to_drop)` participants are dropped for excessive
 missing data.
 
 Filter out individual trials with excessive missing data.
 
 ```{r}
-trials_to_drop  <- rwl_looks %>% 
-  anti_join(participants_to_drop) %>% 
-  filter(between(Time, 0, 2005)) %>%
+df_trials_to_drop  <- df_rwl_looks %>% 
+  anti_join(df_participants_to_drop) %>% 
+  filter(between(Time, -20, 2020)) %>% 
   AggregateLooks(Dialect + TrialID + ResearchID ~ GazeByImageAOI) %>% 
   tibble::as_tibble() %>% 
   filter(PropNA > .5) %>% 
   select(NativeDialect = Dialect, ResearchID, TrialID)
 
-trials_to_drop %>% 
+df_trials_to_drop %>% 
   count(NativeDialect)
 ```
 
-`r nrow(trials_to_drop)` additional trials are dropped.
+`r nrow(df_trials_to_drop)` additional trials are dropped.
 
 
 Data quality stats for remaining children.
 
 ```{r}
-rwl_looks %>%
-  anti_join(participants_to_drop) %>% 
-  anti_join(trials_to_drop) %>% 
-  filter(between(Time, 0, 2005)) %>% 
-  AggregateLooks(Dialect + ResearchID + TrialID ~ GazeByImageAOI) %>% 
+df_rwl_looks <- df_rwl_looks %>% 
+  anti_join(df_participants_to_drop) %>% 
+  anti_join(df_trials_to_drop) %>% 
+  mutate(BlockDialect = ifelse(BlockDialect == "AAE", "AAE", "MAE"),
+         HearsNativeDialect = Dialect == BlockDialect)
+
+df_rwl_looks %>%
+  filter(between(Time, -20, 2020)) %>% 
+  AggregateLooks(Dialect + BlockDialect + ResearchID + TrialID ~ GazeByImageAOI) %>% 
   tibble::as_tibble() %>% 
-  group_by(Dialect, ResearchID) %>% 
+  group_by(Dialect, BlockDialect, ResearchID) %>% 
   summarise(
     nGoodTrials = n(),
     Mean_Prop_NA = mean(PropNA)) %>% 
@@ -434,41 +301,153 @@ rwl_looks %>%
     `Min Prop Missing` = min(Mean_Prop_NA) %>% round(3),
     `Max Prop Missing` = max(Mean_Prop_NA) %>% round(3)) %>% 
   knitr::kable()
+
+df_participants <- df_rwl_looks %>% 
+  distinct(Study, ResearchID, ChildStudyID)
+
+df_child_info <- df_child_info %>% inner_join(df_participants)
 ```
 
 
+
+## Summarize child-level information
+
+Now that we know which blocks to include, we can get the vocabulary scores for
+the children who contributed those blocks.
+
+```{r}
+df_evt <- tbl(l2t_main, "EVT") %>% 
+  select(Study, ResearchID, EVT_Age:EVT_Standard) %>% 
+  collect()
+
+df_ppvt <- tbl(l2t_main, "PPVT") %>% 
+  select(Study, ResearchID, PPVT_Age:PPVT_Standard) %>% 
+  collect()
+
+df_child_vars <- df_child_info %>% 
+  select(Study, ResearchID, ChildStudyID, Female:Gender) %>% 
+  distinct() %>% 
+  left_join(df_evt) %>% 
+  left_join(df_ppvt)
+```
+
+Boys/girls by native dialect.
+
+```{r}
+df_child_vars %>% 
+  count(Dialect, Gender) %>% 
+  ungroup() %>% 
+  rename(`N Children` = n) %>% 
+  knitr::kable()
+```
+
+Maternal education by native dialect.
+
+```{r}
+df_child_vars %>% 
+  count(Dialect, Maternal_Education_Group) %>% 
+  ungroup() %>% 
+  rename(`N Children` = n) %>%   
+  knitr::kable() 
+
+df_child_vars %>% 
+  count(Dialect, Maternal_Education_Group) %>% 
+  ungroup() %>% 
+  tidyr::spread(Dialect, n) %>% 
+  knitr::kable()
+
+df_child_vars %>% 
+  count(Dialect, Maternal_Education_Group, Maternal_Education) %>% 
+  ungroup() %>% 
+  tidyr::spread(Dialect, n) %>% 
+  tidyr::replace_na(list(AAE = 0, MAE = 0)) %>% 
+  knitr::kable()
+```
+
+
+Child level measures by dialect group.
+
+```{r}
+narm_mean <- function(...) mean(..., na.rm = TRUE)
+narm_sd <- function(...) sd(..., na.rm = TRUE)
+narm_n <- function(...) sum(!is.na(...))
+
+df_child_vars %>% 
+  group_by(Dialect) %>% 
+  summarise(
+    `N Children` = n(), 
+    sum(Female),
+    `Mean Age (months)` = narm_mean(EVT_Age),
+    `SD Age (months)` = narm_sd(EVT_Age),
+    `N EVT` = narm_n(EVT_Raw), 
+    `Mean EVT Standard` = narm_mean(EVT_Standard),
+    `SD EVT Standard` = narm_sd(EVT_Standard),
+    `N PPVT` = narm_n(PPVT_Raw), 
+    `Mean PPVT Standard` = narm_mean(PPVT_Standard),
+    `SD PPVT Standard` = narm_sd(PPVT_Standard)) %>% 
+  knitr::kable(digits = 1)
+
+df_child_vars %>% 
+  group_by(Dialect, Maternal_Education_Group) %>% 
+  summarise(
+    `N Children` = n(), 
+    `Mean Age (months)` = narm_mean(EVT_Age),
+    `SD Age (months)` = narm_sd(EVT_Age),
+    `N EVT` = narm_n(EVT_Raw), 
+    `Mean EVT Standard` = narm_mean(EVT_Standard),
+    `SD EVT Standard` = narm_sd(EVT_Standard),
+    `N PPVT` = narm_n(PPVT_Raw), 
+    `Mean PPVT Standard` = narm_mean(PPVT_Standard),
+    `SD PPVT Standard` = narm_sd(PPVT_Standard)) %>% 
+  knitr::kable(digits = 1)
+```
+
 ## Finally, plots of fixation patterns over time
+
+Assign the individual frames into 50-ms bins.
+
+```{r}
+df_bin_times <- df_rwl_looks %>%  
+  filter(between(Time, -520, 2020)) %>% 
+  distinct(Time) %>% 
+  mutate(Bin = lookr::AssignBins(Time, bin_width = 3)) %>% 
+  group_by(Bin) %>% 
+  mutate(BinTime = Time %>% median() %>% round(-1)) %>% 
+  ungroup()
+df_bin_times
+```
+
+
+
 
 Aggregated looking data over Time across trials within Dialect x BlockDialect
 within Child.
 
 ```{r}
-looks <- rwl_looks %>%
-  anti_join(participants_to_drop) %>% 
-  anti_join(trials_to_drop) %>% 
-  filter(between(Time, -505, 2005)) %>% 
+df_looks <- df_rwl_looks %>%
+  inner_join(df_bin_times) %>% 
   AggregateLooks(Maternal_Education_Group + Study + Dialect + BlockDialect + 
-                   HearsNativeDialect + ResearchID + Time ~ GazeByImageAOI) %>% 
+                   HearsNativeDialect + ResearchID + BinTime ~ GazeByImageAOI) %>% 
   tibble::as_tibble() %>% 
+  rename(Time = BinTime) %>% 
   mutate(Looks_Images = Target + Others,
        Prop_Target = Target / Looks_Images,
        Prop_PhonologicalFoil = PhonologicalFoil / Looks_Images,
        Prop_SemanticFoil = SemanticFoil / Looks_Images,
        Prop_Unrelated = Unrelated / Looks_Images)
 
-evt <- child_vars %>% 
+df_evt <- df_child_vars %>% 
   mutate(Vocab3tile = ntile(EVT_Standard, 3), 
          `Exp. vocab.` = factor(Vocab3tile, 1:3, 
                                 c("Lower third", "Middle third", "Upper third"))) %>% 
   select(Study, ResearchID, Vocab3tile, `Exp. vocab.`)
 
-looks <- looks %>% 
+df_looks <- df_looks %>% 
   mutate(`Child hears` = ifelse(HearsNativeDialect, "Native dialect", 
                                 "Non-native dialect"),
          `Native dialect` = Dialect,
          `Maternal edu.` = Maternal_Education_Group) %>% 
-  left_join(evt)
-
+  left_join(df_evt)
 ```
 
 
@@ -481,7 +460,14 @@ plot_text <- list(
   caption_mean_se = "Mean ± SE"
 )
 
-ggplot(looks) + 
+legend_position <- theme(
+  legend.position = "bottom", 
+  legend.text = element_text(size = 10), 
+  legend.justification = "left")
+
+colors <- viridis::scale_color_viridis(end = .7, discrete = TRUE)
+
+ggplot(df_looks) + 
   aes(x = Time, y = Proportion) +   
   geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
   geom_vline(xintercept = 0, size = 1.25, color = "#cccccc") + 
@@ -491,28 +477,42 @@ ggplot(looks) +
        y = plot_text$y_target, 
        caption = plot_text$caption_mean_se)
 
-ggplot(looks) + 
+ggplot(df_looks) + 
   aes(x = Time, y = Proportion, color = `Child hears`) + 
   geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
   geom_vline(xintercept = 0, size = 1.25, color = "#cccccc") + 
   stat_summary() + 
   theme_ipsum_rc(axis_title_size = 11) + 
-  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  legend_position + 
   labs(x = plot_text$x_time, 
-       y = plot_text$y_target)
+       y = plot_text$y_target) + 
+  colors
 
-ggplot(looks) + 
+ggplot(df_looks) + 
   aes(x = Time, y = Proportion, color = `Child hears`) + 
   geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
   stat_summary() + 
   theme_ipsum_rc(axis_title_size = 11) + 
-  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
+  legend_position + 
   labs(x = plot_text$x_time, 
        y = plot_text$y_target) +
   facet_wrap("`Native dialect`", labeller = label_both) + 
+  xlim(0, 2000) + 
+  colors
+
+ggplot(df_looks %>% filter(!is.na(`Exp. vocab.`))) + 
+  aes(x = Time, y = Proportion, color = `Child hears`) + 
+  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
+  stat_summary() + 
+  theme_ipsum_rc(axis_title_size = 11) + 
+  legend_position + 
+  colors +
+  labs(x = plot_text$x_time, 
+       y = plot_text$y_target) +
+  facet_wrap("`Exp. vocab.`", labeller = label_both) + 
   xlim(0, 2000)
 
-ggplot(looks %>% filter(!is.na(Maternal_Education_Group))) + 
+ggplot(df_looks %>% filter(!is.na(Maternal_Education_Group))) + 
   aes(x = Time, y = Proportion, color = `Child hears`) + 
   geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
   stat_summary() + 
@@ -522,23 +522,14 @@ ggplot(looks %>% filter(!is.na(Maternal_Education_Group))) +
        y = plot_text$y_target) +
   facet_wrap("`Maternal edu.`", labeller = label_both) + 
   xlim(0, 2000)
-
-ggplot(looks %>% filter(!is.na(`Exp. vocab.`))) + 
-  aes(x = Time, y = Proportion, color = `Child hears`) + 
-  geom_hline(yintercept = .25, size = 1.25, color = "#cccccc") + 
-  stat_summary() + 
-  theme_ipsum_rc(axis_title_size = 11) + 
-  theme(legend.position = "bottom", legend.text = element_text(size = 10)) + 
-  labs(x = plot_text$x_time, 
-       y = plot_text$y_target) +
-  facet_wrap("`Exp. vocab.`", labeller = label_both) + 
-  xlim(0, 2000)
 ```
+
+
 
 ## Plot looks to each competitor type.
 
 ```{r aoi-plots}
-df_looks_to_aois <- looks %>% 
+df_looks_to_aois <- df_looks %>% 
   select(Study, ResearchID, `Child hears`:`Maternal edu.`, `Exp. vocab.`,
          Time, starts_with("Prop_")) %>% 
   tidyr::gather(AOI, Proportion, starts_with("Prop_")) %>% 
@@ -671,6 +662,8 @@ ggplot(df_looks_to_aois) +
 
 ```
 
+By vocabulary.
+
 ```{r by-vocabulary}
 ggplot(df_looks_to_aois %>% 
          filter(Image == "Phonological foil", !is.na(`Exp. vocab.`))) + 
@@ -696,6 +689,4 @@ last_plot() %+%
 last_plot() %+% 
   filter(df_looks_to_aois, 
          Image == "Target word", !is.na(`Exp. vocab.`)) 
-
 ```
-
