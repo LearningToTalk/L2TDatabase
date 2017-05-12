@@ -45,7 +45,7 @@ df_matches <- tbl(l2t_main, "CIMatching") %>%
   left_join(tbl(l2t_main, "PPVT")) %>% 
   left_join(tbl(l2t_main, "GFTA")) %>% 
   select(Group = Matching_Group, Matching_PairNumber, ChildStudyID, 
-         Study, ResearchID, 
+         Study, ResearchID, ChildID,
          Female, AAE, LateTalker, CImplant, 
          Maternal_Education, Maternal_Education_Level, 
          EVT_Age, EVT_Raw, EVT_GSV, EVT_Standard,
@@ -490,6 +490,30 @@ p5
 
 ## Look at the MP data
 
+
+```{r}
+df_mp %>% 
+  distinct(Study, ResearchID, Group, Matching_PairNumber) %>% 
+  inner_join(df_matches) %>% 
+  distinct(Group, ChildID) %>% 
+  count(Group)
+
+df_mp %>% 
+  distinct(Study, ResearchID, Group, Matching_PairNumber) %>% 
+  inner_join(df_matches) %>% 
+  count(Group, ChildID) %>% 
+  ungroup() %>% 
+  count(Group, n)
+
+df_mp %>% 
+  distinct(Study, ResearchID, Group, Matching_PairNumber) %>% 
+  inner_join(df_matches) %>% 
+  group_by(Group) %>% 
+  summarise(MinAge = min(EVT_Age), MaxAge = max(EVT_Age))
+```
+
+
+
 Similar steps as above. Let's downsample into 50ms bins, and aggregate the
 number of looks.
 
@@ -570,10 +594,31 @@ p3 <- ggplot(df_plot) +
   geom_hline(yintercept = .5, size = 2, color = "white") + 
   stat_summary(fun.data = mean_se, geom = "pointrange") +
   p_theme + curr_labs + 
-  viridis::scale_color_viridis(discrete = TRUE, option = "viridis", end = .8)
+  viridis::scale_color_viridis(discrete = TRUE, option = "viridis", end = .8) +
   labs(shape = "Group")
 p3
 ```
+
+```{r}
+df_model_a <- df_plot %>% 
+  filter(between(Time, 250, 1500), 
+         Condition != "nonword") %>% 
+  mutate(Group = factor(Group, c("NormalHearing", "CochlearImplant")))
+
+library(rstanarm)
+options(mc.cores = parallel::detectCores())
+
+m <- stan_glmer(
+  cbind(Target, Distractor) ~ poly(Time, 3) * Condition * Group + 
+    (poly(Time, 3) | ChildStudyID:Condition),
+  family = binomial, 
+  prior = normal(0, 40),
+  prior_covariance = decov(regularization = 2),
+  data = df_model_a)
+save(m, "model.Rdata")
+```
+
+
 
 ### Mispronunciation effects
 
