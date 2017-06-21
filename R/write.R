@@ -8,9 +8,10 @@
 #' @export
 append_rows_to_table <- function(src, tbl_name, rows) {
   # Unpack dplyr connection
-  if (inherits(src, "src_mysql")) {
-    db_name <- src$info$dbname
+  if (inherits(src, "src_dbi")) {
+    dplyr_src <- src
     src <- src$con
+    db_name <- DBI::dbGetInfo(src)[["dbname"]]
   }
 
   # Confirm classes
@@ -92,10 +93,10 @@ find_new_rows_in_table <- function(data, ref_data, required_cols, extra_cols = c
 #' @export
 overwrite_rows_in_table <- function(src, tbl_name, rows, preview = TRUE) {
   # Unpack dplyr connection
-  if (inherits(src, "src_mysql")) {
-    db_name <- src$info$dbname
+  if (inherits(src, "src_dbi")) {
     dplyr_src <- src
     src <- src$con
+    db_name <- DBI::dbGetInfo(src)[["dbname"]]
   }
 
   # Confirm classes
@@ -300,10 +301,10 @@ find_updates_in_daff <- function(ref_data, new_data) {
 #' @inherit overwrite_rows_in_table return
 delete_rows_in_table <- function(src, tbl_name, rows, guard = TRUE, preview = TRUE) {
   # Unpack dplyr connection
-  if (inherits(src, "src_mysql")) {
-    db_name <- src$info$dbname
+  if (inherits(src, "src_dbi")) {
     dplyr_src <- src
     src <- src$con
+    db_name <- DBI::dbGetInfo(src)[["dbname"]]
   }
 
   # Confirm classes

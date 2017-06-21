@@ -64,10 +64,9 @@ l2t_backup <- function(src, backup_dir) {
 #'   DataType, DefaultValue, NullAllowed (whether blanks are allowed),
 #'   Description (the comment field from the table structure).
 #' @export
-#' @importFrom DBI dbGetQuery
 describe_tbl <- function(src, tbl_name) {
   # Borrow connection if it's a dplyr connection. Not sure if this is dangerous
-  if (inherits(src, "src_mysql")) src <- src$con
+  if (inherits(src, "src_dbi")) src <- src$con
   assert_that(inherits(src, "MySQLConnection"))
 
   # Make sure table exists
@@ -75,7 +74,7 @@ describe_tbl <- function(src, tbl_name) {
 
   # Get the table description
   this_query <- sprintf("SHOW FULL COLUMNS FROM %s", tbl_name)
-  info <- dbGetQuery(src, statement = this_query)
+  info <- DBI::dbGetQuery(src, statement = this_query)
 
   info <- info %>%
     mutate(Table = tbl_name) %>%
@@ -92,17 +91,18 @@ describe_tbl <- function(src, tbl_name) {
 #'   dataframe: Database, Table, (number of) Rows, Description (comment field
 #'   for the table)
 #' @export
-#' @importFrom DBI dbGetQuery
 describe_db <- function(src) {
-  # Borrow connection if it's a dplyr connection. Not sure if this is dangerous
-  if (inherits(src, "src_mysql")) {
-    db_name <- src$info$dbname
+  # Unpack dplyr connection
+  if (inherits(src, "src_dbi")) {
+    dplyr_src <- src
     src <- src$con
+    db_name <- DBI::dbGetInfo(src)[["dbname"]]
   }
+
   assert_that(inherits(src, "MySQLConnection"))
 
   # Get the description
-  info <- dbGetQuery(src, statement = "SHOW TABLE STATUS")
+  info <- DBI::dbGetQuery(src, statement = "SHOW TABLE STATUS")
 
   info <- info %>%
     mutate(Database = db_name) %>%

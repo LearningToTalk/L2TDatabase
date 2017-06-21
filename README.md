@@ -87,20 +87,19 @@ library("dplyr", warn.conflicts = FALSE)
 # use tbl to create a link to a tbl in the database
 minp_resp <- tbl(src = l2t, from = "MinPair_Trials") 
 minp_resp
-#> Source:   query [?? x 13]
-#> Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2t]
-#> 
+#> # Source:   table<MinPair_Trials> [?? x 13]
+#> # Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2t]
 #>               Study ResearchID MinPair_EprimeFile MinPair_Dialect
 #>               <chr>      <chr>              <chr>           <chr>
-#> 1  CochlearMatching       390A     MINP_390A69FS3             SAE
-#> 2  CochlearMatching       390A     MINP_390A69FS3             SAE
-#> 3  CochlearMatching       390A     MINP_390A69FS3             SAE
-#> 4  CochlearMatching       390A     MINP_390A69FS3             SAE
-#> 5  CochlearMatching       390A     MINP_390A69FS3             SAE
-#> 6  CochlearMatching       390A     MINP_390A69FS3             SAE
-#> 7  CochlearMatching       390A     MINP_390A69FS3             SAE
-#> 8  CochlearMatching       390A     MINP_390A69FS3             SAE
-#> 9  CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  1 CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  2 CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  3 CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  4 CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  5 CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  6 CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  7 CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  8 CochlearMatching       390A     MINP_390A69FS3             SAE
+#>  9 CochlearMatching       390A     MINP_390A69FS3             SAE
 #> 10 CochlearMatching       390A     MINP_390A69FS3             SAE
 #> # ... with more rows, and 9 more variables: MinPair_Completion <chr>,
 #> #   MinPair_Age <int>, MinPair_TrialType <chr>, MinPair_Trial <int>,
@@ -115,41 +114,42 @@ man_moon_practice <- minp_resp %>%
   filter(MinPair_Item1 == "man", MinPair_Item2 == "moon") %>% 
   select(Study, ResearchID, MinPair_TargetItem, MinPair_Correct)
 man_moon_practice
-#> Source:   query [?? x 4]
-#> Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2t]
-#> 
+#> # Source:   lazy query [?? x 4]
+#> # Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2t]
 #>               Study ResearchID MinPair_TargetItem MinPair_Correct
 #>               <chr>      <chr>              <chr>           <int>
-#> 1  CochlearMatching       390A               moon               1
-#> 2  CochlearMatching       390A                man               1
-#> 3  CochlearMatching       391A               moon               1
-#> 4  CochlearMatching       391A                man               1
-#> 5  CochlearMatching       393A               moon               1
-#> 6  CochlearMatching       393A                man               1
-#> 7        CochlearV1       300E               moon               1
-#> 8        CochlearV1       300E                man               1
-#> 9        CochlearV1       301E               moon               0
+#>  1 CochlearMatching       390A               moon               1
+#>  2 CochlearMatching       390A                man               1
+#>  3 CochlearMatching       391A               moon               1
+#>  4 CochlearMatching       391A                man               1
+#>  5 CochlearMatching       393A               moon               1
+#>  6 CochlearMatching       393A                man               1
+#>  7       CochlearV1       300E               moon               1
+#>  8       CochlearV1       300E                man               1
+#>  9       CochlearV1       301E               moon               0
 #> 10       CochlearV1       301E                man               1
 #> # ... with more rows
 ```
 
-This data lives in "the cloud" on a remote computer. That's why the first line of the print out says `Source: query [?? x 4]`. When we print the data as we did above, dplyr downloads just enough rows of data to give us a preview of the data. There are approximately 12,000 rows of data in the `minp_resp` table, and this just-a-preview behavior prevented us from accidentally or prematurely downloading thousands of rows when we peeked at the data. We have to **use `collect()` to download data to our computer**.
+This data lives in "the cloud" on a remote computer. That's why the first line of the print out says `Source: lazy query [?? x 4]`.
+
+When we print the data as we did above, dplyr downloads just enough rows of data to give us a preview of the data. There are approximately 12,000 rows of data in the `minp_resp` table, and this just-a-preview behavior prevented us from accidentally or prematurely downloading thousands of rows when we peeked at the data. We have to **use `collect()` to download data to our computer**.
 
 ``` r
 man_moon_practice <- collect(man_moon_practice)
 man_moon_practice
-#> # A tibble: 884 × 4
+#> # A tibble: 884 x 4
 #>               Study ResearchID MinPair_TargetItem MinPair_Correct
 #>               <chr>      <chr>              <chr>           <int>
-#> 1  CochlearMatching       390A               moon               1
-#> 2  CochlearMatching       390A                man               1
-#> 3  CochlearMatching       391A               moon               1
-#> 4  CochlearMatching       391A                man               1
-#> 5  CochlearMatching       393A               moon               1
-#> 6  CochlearMatching       393A                man               1
-#> 7        CochlearV1       300E               moon               1
-#> 8        CochlearV1       300E                man               1
-#> 9        CochlearV1       301E               moon               0
+#>  1 CochlearMatching       390A               moon               1
+#>  2 CochlearMatching       390A                man               1
+#>  3 CochlearMatching       391A               moon               1
+#>  4 CochlearMatching       391A                man               1
+#>  5 CochlearMatching       393A               moon               1
+#>  6 CochlearMatching       393A                man               1
+#>  7       CochlearV1       300E               moon               1
+#>  8       CochlearV1       300E                man               1
+#>  9       CochlearV1       301E               moon               0
 #> 10       CochlearV1       301E                man               1
 #> # ... with 874 more rows
 ```
@@ -169,20 +169,20 @@ Information about our participants and their testing data are stored in two sepa
 # list all the tbls in the database
 src_tbls(l2t)
 #>  [1] "BRIEF"                   "Blending_Summary"       
-#>  [3] "CTOPP_Blending"          "CTOPP_Elision"          
-#>  [5] "CTOPP_Memory"            "DELV_Risk"              
-#>  [7] "DELV_Variation"          "EVT"                    
-#>  [9] "FruitStroop"             "GFTA"                   
-#> [11] "KBIT"                    "LENA_Averages"          
-#> [13] "Maternal_Education"      "MinPair_Aggregate"      
-#> [15] "MinPair_Dialect_Summary" "MinPair_Trials"         
-#> [17] "PPVT"                    "Rhyming_Aggregate"      
-#> [19] "SAILS_Aggregate"         "SAILS_Module_Aggregate" 
-#> [21] "Scores_CochlearMatching" "Scores_CochlearV1"      
-#> [23] "Scores_CochlearV2"       "Scores_TimePoint1"      
-#> [25] "Scores_TimePoint2"       "Scores_TimePoint3"      
-#> [27] "Task_Ages"               "Task_Ages_Summary"      
-#> [29] "VerbalFluency"
+#>  [3] "CIMatching"              "CTOPP_Blending"         
+#>  [5] "CTOPP_Elision"           "CTOPP_Memory"           
+#>  [7] "DELV_Risk"               "DELV_Variation"         
+#>  [9] "EVT"                     "FruitStroop"            
+#> [11] "GFTA"                    "KBIT"                   
+#> [13] "LENA_Averages"           "Maternal_Education"     
+#> [15] "MinPair_Aggregate"       "MinPair_Dialect_Summary"
+#> [17] "MinPair_Trials"          "PPVT"                   
+#> [19] "Rhyming_Aggregate"       "SAILS_Aggregate"        
+#> [21] "SAILS_Module_Aggregate"  "Scores_CochlearMatching"
+#> [23] "Scores_CochlearV1"       "Scores_CochlearV2"      
+#> [25] "Scores_TimePoint1"       "Scores_TimePoint2"      
+#> [27] "Scores_TimePoint3"       "Task_Ages"              
+#> [29] "Task_Ages_Summary"       "VerbalFluency"
 ```
 
 The tables here are *queries*: Tables that are computed on-the-fly whenever the data is requested. For example, `MinPair_Aggregate` shows the proportion correct of non-practice trials in the minimal pairs task by participant and by study. (I `select()` a subset of columns to exclude unnecessary columns like the name of the Eprime file containing the raw data.) The `Study` and `ResearchID` are the conventional identifiers for studies and participants.
@@ -190,20 +190,19 @@ The tables here are *queries*: Tables that are computed on-the-fly whenever the 
 ``` r
 tbl(l2t, "MinPair_Aggregate") %>% 
   select(Study, ResearchID, MinPair_Dialect, MinPair_ProportionCorrect)
-#> Source:   query [?? x 4]
-#> Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2t]
-#> 
+#> # Source:   lazy query [?? x 4]
+#> # Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2t]
 #>               Study ResearchID MinPair_Dialect MinPair_ProportionCorrect
 #>               <chr>      <chr>           <chr>                     <dbl>
-#> 1  CochlearMatching       390A             SAE                    1.0000
-#> 2  CochlearMatching       391A             SAE                    0.9667
-#> 3  CochlearMatching       393A             SAE                    0.9667
-#> 4        CochlearV1       300E             SAE                    0.6667
-#> 5        CochlearV1       301E             SAE                    0.7667
-#> 6        CochlearV1       302E             SAE                    0.6667
-#> 7        CochlearV1       303E             SAE                    0.9000
-#> 8        CochlearV1       304E             SAE                    0.3750
-#> 9        CochlearV1       305E             SAE                    0.5000
+#>  1 CochlearMatching       390A             SAE                    1.0000
+#>  2 CochlearMatching       391A             SAE                    0.9667
+#>  3 CochlearMatching       393A             SAE                    0.9667
+#>  4       CochlearV1       300E             SAE                    0.6667
+#>  5       CochlearV1       301E             SAE                    0.7667
+#>  6       CochlearV1       302E             SAE                    0.6667
+#>  7       CochlearV1       303E             SAE                    0.9000
+#>  8       CochlearV1       304E             SAE                    0.3750
+#>  9       CochlearV1       305E             SAE                    0.5000
 #> 10       CochlearV1       306E             SAE                    0.6667
 #> # ... with more rows
 ```
@@ -221,51 +220,52 @@ src_tbls(l2t_backend)
 #>  [1] "BRIEF"                             
 #>  [2] "Blending_Admin"                    
 #>  [3] "Blending_Responses"                
-#>  [4] "CTOPP_Blending"                    
-#>  [5] "CTOPP_Elision"                     
-#>  [6] "CTOPP_Memory"                      
-#>  [7] "Caregiver"                         
-#>  [8] "Caregiver_Entry"                   
-#>  [9] "Child"                             
-#> [10] "ChildStudy"                        
-#> [11] "DELV_Risk"                         
-#> [12] "DELV_Variation"                    
-#> [13] "EVT"                               
-#> [14] "FruitStroop"                       
-#> [15] "GFTA"                              
-#> [16] "Household"                         
-#> [17] "KBIT"                              
-#> [18] "LENA_Admin"                        
-#> [19] "LENA_Hours"                        
-#> [20] "Literacy"                          
-#> [21] "MinPair_Admin"                     
-#> [22] "MinPair_Responses"                 
-#> [23] "PPVT"                              
-#> [24] "RealWordRep_Admin"                 
-#> [25] "Rhyming_Admin"                     
-#> [26] "Rhyming_Responses"                 
-#> [27] "SAILS_Admin"                       
-#> [28] "SAILS_Responses"                   
-#> [29] "SES"                               
-#> [30] "SES_Entry"                         
-#> [31] "Study"                             
-#> [32] "VerbalFluency"                     
-#> [33] "q_Blending_ModulePropCorrect"      
-#> [34] "q_Blending_PropCorrect"            
-#> [35] "q_Blending_Summary"                
-#> [36] "q_Blending_SupportPropCorrect"     
-#> [37] "q_Household_Education"             
-#> [38] "q_Household_Maternal_Caregiver"    
-#> [39] "q_Household_Max_Maternal_Education"
-#> [40] "q_LENA_Averages"                   
-#> [41] "q_MinPair_Aggregate"               
-#> [42] "q_MinPair_Dialect_Summary"         
-#> [43] "q_Rhyming_Aggregate"               
-#> [44] "q_Rhyming_PropCorrect"             
-#> [45] "q_SAILS_Aggregate"                 
-#> [46] "q_SAILS_PropCorrect"               
-#> [47] "q_Task_Ages"                       
-#> [48] "q_Task_Ages_Summary"
+#>  [4] "CIMatching"                        
+#>  [5] "CTOPP_Blending"                    
+#>  [6] "CTOPP_Elision"                     
+#>  [7] "CTOPP_Memory"                      
+#>  [8] "Caregiver"                         
+#>  [9] "Caregiver_Entry"                   
+#> [10] "Child"                             
+#> [11] "ChildStudy"                        
+#> [12] "DELV_Risk"                         
+#> [13] "DELV_Variation"                    
+#> [14] "EVT"                               
+#> [15] "FruitStroop"                       
+#> [16] "GFTA"                              
+#> [17] "Household"                         
+#> [18] "KBIT"                              
+#> [19] "LENA_Admin"                        
+#> [20] "LENA_Hours"                        
+#> [21] "Literacy"                          
+#> [22] "MinPair_Admin"                     
+#> [23] "MinPair_Responses"                 
+#> [24] "PPVT"                              
+#> [25] "RealWordRep_Admin"                 
+#> [26] "Rhyming_Admin"                     
+#> [27] "Rhyming_Responses"                 
+#> [28] "SAILS_Admin"                       
+#> [29] "SAILS_Responses"                   
+#> [30] "SES"                               
+#> [31] "SES_Entry"                         
+#> [32] "Study"                             
+#> [33] "VerbalFluency"                     
+#> [34] "q_Blending_ModulePropCorrect"      
+#> [35] "q_Blending_PropCorrect"            
+#> [36] "q_Blending_Summary"                
+#> [37] "q_Blending_SupportPropCorrect"     
+#> [38] "q_Household_Education"             
+#> [39] "q_Household_Maternal_Caregiver"    
+#> [40] "q_Household_Max_Maternal_Education"
+#> [41] "q_LENA_Averages"                   
+#> [42] "q_MinPair_Aggregate"               
+#> [43] "q_MinPair_Dialect_Summary"         
+#> [44] "q_Rhyming_Aggregate"               
+#> [45] "q_Rhyming_PropCorrect"             
+#> [46] "q_SAILS_Aggregate"                 
+#> [47] "q_SAILS_PropCorrect"               
+#> [48] "q_Task_Ages"                       
+#> [49] "q_Task_Ages_Summary"
 ```
 
 Some of the tables in the backend are not tables of raw data but intermediate, helper queries that are used in the main database. These helpers queries are prefixed with `q_`. For example, `q_Household_Education`, `q_Household_Maternal_Caregiver`, and `q_Household_Max_Maternal_Education` are a pipeline of calculations that determine the highest maternal education level in each household.
@@ -336,16 +336,16 @@ describe_db(src = l2t_backend) %>% head()
 #> 1  backend              BRIEF  314
 #> 2  backend     Blending_Admin   65
 #> 3  backend Blending_Responses 1643
-#> 4  backend     CTOPP_Blending  245
-#> 5  backend      CTOPP_Elision  245
-#> 6  backend       CTOPP_Memory  175
+#> 4  backend         CIMatching   82
+#> 5  backend     CTOPP_Blending  245
+#> 6  backend      CTOPP_Elision  245
 #>                                                   Description
 #> 1 Scores from Behvr Rating Inventory of Exec Func (Preschool)
 #> 2                  Administrations of the Blending experiment
 #> 3           Trials and responses from the Blending experiment
-#> 4     Blending subtest of Comp Test of Phon Processing-2nd ed
-#> 5      Elision subtest of Comp Test of Phon Processing-2nd ed
-#> 6 MemForDigits subtest of Comp Test of Phon Processing-2nd ed
+#> 4       CI/NH pairs matched on age, mat. ed., sex, lab visits
+#> 5     Blending subtest of Comp Test of Phon Processing-2nd ed
+#> 6      Elision subtest of Comp Test of Phon Processing-2nd ed
 ```
 
 These two forms of metadata are backed up by the `l2t_backup()` helper function.
@@ -361,71 +361,72 @@ Here's how backing up the backend of the database looks:
 # back up each tbl
 backup_dir <- "./inst/backup"
 all_tbls <- l2t_backup(src = l2t_backend, backup_dir = backup_dir)
-#> Writing ./inst/backup/2017-04-25_09-21/BRIEF.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Blending_Admin.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Blending_Responses.csv
-#> Writing ./inst/backup/2017-04-25_09-21/CTOPP_Blending.csv
-#> Writing ./inst/backup/2017-04-25_09-21/CTOPP_Elision.csv
-#> Writing ./inst/backup/2017-04-25_09-21/CTOPP_Memory.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Caregiver.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Caregiver_Entry.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Child.csv
-#> Writing ./inst/backup/2017-04-25_09-21/ChildStudy.csv
-#> Writing ./inst/backup/2017-04-25_09-21/DELV_Risk.csv
-#> Writing ./inst/backup/2017-04-25_09-21/DELV_Variation.csv
-#> Writing ./inst/backup/2017-04-25_09-21/EVT.csv
-#> Writing ./inst/backup/2017-04-25_09-21/FruitStroop.csv
-#> Writing ./inst/backup/2017-04-25_09-21/GFTA.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Household.csv
-#> Writing ./inst/backup/2017-04-25_09-21/KBIT.csv
-#> Writing ./inst/backup/2017-04-25_09-21/LENA_Admin.csv
-#> Writing ./inst/backup/2017-04-25_09-21/LENA_Hours.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Literacy.csv
-#> Writing ./inst/backup/2017-04-25_09-21/MinPair_Admin.csv
-#> Writing ./inst/backup/2017-04-25_09-21/MinPair_Responses.csv
-#> Writing ./inst/backup/2017-04-25_09-21/PPVT.csv
-#> Writing ./inst/backup/2017-04-25_09-21/RealWordRep_Admin.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Rhyming_Admin.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Rhyming_Responses.csv
-#> Writing ./inst/backup/2017-04-25_09-21/SAILS_Admin.csv
-#> Writing ./inst/backup/2017-04-25_09-21/SAILS_Responses.csv
-#> Writing ./inst/backup/2017-04-25_09-21/SES.csv
-#> Writing ./inst/backup/2017-04-25_09-21/SES_Entry.csv
-#> Writing ./inst/backup/2017-04-25_09-21/Study.csv
-#> Writing ./inst/backup/2017-04-25_09-21/VerbalFluency.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Blending_ModulePropCorrect.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Blending_PropCorrect.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Blending_Summary.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Blending_SupportPropCorrect.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Household_Education.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Household_Maternal_Caregiver.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Household_Max_Maternal_Education.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_LENA_Averages.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_MinPair_Aggregate.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_MinPair_Dialect_Summary.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Rhyming_Aggregate.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Rhyming_PropCorrect.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_SAILS_Aggregate.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_SAILS_PropCorrect.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Task_Ages.csv
-#> Writing ./inst/backup/2017-04-25_09-21/q_Task_Ages_Summary.csv
-#> Writing ./inst/backup/2017-04-25_09-21/metadata/field_descriptions.csv
-#> Writing ./inst/backup/2017-04-25_09-21/metadata/table_descriptions.csv
+#> Writing ./inst/backup/2017-06-21_09-29/BRIEF.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Blending_Admin.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Blending_Responses.csv
+#> Writing ./inst/backup/2017-06-21_09-29/CIMatching.csv
+#> Writing ./inst/backup/2017-06-21_09-29/CTOPP_Blending.csv
+#> Writing ./inst/backup/2017-06-21_09-29/CTOPP_Elision.csv
+#> Writing ./inst/backup/2017-06-21_09-29/CTOPP_Memory.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Caregiver.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Caregiver_Entry.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Child.csv
+#> Writing ./inst/backup/2017-06-21_09-29/ChildStudy.csv
+#> Writing ./inst/backup/2017-06-21_09-29/DELV_Risk.csv
+#> Writing ./inst/backup/2017-06-21_09-29/DELV_Variation.csv
+#> Writing ./inst/backup/2017-06-21_09-29/EVT.csv
+#> Writing ./inst/backup/2017-06-21_09-29/FruitStroop.csv
+#> Writing ./inst/backup/2017-06-21_09-29/GFTA.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Household.csv
+#> Writing ./inst/backup/2017-06-21_09-29/KBIT.csv
+#> Writing ./inst/backup/2017-06-21_09-29/LENA_Admin.csv
+#> Writing ./inst/backup/2017-06-21_09-29/LENA_Hours.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Literacy.csv
+#> Writing ./inst/backup/2017-06-21_09-29/MinPair_Admin.csv
+#> Writing ./inst/backup/2017-06-21_09-29/MinPair_Responses.csv
+#> Writing ./inst/backup/2017-06-21_09-29/PPVT.csv
+#> Writing ./inst/backup/2017-06-21_09-29/RealWordRep_Admin.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Rhyming_Admin.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Rhyming_Responses.csv
+#> Writing ./inst/backup/2017-06-21_09-29/SAILS_Admin.csv
+#> Writing ./inst/backup/2017-06-21_09-29/SAILS_Responses.csv
+#> Writing ./inst/backup/2017-06-21_09-29/SES.csv
+#> Writing ./inst/backup/2017-06-21_09-29/SES_Entry.csv
+#> Writing ./inst/backup/2017-06-21_09-29/Study.csv
+#> Writing ./inst/backup/2017-06-21_09-29/VerbalFluency.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Blending_ModulePropCorrect.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Blending_PropCorrect.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Blending_Summary.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Blending_SupportPropCorrect.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Household_Education.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Household_Maternal_Caregiver.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Household_Max_Maternal_Education.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_LENA_Averages.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_MinPair_Aggregate.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_MinPair_Dialect_Summary.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Rhyming_Aggregate.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Rhyming_PropCorrect.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_SAILS_Aggregate.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_SAILS_PropCorrect.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Task_Ages.csv
+#> Writing ./inst/backup/2017-06-21_09-29/q_Task_Ages_Summary.csv
+#> Writing ./inst/backup/2017-06-21_09-29/metadata/field_descriptions.csv
+#> Writing ./inst/backup/2017-06-21_09-29/metadata/table_descriptions.csv
 
 # l2t_backup() also returns each tbl in a list, so we can view them as well.
 all_tbls$EVT
-#> # A tibble: 662 × 10
+#> # A tibble: 662 x 10
 #>    ChildStudyID EVTID       EVT_Timestamp EVT_Form EVT_Completion EVT_Raw
 #>           <int> <int>               <chr>    <chr>          <chr>   <int>
-#> 1             1     1 2015-07-07 15:05:37        B     2012-10-29      69
-#> 2             3     3 2016-07-01 15:22:10        B     2012-11-27      43
-#> 3             4     4 2015-07-07 13:13:18        B     2012-12-07      70
-#> 4             5     5 2015-07-07 13:13:18        A     2012-11-09      45
-#> 5             6     6 2015-07-07 13:13:18        A     2012-11-12      13
-#> 6             7     7 2016-01-20 13:56:28        A     2013-02-08      23
-#> 7             8     8 2015-07-07 13:13:18        B     2012-11-13      41
-#> 8             9     9 2015-07-07 13:13:18        A     2012-12-06      56
-#> 9            10    10 2015-07-07 14:23:34        A     2012-12-10      10
+#>  1            1     1 2015-07-07 15:05:37        B     2012-10-29      69
+#>  2            3     3 2016-07-01 15:22:10        B     2012-11-27      43
+#>  3            4     4 2015-07-07 13:13:18        B     2012-12-07      70
+#>  4            5     5 2015-07-07 13:13:18        A     2012-11-09      45
+#>  5            6     6 2015-07-07 13:13:18        A     2012-11-12      13
+#>  6            7     7 2016-01-20 13:56:28        A     2013-02-08      23
+#>  7            8     8 2015-07-07 13:13:18        B     2012-11-13      41
+#>  8            9     9 2015-07-07 13:13:18        A     2012-12-06      56
+#>  9           10    10 2015-07-07 14:23:34        A     2012-12-10      10
 #> 10           11    11 2015-07-07 13:13:18        A     2012-11-16      52
 #> # ... with 652 more rows, and 4 more variables: EVT_Standard <int>,
 #> #   EVT_GSV <int>, EVT_Age <int>, EVT_Note <chr>
@@ -459,9 +460,8 @@ l2t_test <- l2t_connect("./inst/l2t_db.cnf", db_name = "l2ttest")
 
 # Before writing
 tbl(l2t_test, "TestWrites")
-#> Source:   query [?? x 3]
-#> Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2ttest]
-#> 
+#> # Source:   table<TestWrites> [?? x 3]
+#> # Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2ttest]
 #> # ... with 3 variables: TestWritesID <int>, Message <chr>,
 #> #   TestWrites_TimeStamp <chr>
 
@@ -474,12 +474,11 @@ append_rows_to_table(
 
 # After writing
 tbl(l2t_test, "TestWrites")
-#> Source:   query [?? x 3]
-#> Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2ttest]
-#> 
+#> # Source:   table<TestWrites> [?? x 3]
+#> # Database: mysql 5.6.20 [demo_user@dummy.host.name:/l2ttest]
 #>   TestWritesID Message TestWrites_TimeStamp
 #>          <int>   <chr>                <chr>
-#> 1            1  Hello!  2017-04-25 09:22:02
+#> 1            2  Hello!  2017-06-21 09:29:50
 ```
 
 I also have an *experimental* helper function. `overwrite_rows_in_table()` which will update existing rows in a table, but this one is not as robust or user-friendly as I would like. In my scripts, I usually have lots of checks on the data before and after using this function to confirm that it behaves as expected.

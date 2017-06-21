@@ -155,8 +155,7 @@ undo_excel_date <- function(dates) {
 #' #> [1] 24  3 49
 chrono_age <- function(t1, t2) {
   assert_that(length(t1) == length(t2))
-  ages <- Map(failwith(NA, chrono_age_single), t1, t2)
-  unlist(ages, use.names = FALSE)
+  purrr::map2_dbl(t1, t2, purrr::possibly(chrono_age_single, NA))
 }
 
 #' Compute difference between two dates in months
@@ -176,8 +175,8 @@ diff_date <- function(t1, t2) {
     return(list(y = NA, m = NA, d = NA))
   }
 
-  t1 <- ymd(t1)
-  t2 <- ymd(t2)
+  t1 <- lubridate::ymd(t1)
+  t2 <- lubridate::ymd(t2)
 
   # Sort dates and convert to a list
   d1 <- as_date_list(min(t1, t2))

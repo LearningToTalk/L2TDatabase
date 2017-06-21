@@ -7,11 +7,13 @@
 #' @export
 l2t_connect <- function(cnf_file, db_name = "l2t") {
   assert_that(file.exists(cnf_file))
-  src_mysql(
-    user = NULL,
-    password = NULL,
+
+  con <- DBI::dbConnect(
+    drv = RMySQL::MySQL(),
     dbname = db_name,
     default.file = cnf_file)
+
+  dbplyr::src_dbi(con, auto_disconnect = TRUE)
 }
 
 #' Create a MySQL config file

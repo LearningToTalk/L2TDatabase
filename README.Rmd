@@ -19,21 +19,24 @@ knitr::opts_chunk$set(
   fig.path = "README-"
 )
 
-# Override dplyr print methods to obscure the server address
-print.tbl_sql <- function(x, ..., n = NULL, width = NULL) {
-  cat("Source:   query ", dim_desc(x), "\n", sep = "")
-  x2 <- x
-  x2$src$info$user <- "demo_user"
-  x2$src$info$host <- "dummy.host.name"
-  
-  cat("Database: ", src_desc(x2$src), "\n", sep = "")
-    grps <- op_grps(x$ops)
-    if (length(grps) > 0) {
-        cat("Groups: ", commas(op_grps(x$ops)), "\n", sep = "")
-    }
-    cat("\n")
-    print(trunc_mat(x, n = n, width = width))
-    invisible(x)
+# Override dplyr/dbplyr print methods to obscure the server address
+db_desc.MySQLConnection <- function (x) {
+  info <- DBI::dbGetInfo(x)
+  info$user <- "demo_user"
+  info$host <- "dummy.host.name"
+  paste0("mysql ", info$serverVersion, " [", info$user, "@", 
+      info$host, ":", info$port, "/", info$dbname, "]")
+}
+
+tbl_sum.tbl_sql <- function(x) {
+  grps <- dbplyr::op_grps(x$ops)
+  sort <- dbplyr::op_sort(x$ops)
+  c(
+    "Source" = dbplyr:::tbl_desc(x),
+    "Database" = db_desc(x$src$con),
+    if (length(grps) > 0) c("Groups" = dbplyr:::commas(grps)),
+    if (length(sort) > 0) c("Ordered by" = dbplyr:::commas(dbplyr:::deparse_all(sort)))
+  )
 }
 ```
 
@@ -135,12 +138,13 @@ man_moon_practice
 ```
 
 This data lives in "the cloud" on a remote computer. That's why the first line
-of the print out says `Source: query [?? x 4]`. When we print the data as we
-did above, dplyr downloads just enough rows of data to give us a preview of
-the data. There are approximately 12,000 rows of data in the `minp_resp` table,
-and this just-a-preview behavior prevented us from accidentally or prematurely
-downloading thousands of rows when we peeked at the data. We have to 
-**use `collect()` to download data to our computer**.
+of the print out says `Source: lazy query [?? x 4]`. 
+
+When we print the data as we did above, dplyr downloads just enough rows of data
+to give us a preview of the data. There are approximately 12,000 rows of data in
+the `minp_resp` table, and this just-a-preview behavior prevented us from
+accidentally or prematurely downloading thousands of rows when we peeked at the
+data. We have to **use `collect()` to download data to our computer**.
 
 ```{r}
 man_moon_practice <- collect(man_moon_practice)
