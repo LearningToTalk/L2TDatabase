@@ -1,0 +1,39 @@
+---
+title: "Demo of Household table"
+output: 
+  rmarkdown::github_document: default
+---
+
+```{r setup, include = FALSE, message = FALSE, warning = FALSE, results = 'hide'}
+library("knitr")
+opts_chunk$set(echo = TRUE)
+opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE)
+
+wd <- rprojroot::find_rstudio_root_file()
+opts_knit$set(root.dir = wd)
+```
+
+View a bit of the raw table.
+
+```{r}
+library(dplyr)
+library(L2TDatabase)
+
+# Get the HouseholdIDs and ResearchIDs from the database
+backend <- l2t_connect(cnf_file = "./inst/l2t_db.cnf", db_name = "backend")
+
+tbl(backend, "Household") %>% 
+  collect() %>% 
+  head()
+```
+
+Demonstrate a query.
+
+```{r}
+tbl(backend, "Household") %>% 
+  left_join(tbl(backend, "Child")) %>% 
+  select(ChildID, HouseholdID, Household_FamilyIncome) %>% 
+  count(Household_FamilyIncome) %>% 
+  collect()
+```
+
