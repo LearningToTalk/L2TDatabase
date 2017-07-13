@@ -93,7 +93,7 @@ df_remote <- match_columns(df_remote, df_local) %>%
 
 # Preview changes with daff
 library("daff")
-daff <- diff_data(df_remote, df_local, context = 0)
+daff <- diff_data(df_remote, df_local, unchanged_context = 0)
 stamp <- format(Sys.time(), "%Y-%m-%d_%H-%M")
 render_diff(daff)
 
