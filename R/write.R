@@ -165,7 +165,7 @@ overwrite_rows_in_table <- function(src, tbl_name, rows, preview = TRUE) {
     message("Performing queries")
     for (query in queries_to_run) {
       message("\t", query)
-      result <- dbGetQuery(src, statement = query)
+      result <- DBI::dbGetQuery(src, statement = query)
     }
   }
 
@@ -177,7 +177,7 @@ convert_diff_to_update_statement <- function(src, tbl_name, primary_key, tbl_dif
   # Only update one record
   records_to_update <- tbl_diff %>%
     select(one_of(primary_key)) %>%
-    distinct
+    distinct()
   assert_that(nrow(records_to_update) == 1)
 
   # Escape values
@@ -192,8 +192,8 @@ convert_diff_to_update_statement <- function(src, tbl_name, primary_key, tbl_dif
 
   # Assuming that the primary key is a single field
   key_value <- tbl_diff[[primary_key]] %>%
-    unique %>%
-    sql_escape_string(src, .)
+    unique() %>%
+    dbplyr::escape()
 
   where_part <- sprintf("%s = %s", primary_key_esc, key_value)
 
@@ -255,19 +255,20 @@ create_diff_table <- function(data, ref_data, primary_key) {
 
 # Keep just the x->y rows in a daff
 find_updates_in_daff <- function(ref_data, new_data) {
-  this_daff <- daff::diff_data(ref_data, new_data, context = 0)
+  this_daff <- daff::diff_data(ref_data, new_data,
+                               unchanged_context = 0, never_show_order = TRUE)
 
   # Determine the number of columns in the diff csv
   num_cols <- suppressWarnings({
     this_daff$to_csv() %>%
-      read_csv(skip = 0) %>%
+      readr::read_csv(skip = 0) %>%
       ncol
   })
 
   # Locate header line. Sometimes it's the second line if there have been
   # columns inserted/removed
   at_at_line <- this_daff$to_csv() %>%
-    read_lines %>%
+    readr::read_lines() %>%
     stringr::str_detect("@@")
 
   header_row <- seq_along(at_at_line)[at_at_line]
@@ -278,9 +279,9 @@ find_updates_in_daff <- function(ref_data, new_data) {
   # strings
   col_types <- rep_len("c", num_cols) %>% paste0(collapse = "")
   updated_rows <- this_daff$to_csv() %>%
-    read_csv(skip = skip_to_find_header, col_types = col_types) %>%
+    readr::read_csv(skip = skip_to_find_header, col_types = col_types) %>%
     filter(`@@` == "->") %>%
-    type_convert
+    readr::type_convert()
 
   updated_rows
 }
