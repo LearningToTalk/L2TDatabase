@@ -25,11 +25,14 @@ evts <- tbl(l2t, "EVT") %>%
 
 # Ready data-frame
 d <- evts %>% 
-  collect %>% 
+  collect() %>% 
   filter(!is.na(EVT_GSV)) %>% 
   select(ChildID, EVT_Age, EVT_GSV, LateTalker, CImplant) %>% 
   mutate(Group = ifelse(LateTalker, "Late Talker", "TD"),
          Group = ifelse(CImplant, "Cochlear Implant", Group))
+
+d %>% count()
+d %>% count(Group)
 
 # Plot quadratic growth curve
 library("ggplot2")
@@ -38,6 +41,5 @@ ggplot(d) +
   geom_line(aes(group = ChildID), alpha = .4) + 
   facet_grid(~ Group) + 
   stat_smooth(method = "lm", formula = y ~ poly(x, 2))
-
 ```
 
