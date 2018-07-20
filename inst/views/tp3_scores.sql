@@ -3,7 +3,7 @@
 -- Replace "create" with "alter" to update an existing view
 --
 
-create or replace algorithm = undefined view  l2t.Scores_TimePoint3 as
+create or replace algorithm = undefined view l2t.Scores_TimePoint3 as
   select
     study.Study,
     childstudy.ShortResearchID as `ResearchID`,
@@ -114,25 +114,29 @@ create or replace algorithm = undefined view l2t.MPNormingClosed_Items as
     d.ChildStudyID,
     c.Study,
     d.ShortResearchID as `ResearchID`,
-    b.MPNormingClosed_Completion,
-    b.MPNormingClosed_Age,
-    b.MPNormingClosed_ItemSet,
-    b.MPNormingClosed_ItemNumber,
-    b.MPNormingClosed_Item,
-    b.MPNormingClosed_Type,
-    b.MPNormingClosed_Correct
+    b.MPNormingClosed_Admin_Completion as `MPNormingClosed_Completion`,
+    b.MPNormingClosed_Admin_Age as `MPNormingClosed_Age`,
+    e.ItemSet as `MPNormingClosed_ItemSet`,
+    e.ItemNumber as `MPNormingClosed_ItemNumber`,
+    e.Item as `MPNormingClosed_Item`,
+    e.Type as `MPNormingClosed_Type`,
+    f.MPNormingClosed_Responses_Correct as `MPNormingClosed_Correct`
   from
     backend.ChildStudy d
     left join backend.Study c
       using (StudyID)
-    left join backend.MPNormingClosed b
+    left join backend.MPNormingClosed_Admin b
       using (ChildStudyID)
+    left join backend.MPNormingClosed_Responses f
+      using (MPNormingClosed_AdminID)
+    left join backend.MPNormingClosed_Design e
+      using (MPNormingClosed_DesignID)
   where
-    b.MPNormingClosed_Completion is not null
+    b.MPNormingClosed_Admin_Completion is not null
   order by
     c.Study,
     d.ShortResearchID,
-    b.MPNormingClosed_ItemNumber;
+    e.ItemNumber;
 
 -- MPNorming Results
 create or replace algorithm = undefined view l2t.MPNormingClosed_Averages as
@@ -140,23 +144,31 @@ create or replace algorithm = undefined view l2t.MPNormingClosed_Averages as
     d.ChildStudyID,
     c.Study,
     d.ShortResearchID as `ResearchID`,
-    b.MPNormingClosed_Completion,
-    b.MPNormingClosed_Age,
-    b.MPNormingClosed_ItemSet,
-    b.MPNormingClosed_Type,
-    round(avg(b.MPNormingClosed_Correct), 4.0) as `MPNormingClosed_ProportionCorrect`
+    b.MPNormingClosed_Admin_Completion as `MPNormingClosed_Completion`,
+    b.MPNormingClosed_Admin_Age as `MPNormingClosed_Age`,
+    e.ItemSet as `MPNormingClosed_ItemSet`,
+    e.Item as `MPNormingClosed_Item`,
+    e.Type as `MPNormingClosed_Type`,
+    count(f.MPNormingClosed_Responses_Correct) as `MPNormingClosed_NumTrials`,
+    sum(f.MPNormingClosed_Responses_Correct) as `MPNormingClosed_NumCorrectTrials`,
+    round(avg(f.MPNormingClosed_Responses_Correct), 4.0) as `MPNormingClosed_ProportionCorrect`
   from
     backend.ChildStudy d
     left join backend.Study c
       using (StudyID)
-    left join backend.MPNormingClosed b
+    left join backend.MPNormingClosed_Admin b
       using (ChildStudyID)
+    left join backend.MPNormingClosed_Responses f
+      using (MPNormingClosed_AdminID)
+    left join backend.MPNormingClosed_Design e
+      using (MPNormingClosed_DesignID)
   where
-    b.MPNormingClosed_Completion is not null
+    b.MPNormingClosed_Admin_Completion is not null
   group by
     c.Study,
     d.ShortResearchID,
-    b.MPNormingClosed_Completion
+    b.MPNormingClosed_Admin_Completion,
+    e.Type
   order by
     c.Study,
     d.ShortResearchID;
