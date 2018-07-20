@@ -106,3 +106,57 @@ create or replace algorithm = undefined view  l2t.Scores_TimePoint3 as
     study.Study = "TimePoint3"
   order by
     childstudy.ShortResearchID;
+
+
+-- MPNorming Results
+create or replace algorithm = undefined view l2t.MPNormingClosed_Items as
+  select
+    d.ChildStudyID,
+    c.Study,
+    d.ShortResearchID as `ResearchID`,
+    b.MPNormingClosed_Completion,
+    b.MPNormingClosed_Age,
+    b.MPNormingClosed_ItemSet,
+    b.MPNormingClosed_ItemNumber,
+    b.MPNormingClosed_Item,
+    b.MPNormingClosed_Type,
+    b.MPNormingClosed_Correct
+  from
+    backend.ChildStudy d
+    left join backend.Study c
+      using (StudyID)
+    left join backend.MPNormingClosed b
+      using (ChildStudyID)
+  where
+    b.MPNormingClosed_Completion is not null
+  order by
+    c.Study,
+    d.ShortResearchID,
+    b.MPNormingClosed_ItemNumber;
+
+-- MPNorming Results
+create or replace algorithm = undefined view l2t.MPNormingClosed_Averages as
+  select
+    d.ChildStudyID,
+    c.Study,
+    d.ShortResearchID as `ResearchID`,
+    b.MPNormingClosed_Completion,
+    b.MPNormingClosed_Age,
+    b.MPNormingClosed_ItemSet,
+    b.MPNormingClosed_Type,
+    round(avg(b.MPNormingClosed_Correct), 4.0) as `MPNormingClosed_ProportionCorrect`
+  from
+    backend.ChildStudy d
+    left join backend.Study c
+      using (StudyID)
+    left join backend.MPNormingClosed b
+      using (ChildStudyID)
+  where
+    b.MPNormingClosed_Completion is not null
+  group by
+    c.Study,
+    d.ShortResearchID,
+    b.MPNormingClosed_Completion
+  order by
+    c.Study,
+    d.ShortResearchID;
