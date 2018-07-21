@@ -120,6 +120,8 @@ create or replace algorithm = undefined view l2t.MPNormingClosed_Items as
     e.ItemNumber as `MPNormingClosed_ItemNumber`,
     e.Item as `MPNormingClosed_Item`,
     e.Type as `MPNormingClosed_Type`,
+    e.WordGroup as `MPNormingClosed_WordGroup`,
+    e.WorldBet as `MPNormingClosed_WorldBet`,
     f.MPNormingClosed_Responses_Correct as `MPNormingClosed_Correct`
   from
     backend.ChildStudy d
