@@ -61,3 +61,33 @@ create or replace algorithm = undefined view l2t.LENA_Averages as
   order by
     Study,
     ResearchID;
+
+-- hourly data
+create or replace algorithm = undefined view cla_l2t.LENA_Hours as
+  select
+    childstudy.ChildStudyID,
+    study.Study,
+    childstudy.ShortResearchID as ResearchID,
+    recording.LENA_Date as LENA_Completion,
+    recording.LENA_Age as LENA_Age,
+    hours.Hour as LENA_Hour,
+    hours.Duration as LENA_Duration,
+    hours.Meaningful as LENA_Meaningful,
+    hours.Distant as LENA_Distant,
+    hours.TV as LENA_TV,
+    hours.Noise as LENA_Noise,
+    hours.Silence as LENA_Silence,
+    hours.AWC_Actual as LENA_AWC_Actual,
+    hours.CTC_Actual as LENA_CTC_Actual,
+    hours.CVC_Actual as LENA_CVC_Actual
+  from
+    cla_l2t_backend.ChildStudy childstudy
+    left join cla_l2t_backend.Study study
+      using (StudyID)
+    left join cla_l2t_backend.LENA_Admin recording
+      using (ChildStudyID)
+    left join cla_l2t_backend.LENA_Hours hours
+      using (LENAID)
+  where
+    -- compute averages/sums only for LENA hourly measurements from 6AM to 11PM
+    recording.LENA_Date is not null;
