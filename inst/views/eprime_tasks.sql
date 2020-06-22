@@ -344,7 +344,8 @@ create or replace algorithm = undefined view backend.q_SAILS_Aggregate as
     b.SAILS_Dialect,
     count(case a.Running when "Familiarization" then 1 else null end) as `SAILS_NumPracticeTrials`,
     count(case a.Running when "Test" then 1 else null end) as `SAILS_NumTestTrials`,
-    p.SAILS_ProportionCorrect as `SAILS_ProportionTestCorrect`
+    -- there will be only one value here so the min() is the unique value
+    min(p.SAILS_ProportionCorrect) as `SAILS_ProportionTestCorrect`
   from
     backend.ChildStudy d
     left join backend.Study c
