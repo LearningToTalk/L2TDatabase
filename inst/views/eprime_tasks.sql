@@ -386,6 +386,39 @@ create or replace algorithm = undefined view l2t.SAILS_Aggregate as
 
 -- Create a view to display the proportion correct for non-training trials in
 -- each module of each administration of the SAILS experiment.
+create or replace algorithm = undefined view cla_l2t.SAILS_Responses as
+  select
+    d.ChildStudyID,
+    c.Study,
+    d.ShortResearchID as `ResearchID`,
+    b.SAILSID,
+    b.SAILS_EprimeFile,
+    b.SAILS_Completion,
+    b.SAILS_Dialect,
+    b.SAILS_Age,
+    a.Running as SAILS_Running,
+    a.Module as SAIL_Module,
+    a.Cycle as SAILS_Cycle,
+    a.Trial as SAILS_Trial,
+    a.Sound as SAILS_Sound,
+    a.CorrectResponse as SAILS_TargetResponse,
+    a.Response as SAILS_Response,
+    a.Correct as SAILS_Correct
+  from
+    cla_l2t_backend.ChildStudy d
+    left join cla_l2t_backend.Study c
+      using (StudyID)
+    left join cla_l2t_backend.SAILS_Admin b
+      using (ChildStudyID)
+    left join cla_l2t_backend.SAILS_Responses a
+      using (SAILSID)
+  order by
+    c.Study,
+    d.ShortResearchID;
+
+
+-- Create a view to display the proportion correct for non-training trials in
+-- each module of each administration of the SAILS experiment.
 create or replace algorithm = undefined view l2t.SAILS_Module_Aggregate as
   select
     c.Study,
